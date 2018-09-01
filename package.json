@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "name": "smart-contract-builder",
+  "productName": "Smart Contract Builder",
   "version": "0.14.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "description": "GUI for building smart contracts",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
@@ -45,8 +45,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.develar.ElectronReact",
+    "productName": "Smart Contract Builder",
+    "appId": "com.sean.smart-contract-builder",
     "files": [
       "dist/",
       "node_modules/",
@@ -88,29 +88,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/Sean2108/Smart-Contract-Builder.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "Sean Tan",
+    "email": "sean2108@gmail.com",
+    "url": "https://github.com/Sean2108"
   },
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
-  },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "redux",
-    "flow",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "smart contract"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/Sean2108/Smart-Contract-Builder",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
@@ -207,6 +196,8 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
+    "@material-ui/core": "^3.0.1",
+    "@material-ui/icons": "^3.0.1",
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "history": "^4.7.2",
