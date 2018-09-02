@@ -19,6 +19,7 @@ import WifiIcon from '@material-ui/icons/Wifi';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Connect from './Connect';
 import Settings from './Settings';
+import Build from './Build';
 
 const drawerWidth = 240;
 
@@ -80,23 +81,13 @@ const styles = theme => ({
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
-  },
-  formControl: {
-    margin: theme.spacing.unit,
-  },
-  button: {
-    margin: theme.spacing.unit,
-  },
 });
 
 
 const selection = {
   CONNECT: 'connect',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  BUILD: 'build'
 }
 
 class MiniDrawer extends React.Component {
@@ -112,6 +103,19 @@ class MiniDrawer extends React.Component {
   handleDrawerClose = () => {
     this.setState({ open: false });
   };
+
+  goToBuild = () => this.setState({selected: selection.BUILD});
+
+  goToConnect = () => this.setState({selected: selection.CONNECT});
+
+  selectShown = (selected) => {
+    switch(selected) {
+      case selection.CONNECT: return <Connect onclick={this.goToBuild}/>;
+      case selection.SETTINGS: return <Settings/>;
+      case selection.BUILD: return <Build onback={this.goToConnect}/>;
+      default: return null;
+    }
+  }
 
   render() {
     const { classes, theme } = this.props;
@@ -171,7 +175,7 @@ class MiniDrawer extends React.Component {
             </div>
           </List>
         </Drawer>
-        {selectShown(this.state.selected)}
+        {this.selectShown(this.state.selected)}
       </div>
     );
   }
@@ -181,13 +185,5 @@ MiniDrawer.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
 };
-
-function selectShown(selected) {
-  switch(selected) {
-    case selection.CONNECT: return <Connect/>;
-    case selection.SETTINGS: return <Settings/>;
-    default: return null;
-  }
-}
 
 export default withStyles(styles, { withTheme: true })(MiniDrawer);

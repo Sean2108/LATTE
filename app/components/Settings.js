@@ -13,7 +13,7 @@ const styles = theme => ({
     },
   content: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: 'white',
     padding: theme.spacing.unit * 3,
     margin: theme.spacing.unit * 3,
   },
