@@ -57,7 +57,7 @@ class Connect extends React.Component {
     web3.eth.net.isListening()
     .then(res => {
       this.setState({connectionFailed: !res});
-      this.props.onclick();
+      this.props.onclick(web3);
     })
     .catch(err => this.setState({connectionFailed: true}));
   }

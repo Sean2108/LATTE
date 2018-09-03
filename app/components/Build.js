@@ -33,7 +33,7 @@ const styles = theme => ({
 class Build extends React.Component {
 
   render() {
-    const { classes, theme, onback } = this.props;
+    const { classes, theme, onback, connection } = this.props;
 
     return (
         <main align="center" className={classes.content}>
@@ -45,7 +45,7 @@ class Build extends React.Component {
         <div className={classes.root}>
       <Grid container spacing={24}>
         <Grid item xs={3}>
-          <BuildOptions onback={onback}/>
+          <BuildOptions onback={onback} connection={connection}/>
         </Grid>
         <Grid item xs={9}>
             <BuildDiagram/>
@@ -63,7 +63,8 @@ class Build extends React.Component {
 Build.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
-  onback: PropTypes.func.isRequired
+  onback: PropTypes.func.isRequired,
+  connection: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(Build);

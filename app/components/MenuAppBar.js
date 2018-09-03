@@ -94,7 +94,8 @@ const selection = {
 class MiniDrawer extends React.Component {
   state = {
     open: false,
-    selected: selection.CONNECT
+    selected: selection.CONNECT,
+    connection: null
   };
 
   handleDrawerOpen = () => {
@@ -105,7 +106,7 @@ class MiniDrawer extends React.Component {
     this.setState({ open: false });
   };
 
-  goToBuild = () => this.setState({selected: selection.BUILD});
+  goToBuild = (connection) => this.setState({selected: selection.BUILD, connection: connection});
 
   goToConnect = () => this.setState({selected: selection.CONNECT});
 
@@ -113,7 +114,7 @@ class MiniDrawer extends React.Component {
     switch(selected) {
       case selection.CONNECT: return <Connect onclick={this.goToBuild}/>;
       case selection.SETTINGS: return <Settings/>;
-      case selection.BUILD: return <Build onback={this.goToConnect}/>;
+      case selection.BUILD: return <Build onback={this.goToConnect} connection={this.state.connection}/>;
       default: return null;
     }
   }
