@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import BuildOptions from './BuildOptions';
-import BuildDiagram from './BuildDiagram';
+import BuildTabs from './BuildTabs';
 
 var Web3 = require('web3');
 
@@ -43,14 +43,8 @@ class Build extends React.Component {
           <div>
 
         <div className={classes.root}>
-      <Grid container spacing={24}>
-        <Grid item xs={3}>
+            <BuildTabs/>
           <BuildOptions onback={onback} connection={connection}/>
-        </Grid>
-        <Grid item xs={9}>
-            <BuildDiagram/>
-        </Grid>
-      </Grid>
     </div>
 
     
