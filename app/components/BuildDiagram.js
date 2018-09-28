@@ -66,6 +66,7 @@ class BuildDiagram extends React.Component {
 
     return (
           <Paper className={classes.paper}>
+          <Typography variant="title" noWrap>Action Phase</Typography>
           
           {this.renderDiagram()}
           

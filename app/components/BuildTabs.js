@@ -7,6 +7,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import GlobalStateTab from './GlobalStateTab';
 import BuildDiagram from './BuildDiagram';
+import RequiresList from './RequiresList';
 
 function TabContainer(props) {
   return (
@@ -43,18 +44,6 @@ class BuildTabs extends React.Component {
 
     return (
       <div className={classes.tabs}>
-        {value === 0 && 
-        <TabContainer>
-            <GlobalStateTab/>
-        </TabContainer>}
-        {value === 1 && <TabContainer>
-            <BuildDiagram/>
-        </TabContainer>}
-        {value === 2 && <TabContainer>delegate</TabContainer>}
-        {value === 3 && <TabContainer>vote</TabContainer>}
-        {value === 4 && <TabContainer>winningProposal</TabContainer>}
-        {value === 5 && <TabContainer>winnerName</TabContainer>}
-        {value === 6 && <TabContainer>+</TabContainer>}
         <AppBar position="static" color="default">
           <Tabs
             value={value}
@@ -73,6 +62,20 @@ class BuildTabs extends React.Component {
             <Tab label="+" />
           </Tabs>
         </AppBar>
+        {value === 0 && 
+        <TabContainer>
+            <GlobalStateTab/>
+        </TabContainer>}
+        {value === 1 && <TabContainer>
+            <RequiresList header={"Checking Phase"} vars={["var1", "var2"]}/>
+            <br/>
+            <BuildDiagram/>
+        </TabContainer>}
+        {value === 2 && <TabContainer>delegate</TabContainer>}
+        {value === 3 && <TabContainer>vote</TabContainer>}
+        {value === 4 && <TabContainer>winningProposal</TabContainer>}
+        {value === 5 && <TabContainer>winnerName</TabContainer>}
+        {value === 6 && <TabContainer>+</TabContainer>}
       </div>
     );
   }

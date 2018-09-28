@@ -38,8 +38,8 @@ class Build extends React.Component {
     return (
         <main align="center" className={classes.content}>
           <div className={classes.toolbar} />
-          <Typography variant="title" noWrap>Build Your Smart Contract</Typography>
-            <br/>
+          {/* <Typography variant="title" noWrap>Build Your Smart Contract</Typography>
+            <br/> */}
           <div>
 
         <div className={classes.root}>

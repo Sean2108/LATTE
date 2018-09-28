@@ -13,7 +13,7 @@ import VariableList from './VariableList';
 
 const styles = theme => ({
   paper: {
-    padding: theme.spacing.unit * 2,
+    // padding: theme.spacing.unit * 2,
     textAlign: 'center',
     color: theme.palette.text.secondary,
     maxHeight: '20vw',
