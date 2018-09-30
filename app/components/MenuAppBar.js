@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  withStyles
+} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -19,7 +21,7 @@ import WifiIcon from '@material-ui/icons/Wifi';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Connect from './Connect';
 import Settings from './Settings';
-import Build from './Build';
+import Build from './build/Build';
 
 const drawerWidth = 240;
 
@@ -99,86 +101,159 @@ class MiniDrawer extends React.Component {
   };
 
   handleDrawerOpen = () => {
-    this.setState({ open: true });
+    this.setState({
+      open: true
+    });
   };
 
   handleDrawerClose = () => {
-    this.setState({ open: false });
+    this.setState({
+      open: false
+    });
   };
 
-  goToBuild = (connection) => this.setState({selected: selection.BUILD, connection: connection});
+  goToBuild = (connection) => this.setState({
+    selected: selection.BUILD,
+    connection: connection
+  });
 
-  goToConnect = () => this.setState({selected: selection.CONNECT});
+  goToConnect = () => this.setState({
+    selected: selection.CONNECT
+  });
 
   selectShown = (selected) => {
-    switch(selected) {
-      case selection.CONNECT: return <Connect onclick={this.goToBuild}/>;
-      case selection.SETTINGS: return <Settings/>;
-      case selection.BUILD: return <Build onback={this.goToConnect} connection={this.state.connection}/>;
-      default: return null;
+    switch (selected) {
+      case selection.CONNECT:
+        return <Connect onclick = {
+          this.goToBuild
+        }
+        />;
+      case selection.SETTINGS:
+        return <Settings / > ;
+      case selection.BUILD:
+        return <Build onback = {
+          this.goToConnect
+        }
+        connection = {
+          this.state.connection
+        }
+        />;
+      default:
+        return null;
     }
   }
 
   render() {
-    const { classes, theme } = this.props;
+    const {
+      classes,
+      theme
+    } = this.props;
 
-    return (
-      <div className={classes.root}>
-        <AppBar
-          position="absolute"
-          className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
-        >
-          <Toolbar disableGutters={!this.state.open}>
-            <IconButton
-              color="inherit"
-              aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
-              className={classNames(classes.menuButton, this.state.open && classes.hide)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="title" color="inherit" noWrap>
-              Smart Contract Builder
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
-          }}
-          open={this.state.open}
-        >
-          <div className={classes.toolbar}>
-            <IconButton onClick={this.handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            <div>
-              <ListItem button onClick={_ => {this.setState({selected: selection.CONNECT})}}>
-                <ListItemIcon>
-                  <WifiIcon />
-                </ListItemIcon>
-                <ListItemText primary="Connect" />
-              </ListItem>
-            </div>
-          </List>
-          <Divider />
-          <List>
-            <div>
-              <ListItem button onClick={_ => {this.setState({selected: selection.SETTINGS})}}>
-                <ListItemIcon>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Settings" />
-              </ListItem>
-            </div>
-          </List>
-        </Drawer>
-        {this.selectShown(this.state.selected)}
-      </div>
+    return ( <
+      div className = {
+        classes.root
+      } >
+      <
+      AppBar position = "absolute"
+      className = {
+        classNames(classes.appBar, this.state.open && classes.appBarShift)
+      } >
+      <
+      Toolbar disableGutters = {!this.state.open
+      } >
+      <
+      IconButton color = "inherit"
+      aria-label = "Open drawer"
+      onClick = {
+        this.handleDrawerOpen
+      }
+      className = {
+        classNames(classes.menuButton, this.state.open && classes.hide)
+      } >
+      <
+      MenuIcon / >
+      <
+      /IconButton> <
+      Typography variant = "title"
+      color = "inherit"
+      noWrap >
+      Smart Contract Builder <
+      /Typography> <
+      /Toolbar> <
+      /AppBar> <
+      Drawer variant = "permanent"
+      classes = {
+        {
+          paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
+        }
+      }
+      open = {
+        this.state.open
+      } >
+      <
+      div className = {
+        classes.toolbar
+      } >
+      <
+      IconButton onClick = {
+        this.handleDrawerClose
+      } > {
+        theme.direction === 'rtl' ? < ChevronRightIcon / > : < ChevronLeftIcon / >
+      } <
+      /IconButton> <
+      /div> <
+      Divider / >
+      <
+      List >
+      <
+      div >
+      <
+      ListItem button onClick = {
+        _ => {
+          this.setState({
+            selected: selection.CONNECT
+          })
+        }
+      } >
+      <
+      ListItemIcon >
+      <
+      WifiIcon / >
+      <
+      /ListItemIcon> <
+      ListItemText primary = "Connect" / >
+      <
+      /ListItem> <
+      /div> <
+      /List> <
+      Divider / >
+      <
+      List >
+      <
+      div >
+      <
+      ListItem button onClick = {
+        _ => {
+          this.setState({
+            selected: selection.SETTINGS
+          })
+        }
+      } >
+      <
+      ListItemIcon >
+      <
+      SettingsIcon / >
+      <
+      /ListItemIcon> <
+      ListItemText primary = "Settings" / >
+      <
+      /ListItem> <
+      /div> <
+      /List> <
+      /Drawer> {
+        this.selectShown(this.state.selected)
+      } <
+      /div>
     );
   }
 }
@@ -188,4 +263,6 @@ MiniDrawer.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(MiniDrawer);
+export default withStyles(styles, {
+  withTheme: true
+})(MiniDrawer);

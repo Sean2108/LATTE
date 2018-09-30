@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  withStyles
+} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
@@ -22,15 +24,27 @@ const styles = theme => ({
 class Settings extends React.Component {
 
   render() {
-    const { classes, theme } = this.props;
+    const {
+      classes,
+      theme
+    } = this.props;
 
-    return (
-        <main align="center" className={classes.content}>
-          <div className={classes.toolbar} />
-          <Typography variant="title" noWrap>Settings</Typography>
+    return ( <
+      main align = "center"
+      className = {
+        classes.content
+      } >
+      <
+      div className = {
+        classes.toolbar
+      }
+      /> <
+      Typography variant = "title"
+      noWrap > Settings < /Typography>
 
-          
-        </main>
+
+      <
+      /main>
     );
   }
 }
@@ -40,4 +54,6 @@ Settings.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(Settings);
+export default withStyles(styles, {
+  withTheme: true
+})(Settings);

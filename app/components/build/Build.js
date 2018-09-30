@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  withStyles
+} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import BuildOptions from './BuildOptions';
@@ -33,23 +35,48 @@ const styles = theme => ({
 class Build extends React.Component {
 
   render() {
-    const { classes, theme, onback, connection } = this.props;
+    const {
+      classes,
+      theme,
+      onback,
+      connection
+    } = this.props;
 
-    return (
-        <main align="center" className={classes.content}>
-          <div className={classes.toolbar} />
-          {/* <Typography variant="title" noWrap>Build Your Smart Contract</Typography>
-            <br/> */}
-          <div>
+    return ( <
+      main align = "center"
+      className = {
+        classes.content
+      } >
+      <
+      div className = {
+        classes.toolbar
+      }
+      /> {
+        /* <Typography variant="title" noWrap>Build Your Smart Contract</Typography>
+                    <br/> */
+      } <
+      div >
 
-        <div className={classes.root}>
-            <BuildTabs/>
-          <BuildOptions onback={onback} connection={connection}/>
-    </div>
+      <
+      div className = {
+        classes.root
+      } >
+      <
+      BuildTabs / >
+      <
+      BuildOptions onback = {
+        onback
+      }
+      connection = {
+        connection
+      }
+      /> <
+      /div>
 
-    
-      </div>
-        </main>
+
+      <
+      /div> <
+      /main>
     );
   }
 }
@@ -61,4 +88,6 @@ Build.propTypes = {
   connection: PropTypes.object.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(Build);
+export default withStyles(styles, {
+  withTheme: true
+})(Build);
