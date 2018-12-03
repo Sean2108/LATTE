@@ -57,7 +57,7 @@ class VariableBox extends React.Component {
     };
 
     render() {
-        const {classes, theme, header} = this.props;
+        const {classes, theme, header, updateVariables} = this.props;
         return ( < Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > {
@@ -81,13 +81,12 @@ class VariableBox extends React.Component {
             () => {
                 if (!this.state.contents || this.state.variables.includes(this.state.contents)) 
                     return;
-                this.setState({
-                    variables: [
-                        ...this.state.variables,
-                        this.state.contents
-                    ],
-                    contents: ''
-                })
+                let newVars = [
+                    ...this.state.variables,
+                    this.state.contents
+                ];
+                this.setState({variables: newVars, contents: ''});
+                updateVariables(newVars);
             }
         } > Add < AddIcon className = {
             classes.rightIcon
@@ -103,7 +102,7 @@ class VariableBox extends React.Component {
                     classes.innerPaper
                 } > {
                     element
-                } < IconButton size = "small" aria-label = "Delete" className = {
+                } < IconButton size = "small" className = {
                     classes.button
                 }
                 onClick = {
@@ -113,6 +112,7 @@ class VariableBox extends React.Component {
                         if (index !== -1) {
                             vars.splice(index, 1);
                             this.setState({variables: vars});
+                            updateVariables(vars);
                         }
                     }
                 } > < DeleteIcon / > < /IconButton> <
@@ -126,7 +126,8 @@ class VariableBox extends React.Component {
         VariableBox.propTypes = {
           classes: PropTypes.object.isRequired,
           theme: PropTypes.object.isRequired,
-          header: PropTypes.string.isRequired
+          header: PropTypes.string.isRequired,
+          updateVariables: PropTypes.func
         };
 
         export default withStyles(styles, {

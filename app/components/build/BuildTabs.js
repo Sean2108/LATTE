@@ -38,6 +38,7 @@ const styles = theme => ({
 class BuildTabs extends React.Component {
         state = {
             value: 0,
+            variables: []
         };
 
         handleChange = (event, value) => {
@@ -45,6 +46,8 @@ class BuildTabs extends React.Component {
                 value
             });
         };
+
+        updateVariables = (vars) => this.setState({...this.state, variables: vars});
 
         render() {
             const {
@@ -80,6 +83,9 @@ class BuildTabs extends React.Component {
         } > < VariableBox header = {
             "Variables"
         }
+        updateVariables = {
+            this.updateVariables
+        }
         // VariableList header = {   "Global State Objects" } isInput = {   false }
         /> < /Grid > < Grid item xs = {
             6
@@ -89,12 +95,17 @@ class BuildTabs extends React.Component {
             "Constructor Parameters"
         } /> < /
                     Grid > <
-                    /Grid > < br / > < RequiresList header = {
+                    /Grid > < br / > < RequiresList updateVariables = {
+            this.updateVariables
+        }
+        header = {
             "Checking Phase"
         }
         vars = {
             ["var1", "var2"]
-        } /> < br / > < BuildDiagram / > < /TabContainer>} {
+        } /> < br / > < BuildDiagram varList = {
+            this.state.variables
+        } / > < /TabContainer>} {
                     value === 1 && < TabContainer >
                     <
                     // VariableList header = {
@@ -106,12 +117,17 @@ class BuildTabs extends React.Component {
                     VariableBox header = {
                         "Function Parameters"
                     }
+                    updateVariables = {
+                        this.updateVariables
+                    }
                     / > < br / > < RequiresList header = {
             "Checking Phase"
         }
         vars = {
             ["var1", "var2"]
-        } /> < br / > < BuildDiagram / > < /TabContainer>} {
+        } /> < br / > < BuildDiagram varList = {
+            this.state.variables
+        } / > < /TabContainer>} {
                     value === 2 && < TabContainer > vote < /TabContainer >
     }
     {
