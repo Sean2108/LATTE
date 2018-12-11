@@ -9,6 +9,7 @@ import BuildDiagram from './BuildDiagram';
 import RequiresList from './RequiresList';
 import VariableList from './VariableList';
 import VariableBox from './VariableBox';
+import StructList from './StructList';
 import Grid from '@material-ui/core/Grid';
 
 function TabContainer(props) {
@@ -76,7 +77,12 @@ class BuildTabs extends React.Component {
                 scrollable scrollButtons = "auto" >
                 <
                 Tab label = "Initial State" / > < Tab label = "Delegate" / > < Tab label = "Vote" / > < Tab label = "Winning Proposal" / > < Tab label = "Winner Name" / > < Tab label = "+" / > < /Tabs> < /AppBar > {
-        value === 0 && < TabContainer > < Grid container spacing = {
+        value === 0 && < TabContainer > < StructList header = {
+            "Entities"
+        }
+        varList = {
+            this.state.variables
+        } / > <br/> < Grid container spacing = {
             24
         } > < Grid item xs = {
             6
