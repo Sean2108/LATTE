@@ -3,12 +3,8 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
-import DoneIcon from '@material-ui/icons/Done';
-import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import ReturnNode from './diagram_node_options/ReturnNode';
+import AssignmentNode from './diagram_node_options/AssignmentNode';
 
 function getModalStyle() {
     return {top: '50%', left: '50%', transform: 'translate(-50%, -50%)'};
@@ -40,7 +36,7 @@ class DiagramModal extends React.Component {
     }
 
     render() {
-        const {classes, open, close, type, varList} = this.props;
+        const {classes, open, close, submit, type, varList} = this.props;
 
         return (
             <div>
@@ -55,7 +51,7 @@ class DiagramModal extends React.Component {
                                 .toUpperCase() + type.substr(1)}&nbsp; Node
                         </Typography>
                         <Typography variant="caption" id="modal-title">
-                            {this.getTypeFields(type, classes, varList, close)}
+                            {this.getTypeFields(type, classes, varList, close, submit)}
                         </Typography>
                     </div>
                 </Modal>
@@ -63,42 +59,19 @@ class DiagramModal extends React.Component {
         );
     }
 
-    getTypeFields(type, classes, varList, close) {
+    getTypeFields(type, classes, varList, close, submit) {
         switch (type) {
-            case "arithmetic":
-                return "Arithmetic placeholder";
             case "assignment":
-                return "Assigment placeholder";
+                return (
+                    <AssignmentNode close={close} submit={submit} varList={varList}/>
+                );
             case "event":
                 return "Event placeholder";
             case "transfer":
                 return "Transfer placeholder";
             case "return":
                 return (
-                    <FormControl className={classes.formControl}>
-                        <InputLabel htmlFor="age-simple">Return Variable</InputLabel>
-                        <Select
-                            value={this.state.variableSelected}
-                            onChange={(event) => this.setState({variableSelected: event.target.value})}
-                            inputProps={{
-                            name: 'var',
-                            id: 'var'
-                        }}>
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                        </Select>
-
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.button}
-                            onClick={() => close(this.state.variableSelected)}>
-                            Done
-                            <DoneIcon className={classes.rightIcon}/>
-                        </Button>
-                    </FormControl>
+                    <ReturnNode close={close} submit={submit} varList={varList}/>
                 );
             case "conditional":
                 return "If placeholder";
@@ -110,6 +83,7 @@ DiagramModal.propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool.isRequired,
     close: PropTypes.func.isRequired,
+    submit: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
     varList: PropTypes.array
 };

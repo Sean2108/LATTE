@@ -70,16 +70,14 @@ class BuildDiagram extends React.Component {
 
     selectNode(type, desc) {
         switch (type) {
-            case "arithmetic":
-                return this.createDefaultNode("Arithmetic", "rgb(192,255,0)", false);
             case "assignment":
-                return this.createDefaultNode("Assignment", "rgb(192,0,0)", false);
+                return this.createDefaultNode(`Assignment: ${desc}`, "rgb(192,0,0)", false);
             case "event":
                 return this.createDefaultNode("Event", "rgb(0,192,0)", false);
             case "transfer":
                 return this.createDefaultNode("Transfer", "rgb(255,100,0)", false);
             case "return":
-                return this.createDefaultNode("Return " + desc, "rgb(192,255,0)", true);
+                return this.createDefaultNode(`Return ${desc}`, "rgb(192,255,0)", true);
             case "conditional":
                 return new DiamondNodeModel();
         }
@@ -103,12 +101,8 @@ class BuildDiagram extends React.Component {
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > Action Phase < /Typography>
-        <DiagramModal open={this.state.open} close={(info) => {this.setState({open: false}); this.addNode(info);}} type={this.state.type} varList={varList} addNode={this.addNode}/ > < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > < TrayItemWidget model = {
-            {
-                type: "arithmetic"
-            }
-        }
-        name = "Arthmetic Node" color = "rgb(192,255,0)" / > < TrayItemWidget model = {
+        <DiagramModal open={this.state.open} close={() => {this.setState({open: false})}} submit={(info)=>this.addNode(info)} type={this.state.type} varList={varList} addNode={this.addNode}/ > < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > 
+        < TrayItemWidget model = {
             {
                 type: "assignment"
             }
