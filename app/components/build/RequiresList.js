@@ -31,6 +31,7 @@ class RequiresList extends React.Component {
         vars = {
           this.props.vars
         }
+        showMessage = {true}
         />]
       }
 
@@ -68,6 +69,7 @@ class RequiresList extends React.Component {
                 vars = {
                   vars
                 }
+                showMessage = {true}
                 />],
                 nextKey: this.state.nextKey + 1
               })

@@ -9,6 +9,7 @@ import {
 export interface DiamonNodeWidgetProps {
   node: DiamondNodeModel;
   size ? : number;
+  text ? : string;
 }
 
 export interface DiamonNodeWidgetState {}
@@ -62,7 +63,21 @@ export class DiamonNodeWidget extends React.Component < DiamonNodeWidgetProps, D
         `
         }
       }
-      /> <
+      /> 
+      <
+      div style = {
+        {
+          width: 200,
+          position: 'absolute',
+          left: '50%',
+          top: '45%',
+          marginLeft: -100,
+          color: 'white'
+        }
+      } >
+      {this.props.text}<
+      /div>
+      <
       div style = {
         {
           position: "absolute",

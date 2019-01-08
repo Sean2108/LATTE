@@ -5,6 +5,9 @@ import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import ReturnNode from './diagram_node_options/ReturnNode';
 import AssignmentNode from './diagram_node_options/AssignmentNode';
+import TransferNode from './diagram_node_options/TransferNode';
+import ConditionalNode from './diagram_node_options/ConditionalNode';
+import EventNode from './diagram_node_options/EventNode';
 
 function getModalStyle() {
     return {top: '50%', left: '50%', transform: 'translate(-50%, -50%)'};
@@ -36,7 +39,7 @@ class DiagramModal extends React.Component {
     }
 
     render() {
-        const {classes, open, close, submit, type, varList} = this.props;
+        const {classes, open, close, submit, type, varList, events} = this.props;
 
         return (
             <div>
@@ -51,7 +54,7 @@ class DiagramModal extends React.Component {
                                 .toUpperCase() + type.substr(1)}&nbsp; Node
                         </Typography>
                         <Typography variant="caption" id="modal-title">
-                            {this.getTypeFields(type, classes, varList, close, submit)}
+                            {this.getTypeFields(type, classes, varList, events, close, submit)}
                         </Typography>
                     </div>
                 </Modal>
@@ -59,22 +62,28 @@ class DiagramModal extends React.Component {
         );
     }
 
-    getTypeFields(type, classes, varList, close, submit) {
+    getTypeFields(type, classes, varList, events, close, submit) {
         switch (type) {
             case "assignment":
                 return (
                     <AssignmentNode close={close} submit={submit} varList={varList}/>
                 );
             case "event":
-                return "Event placeholder";
+                return (
+                    <EventNode close={close} submit={submit} varList={events}/>
+                );
             case "transfer":
-                return "Transfer placeholder";
+                return (
+                    <TransferNode close={close} submit={submit} varList={varList}/>
+                );
             case "return":
                 return (
                     <ReturnNode close={close} submit={submit} varList={varList}/>
                 );
             case "conditional":
-                return "If placeholder";
+                return (
+                    <ConditionalNode close={close} submit={submit} varList={varList}/>
+                );
         }
     }
 }
@@ -85,7 +94,8 @@ DiagramModal.propTypes = {
     close: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
-    varList: PropTypes.array
+    varList: PropTypes.array,
+    events: PropTypes.object
 };
 
 export default withStyles(styles, {withTheme: true})(DiagramModal);

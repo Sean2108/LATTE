@@ -73,13 +73,13 @@ class BuildDiagram extends React.Component {
             case "assignment":
                 return this.createDefaultNode(`Assignment: ${desc}`, "rgb(192,0,0)", false);
             case "event":
-                return this.createDefaultNode("Event", "rgb(0,192,0)", false);
+                return this.createDefaultNode(`Emit Event: ${desc}`, "rgb(0,192,0)", false);
             case "transfer":
-                return this.createDefaultNode("Transfer", "rgb(255,100,0)", false);
+                return this.createDefaultNode(`Transfer to: ${desc}`, "rgb(255,100,0)", false);
             case "return":
                 return this.createDefaultNode(`Return ${desc}`, "rgb(192,255,0)", true);
             case "conditional":
-                return new DiamondNodeModel();
+                return new DiamondNodeModel(`${desc}`);
         }
         return null;
     }
@@ -96,12 +96,12 @@ class BuildDiagram extends React.Component {
     }
 
     render() {
-        const {classes, theme, varList} = this.props;
+        const {classes, theme, varList, events} = this.props;
 
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > Action Phase < /Typography>
-        <DiagramModal open={this.state.open} close={() => {this.setState({open: false})}} submit={(info)=>this.addNode(info)} type={this.state.type} varList={varList} addNode={this.addNode}/ > < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > 
+        <DiagramModal open={this.state.open} close={() => {this.setState({open: false})}} submit={(info)=>this.addNode(info)} type={this.state.type} varList={varList} events={events} addNode={this.addNode}/ > < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > 
         < TrayItemWidget model = {
             {
                 type: "assignment"
@@ -166,7 +166,8 @@ class BuildDiagram extends React.Component {
 BuildDiagram.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
-    varList: PropTypes.array.isRequired
+    varList: PropTypes.array.isRequired,
+    events: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, {withTheme: true})(BuildDiagram);

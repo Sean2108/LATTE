@@ -39,7 +39,9 @@ const styles = theme => ({
 class BuildTabs extends React.Component {
         state = {
             value: 0,
-            variables: []
+            variables: [],
+            entities: {},
+            events: {}
         };
 
         handleChange = (event, value) => {
@@ -79,10 +81,10 @@ class BuildTabs extends React.Component {
                 Tab label = "Initial State" / > < Tab label = "Delegate" / > < Tab label = "Vote" / > < Tab label = "Winning Proposal" / > < Tab label = "Winner Name" / > < Tab label = "+" / > < /Tabs> < /AppBar > {
         value === 0 && < TabContainer > < StructList header = {
             "Entities"
-        }
-        varList = {
-            this.state.variables
-        } / > <br/> < Grid container spacing = {
+        } updateVariables = {(entities) => this.setState({...this.state, entities : entities})}/ > <br/> < StructList header = {
+            "Events"
+        } updateVariables = {(events) => this.setState({...this.state, events : events})}/ > <br/>
+        < Grid container spacing = {
             24
         } > < Grid item xs = {
             6
@@ -111,7 +113,9 @@ class BuildTabs extends React.Component {
             ["var1", "var2"]
         } /> < br / > < BuildDiagram varList = {
             this.state.variables
-        } / > < /TabContainer>} {
+        } 
+        events = {this.state.events}
+        / > < /TabContainer>} {
                     value === 1 && < TabContainer >
                     <
                     // VariableList header = {

@@ -92,7 +92,7 @@ class StructList extends React.Component {
           }}
         >
           < TextField id = "standard-name"
-    label = "Entity Property Name"
+    label = {header === "Entities" ? "Entity Property Name" : "Property to Display"}
     className = {
         classes.textField
     }
@@ -111,8 +111,8 @@ class StructList extends React.Component {
                 return;
             let newVars = {...this.state.entities};
             newVars[this.state.modalAdd].push(this.state.propcontents);
-            this.setState({variables: newVars, propcontents: '', anchor: null});
-            // updateVariables(newVars);
+            this.setState({entities: newVars, propcontents: '', anchor: null});
+            updateVariables(newVars);
         }
     } > Add < AddIcon className = {
         classes.rightIcon
@@ -165,7 +165,7 @@ class StructList extends React.Component {
                         if (index !== -1) {
                             vars[key].splice(index, 1);
                             this.setState({entities: vars});
-                            // updateVariables(vars);
+                            updateVariables(vars);
                         }
                     }
                 } > < DeleteIcon / > < /IconButton> <
@@ -175,7 +175,7 @@ class StructList extends React.Component {
     }
         </Grid> 
         < TextField id = "standard-name"
-    label = "Entity Name"
+    label = {header === "Entities" ? "Entity Name" : "Event Name"}
     className = {
         classes.textField
     }
@@ -197,7 +197,7 @@ class StructList extends React.Component {
                 [this.state.contents]: []
             };
             this.setState({entities: newVars, contents: ''});
-            // updateVariables(newVars);
+            updateVariables(newVars);
         }
     } > Add < AddIcon className = {
         classes.rightIcon

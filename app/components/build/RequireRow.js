@@ -44,13 +44,19 @@ class StateRow extends React.Component {
         var2: '',
         requireMessage: '',
       }
+      
+      changeCondition = (newState) => {
+        this.props.submit(`${newState.var1} ${newState.comp} ${newState.var2}`)
+      };
 
       render() {
         const {
           classes,
           theme,
           key,
-          vars
+          vars,
+          showMessage,
+          submit
         } = this.props;
         return ( <
           div >
@@ -65,9 +71,14 @@ class StateRow extends React.Component {
             this.state.var1
           }
           onChange = {
-            event => this.setState({ ...this.state,
-              var1: event.target.value
-            })
+            event => {
+              let newState = {
+                ...this.state,
+                var1: event.target.value
+              }
+              this.setState(newState);
+              this.changeCondition(newState);
+            }
           }
           inputProps = {
             {
@@ -90,9 +101,14 @@ class StateRow extends React.Component {
             this.state.comp
           }
           onChange = {
-            event => this.setState({ ...this.state,
-              comp: event.target.value
-            })
+            event => {
+              let newState = {
+                ...this.state,
+                comp: event.target.value
+              };
+              this.setState(newState);
+              this.changeCondition(newState);
+            }
           }
           inputProps = {
             {
@@ -119,9 +135,14 @@ class StateRow extends React.Component {
             this.state.var2
           }
           onChange = {
-            event => this.setState({ ...this.state,
-              var2: event.target.value
-            })
+            event => {
+              let newState = {
+                ...this.state,
+                var2: event.target.value
+              }
+              this.setState(newState);
+              this.changeCondition(newState);
+            }
           }
           inputProps = {
             {
@@ -134,22 +155,22 @@ class StateRow extends React.Component {
           /Select> < /
           FormControl >
 
-
-          <
-          FormControl className = {
-            classes.formControl
-          } >
-          <
-          InputLabel htmlFor = "name-simple" > Failure Message < /InputLabel> <
-          Input id = "requireMessage"
-          multiline fullWidth onChange = {
-            event => this.setState({ ...this.state,
-              failureMessage: event.target.value
-            })
+          {showMessage && 
+            <
+            FormControl className = {
+              classes.formControl
+            } >
+            <
+            InputLabel htmlFor = "name-simple" > Failure Message < /InputLabel> <
+            Input id = "requireMessage"
+            multiline fullWidth onChange = {
+              event => this.setState({ ...this.state,
+                failureMessage: event.target.value
+              })
+            }
+            /> < /
+            FormControl >
           }
-          /> < /
-          FormControl >
-
           <
           /div>
 
@@ -161,7 +182,9 @@ class StateRow extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       key: PropTypes.any,
-      vars: PropTypes.array.isRequired
+      vars: PropTypes.array.isRequired,
+      showMessage: PropTypes.bool,
+      submit: PropTypes.func
     };
 
     export default withStyles(styles, {

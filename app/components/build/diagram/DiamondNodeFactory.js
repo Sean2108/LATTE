@@ -17,7 +17,10 @@ export class DiamondNodeFactory extends SRD.AbstractNodeFactory {
       node
     }
     size = {
-      50
+      150
+    }
+    text = {
+      node.id
     }
     />;
   }
