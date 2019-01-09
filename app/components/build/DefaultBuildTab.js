@@ -21,24 +21,28 @@ const styles = theme => ({
 
 class DefaultBuildTab extends React.Component {
 
+  state = {
+    params: []
+  }
+
+  updateVariables = (vars) => this.setState({...this.state, params: vars});
+
     render() {
-        const {classes, theme, updateVariables, varList, events} = this.props;
+        const {classes, theme, varList, events} = this.props;
 
         return ( < div > <
-         VariableList header = {   "Function Parameters" } isInput = {   true }
-        VariableBox header = {
+         VariableBox header = {
             "Function Parameters"
         }
         updateVariables = {
-            updateVariables
+            this.updateVariables
         } / > < br / > < RequiresList header = {
             "Checking Phase"
         }
         vars = {
-            //placeholder, hardcoded before state implementation
-            ["var1", "var2"]
+            varList.concat(this.state.params)
         } /> < br / > < BuildDiagram varList = {
-            varList
+            varList.concat(this.state.params)
         }
         events = {events} / > < /div>
         );
@@ -48,7 +52,6 @@ class DefaultBuildTab extends React.Component {
     DefaultBuildTab.propTypes = {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
-      updateVariables: PropTypes.func.isRequired,
       varList: PropTypes.array.isRequired,
       events: PropTypes.object.isRequired
     };

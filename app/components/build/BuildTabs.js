@@ -116,7 +116,7 @@ class BuildTabs extends React.Component {
                             "Checking Phase"
                         }
                         vars = {
-                            ["var1", "var2"]
+                            this.state.variables
                         } /> < br / > < BuildDiagram varList = {
                             this.state.variables
                         } 
@@ -125,12 +125,12 @@ class BuildTabs extends React.Component {
                         </TabContainer>
                     }
                     {
-                    value === 2 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
-                    value === 3 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
+                    value === 2 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
+                    value === 3 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
     }
     {
-        value === 4 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
-                    value === 5 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
+        value === 4 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
+                    value === 5 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
     }
     {
         value === 6 && < TabContainer > + < /TabContainer>} < /div >);
