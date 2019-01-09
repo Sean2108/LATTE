@@ -11,6 +11,7 @@ import VariableList from './VariableList';
 import VariableBox from './VariableBox';
 import StructList from './StructList';
 import Grid from '@material-ui/core/Grid';
+import DefaultBuildTab from './DefaultBuildTab';
 
 function TabContainer(props) {
     return (
@@ -78,6 +79,8 @@ class BuildTabs extends React.Component {
                 textColor = "primary"
                 scrollable scrollButtons = "auto" >
                 <
+                Tab label = "Global State" / >
+                <
                 Tab label = "Initial State" / > < Tab label = "Delegate" / > < Tab label = "Vote" / > < Tab label = "Winning Proposal" / > < Tab label = "Winner Name" / > < Tab label = "+" / > < /Tabs> < /AppBar > {
         value === 0 && < TabContainer > < StructList header = {
             "Entities"
@@ -103,49 +106,34 @@ class BuildTabs extends React.Component {
             "Constructor Parameters"
         } /> < /
                     Grid > <
-                    /Grid > < br / > < RequiresList updateVariables = {
-            this.updateVariables
-        }
-        header = {
-            "Checking Phase"
-        }
-        vars = {
-            ["var1", "var2"]
-        } /> < br / > < BuildDiagram varList = {
-            this.state.variables
-        } 
-        events = {this.state.events}
-        / > < /TabContainer>} {
-                    value === 1 && < TabContainer >
-                    <
-                    // VariableList header = {
-                    //   "Function Parameters"
-                    // }
-                    // isInput = {
-                    //   true
-                    // }
-                    VariableBox header = {
-                        "Function Parameters"
+                    /Grid >  < /TabContainer>} 
+                    {
+                        value === 1 && <TabContainer>
+                        < RequiresList updateVariables = {
+                            this.updateVariables
+                        }
+                        header = {
+                            "Checking Phase"
+                        }
+                        vars = {
+                            ["var1", "var2"]
+                        } /> < br / > < BuildDiagram varList = {
+                            this.state.variables
+                        } 
+                        events = {this.state.events}
+                        / >
+                        </TabContainer>
                     }
-                    updateVariables = {
-                        this.updateVariables
-                    }
-                    / > < br / > < RequiresList header = {
-            "Checking Phase"
-        }
-        vars = {
-            ["var1", "var2"]
-        } /> < br / > < BuildDiagram varList = {
-            this.state.variables
-        } / > < /TabContainer>} {
-                    value === 2 && < TabContainer > vote < /TabContainer >
+                    {
+                    value === 2 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
+                    value === 3 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
     }
     {
-        value === 3 && < TabContainer > winningProposal < /TabContainer>} {
-                    value === 4 && < TabContainer > winnerName < /TabContainer >
+        value === 4 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
+                    value === 5 && <TabContainer> <DefaultBuildTab updateVariables = {this.updateVariables} varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
     }
     {
-        value === 5 && < TabContainer > + < /TabContainer>} < /div >);
+        value === 6 && < TabContainer > + < /TabContainer>} < /div >);
     }
 }
 
