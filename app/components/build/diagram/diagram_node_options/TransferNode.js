@@ -35,21 +35,39 @@ const styles = theme => ({
 
 class TransferNode extends React.Component {
     state = {
-        variableSelected: ''
+        variableSelected: '',
+        value: ''
     }
 
     render() {
         const {classes, close, submit, varList} = this.props;
 
         return (
+            <form>
             <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="var">Transfer to</InputLabel>
+                <InputLabel htmlFor="target">Transfer to</InputLabel>
                 <Select
                     value={this.state.variableSelected}
                     onChange={(event) => this.setState({variableSelected: event.target.value})}
                     inputProps={{
-                    name: 'var',
-                    id: 'var'
+                    name: 'target',
+                    id: 'target'
+                }}>
+                    <MenuItem value="">
+                        <em>None</em>
+                    </MenuItem>
+                    {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
+                </Select>
+                </FormControl>
+                <br/>
+                <FormControl className={classes.formControl}>
+                <InputLabel htmlFor="value">Value</InputLabel>
+                <Select
+                    value={this.state.value}
+                    onChange={(event) => this.setState({value: event.target.value})}
+                    inputProps={{
+                    name: 'value',
+                    id: 'value'
                 }}>
                     <MenuItem value="">
                         <em>None</em>
@@ -78,6 +96,7 @@ class TransferNode extends React.Component {
                     </Button>
                 </div>
             </FormControl>
+            </form>
         );
     }
 }

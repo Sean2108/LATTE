@@ -28,6 +28,7 @@ class RequiresList extends React.Component {
       variables: [ < RequireRow key = {
           0
         }
+        //bug here???
         vars = {
           this.props.vars
         }

@@ -35,7 +35,9 @@ class StateRow extends React.Component {
             element
           } > {
             element
-          } < /MenuItem>), <MenuItem key={this.props.vars.length} value="raw">Raw...</MenuItem > ];
+          } < /MenuItem>), <MenuItem key={this.props.vars.length} value="msg.sender">Message sender</MenuItem >,
+          <MenuItem key={this.props.vars.length + 1} value="msg.value">Message value</MenuItem >,
+          <MenuItem key={this.props.vars.length + 2} value="raw">Raw...</MenuItem > ];
       }
 
       state = {
