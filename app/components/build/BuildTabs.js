@@ -41,6 +41,7 @@ class BuildTabs extends React.Component {
         state = {
             value: 0,
             variables: [],
+            constructorParams: [],
             entities: {},
             events: {}
         };
@@ -50,8 +51,6 @@ class BuildTabs extends React.Component {
                 value
             });
         };
-
-        updateVariables = (vars) => this.setState({...this.state, variables: vars});
 
         render() {
             const {
@@ -84,9 +83,11 @@ class BuildTabs extends React.Component {
                 Tab label = "Initial State" / > < Tab label = "Delegate" / > < Tab label = "Vote" / > < Tab label = "Winning Proposal" / > < Tab label = "Winner Name" / > < Tab label = "+" / > < /Tabs> < /AppBar > {
         value === 0 && < TabContainer > < StructList header = {
             "Entities"
-        } updateVariables = {(entities) => this.setState({...this.state, entities : entities})}/ > <br/> < StructList header = {
+        } updateVariables = {(entities) => this.setState({...this.state, entities : entities})}
+        initialVars = {this.state.entities}/ > <br/> < StructList header = {
             "Events"
-        } updateVariables = {(events) => this.setState({...this.state, events : events})}/ > <br/>
+        } updateVariables = {(events) => this.setState({...this.state, events : events})}
+        initialVars = {this.state.events}/ > <br/>
         < Grid container spacing = {
             24
         } > < Grid item xs = {
@@ -95,8 +96,9 @@ class BuildTabs extends React.Component {
             "Variables"
         }
         updateVariables = {
-            this.updateVariables
+            (vars) => this.setState({...this.state, variables: vars})
         }
+        initialVars = {this.state.variables}
         // VariableList header = {   "Global State Objects" } isInput = {   false }
         /> < /Grid > < Grid item xs = {
             6
@@ -104,7 +106,11 @@ class BuildTabs extends React.Component {
         // VariableList header = {   "Constructor Parameters" } isInput = {   true }
         VariableBox header = {
             "Constructor Parameters"
-        } /> < /
+        } 
+        updateVariables = {
+            (vars) => this.setState({...this.state, constructorParams: vars})
+        }
+        initialVars = {this.state.constructorParams}/> < /
                     Grid > <
                     /Grid >  < /TabContainer>} 
                     {

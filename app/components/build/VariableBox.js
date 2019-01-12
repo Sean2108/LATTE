@@ -48,7 +48,7 @@ const styles = theme => ({
 
 class VariableBox extends React.Component {
     state = {
-        variables: [],
+        variables: this.props.initialVars,
         contents: ''
     };
 
@@ -127,7 +127,8 @@ class VariableBox extends React.Component {
           classes: PropTypes.object.isRequired,
           theme: PropTypes.object.isRequired,
           header: PropTypes.string.isRequired,
-          updateVariables: PropTypes.func
+          updateVariables: PropTypes.func,
+          initialVars: PropTypes.array.isRequired
         };
 
         export default withStyles(styles, {

@@ -58,7 +58,7 @@ const styles = theme => ({
 
 class StructList extends React.Component {
     state = {
-        entities: {},
+        entities: this.props.initialVars,
         contents: '',
         propcontents: '',
         modalAdd: '',
@@ -212,7 +212,8 @@ class StructList extends React.Component {
           classes: PropTypes.object.isRequired,
           theme: PropTypes.object.isRequired,
           header: PropTypes.string.isRequired,
-          updateVariables: PropTypes.func
+          updateVariables: PropTypes.func,
+          initialVars: PropTypes.object.isRequired
         };
 
         export default withStyles(styles, {
