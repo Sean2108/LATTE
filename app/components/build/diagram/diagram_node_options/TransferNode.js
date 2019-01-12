@@ -90,7 +90,7 @@ class TransferNode extends React.Component {
                         variant="contained"
                         color="primary"
                         className={classes.button}
-                        onClick={() => {close(); submit(this.state.variableSelected)}}>
+                        onClick={() => {close(); submit(`${this.state.value} to ${this.state.variableSelected}`)}}>
                         Done
                         <DoneIcon/>
                     </Button>

@@ -75,7 +75,7 @@ class BuildDiagram extends React.Component {
             case "event":
                 return this.createDefaultNode(`Emit Event: ${desc}`, "rgb(0,192,0)", false);
             case "transfer":
-                return this.createDefaultNode(`Transfer to: ${desc}`, "rgb(255,100,0)", false);
+                return this.createDefaultNode(`Transfer ${desc}`, "rgb(255,100,0)", false);
             case "return":
                 return this.createDefaultNode(`Return ${desc}`, "rgb(192,255,0)", true);
             case "conditional":

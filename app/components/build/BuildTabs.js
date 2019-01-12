@@ -17,7 +17,8 @@ function TabContainer(props) {
     return (
     < Typography component = "div" style = {
         {
-            padding: 8 * 3
+            'paddingTop': 24,
+            'paddingBottom': 24
         }
     } > {
         props.children

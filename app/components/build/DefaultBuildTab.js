@@ -36,7 +36,8 @@ class DefaultBuildTab extends React.Component {
         }
         updateVariables = {
             this.updateVariables
-        } / > < br / > < RequiresList header = {
+        }
+        initialVars = {this.state.params} / > < br / > < RequiresList header = {
             "Checking Phase"
         }
         vars = {
