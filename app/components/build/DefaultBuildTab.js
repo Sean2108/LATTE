@@ -25,8 +25,6 @@ class DefaultBuildTab extends React.Component {
     params: []
   }
 
-  updateVariables = (vars) => this.setState({...this.state, params: vars});
-
     render() {
         const {classes, theme, varList, events} = this.props;
 
@@ -35,7 +33,7 @@ class DefaultBuildTab extends React.Component {
             "Function Parameters"
         }
         updateVariables = {
-            this.updateVariables
+            (vars) => this.setState({params: vars})
         }
         initialVars = {this.state.params} / > < br / > < RequiresList header = {
             "Checking Phase"

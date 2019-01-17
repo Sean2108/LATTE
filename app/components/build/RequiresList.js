@@ -25,15 +25,7 @@ const styles = theme => ({
 class RequiresList extends React.Component {
     state = {
       nextKey: 1,
-      variables: [ < RequireRow key = {
-          0
-        }
-        //bug here???
-        vars = {
-          this.props.vars
-        }
-        showMessage = {true}
-        />]
+      variables: [0]
       }
 
       render() {
@@ -53,7 +45,8 @@ class RequiresList extends React.Component {
             noWrap > {
               header
             } < /Typography> {
-            this.state.variables.map(element => element)
+              
+            this.state.variables.map(element => <RequireRow key = {element} vars = {vars} showMessage = {true}/>)
           }
 
           <
@@ -64,14 +57,7 @@ class RequiresList extends React.Component {
         }
         onClick = {
           () => this.setState({
-              variables: [...this.state.variables, < RequireRow key = {
-                  this.state.nextKey
-                }
-                vars = {
-                  vars
-                }
-                showMessage = {true}
-                />],
+              variables: [...this.state.variables, this.state.nextKey],
                 nextKey: this.state.nextKey + 1
               })
           } >

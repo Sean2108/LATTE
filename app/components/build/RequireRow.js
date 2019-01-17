@@ -24,22 +24,6 @@ const styles = theme => ({
 
 class StateRow extends React.Component {
 
-    variables;
-
-    constructor(props) {
-      super(props);
-      this.variables = [...this.props.vars.map((element, index) => < MenuItem key = {
-            index
-          }
-          value = {
-            element
-          } > {
-            element
-          } < /MenuItem>), <MenuItem key={this.props.vars.length} value="msg.sender">Message sender</MenuItem >,
-          <MenuItem key={this.props.vars.length + 1} value="msg.value">Message value</MenuItem >,
-          <MenuItem key={this.props.vars.length + 2} value="raw">Raw...</MenuItem > ];
-      }
-
       state = {
         comp: '==',
         var1: '',
@@ -51,6 +35,19 @@ class StateRow extends React.Component {
         this.props.submit(`${newState.var1} ${newState.comp} ${newState.var2}`)
       };
 
+      wrapMenuItems = (vars) => {
+        return [...vars.map((element, index) => < MenuItem key = {
+          index
+        }
+        value = {
+          element
+        } > {
+          element
+        } < /MenuItem>), <MenuItem key={this.props.vars.length} value="msg.sender">Message sender</MenuItem >,
+        <MenuItem key={this.props.vars.length + 1} value="msg.value">Message value</MenuItem >,
+        <MenuItem key={this.props.vars.length + 2} value="raw">Raw...</MenuItem > ];
+      };
+
       render() {
         const {
           classes,
@@ -60,6 +57,7 @@ class StateRow extends React.Component {
           showMessage,
           submit
         } = this.props;
+        let varMenuItems = this.wrapMenuItems(vars);
         return ( <
           div >
 
@@ -88,7 +86,7 @@ class StateRow extends React.Component {
               id: 'var1',
             }
           } > {
-            this.variables
+            varMenuItems
           } <
           /Select> < /
           FormControl >
@@ -152,7 +150,7 @@ class StateRow extends React.Component {
               id: 'var2',
             }
           } > {
-            this.variables
+            varMenuItems
           } <
           /Select> < /
           FormControl >
