@@ -59,20 +59,14 @@ class ReturnNode extends React.Component {
         return (
             <FormControl className={classes.formControl}>
                 <div className={classes.inline}>
-                <InputLabel htmlFor="var">Variable Name</InputLabel>
-                <Select
-                    className={classes.varSelect}
+                <TextField
+                    id="standard-name"
+                    label="Variable Name"
+                    className={classes.textField}
                     value={this.state.variableSelected}
                     onChange={(event) => this.setState({variableSelected: event.target.value})}
-                    inputProps={{
-                    name: 'var',
-                    id: 'var'
-                }}>
-                    <MenuItem value="">
-                        <em>None</em>
-                    </MenuItem>
-                    {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                </Select>
+                    margin="none"
+                />
                 <Typography className={classes.equals}> = </Typography>
                 <
                 TextField id = "standard-name"
@@ -84,7 +78,7 @@ class ReturnNode extends React.Component {
                     (event) => this.setState({assignedVal: event.target.value})
                 }
                 value = {this.state.assignedVal}
-                margin = "normal" / > 
+                margin = "none" / > 
                 </div>
                 <br/>
 

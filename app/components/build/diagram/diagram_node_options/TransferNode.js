@@ -4,10 +4,8 @@ import {withStyles} from '@material-ui/core/styles';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
     paper: {
@@ -45,35 +43,23 @@ class TransferNode extends React.Component {
         return (
             <form>
             <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="target">Transfer to</InputLabel>
-                <Select
+                <TextField
+                    label="Transfer to"
+                    className={classes.textField}
                     value={this.state.variableSelected}
                     onChange={(event) => this.setState({variableSelected: event.target.value})}
-                    inputProps={{
-                    name: 'target',
-                    id: 'target'
-                }}>
-                    <MenuItem value="">
-                        <em>None</em>
-                    </MenuItem>
-                    {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                </Select>
+                    margin="none"
+                />
                 </FormControl>
                 <br/>
                 <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="value">Value</InputLabel>
-                <Select
+                <TextField
+                    label="Value"
+                    className={classes.textField}
                     value={this.state.value}
                     onChange={(event) => this.setState({value: event.target.value})}
-                    inputProps={{
-                    name: 'value',
-                    id: 'value'
-                }}>
-                    <MenuItem value="">
-                        <em>None</em>
-                    </MenuItem>
-                    {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                </Select>
+                    margin="none"
+                />
                 <br/>
 
                 <div className={classes.rightIcon}>

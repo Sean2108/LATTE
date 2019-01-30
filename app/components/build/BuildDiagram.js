@@ -48,6 +48,7 @@ class BuildDiagram extends React.Component {
 
         var start = new DefaultNodeModel("Start", "rgb(0,192,255)");
         var startOut = start.addOutPort(" ");
+        startOut.setMaximumLinks(1);
         start.setPosition(100, 100);
 
         //4) add the models to the root graph
@@ -63,7 +64,8 @@ class BuildDiagram extends React.Component {
         var node = new DefaultNodeModel(label, color);
         node.addInPort(" ");
         if (!isReturn) {
-            node.addOutPort(" ");
+            let outPort = node.addOutPort(" ");
+            outPort.setMaximumLinks(1);
         }
         return node;
     }

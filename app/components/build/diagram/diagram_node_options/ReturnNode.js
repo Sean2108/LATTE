@@ -4,10 +4,8 @@ import {withStyles} from '@material-ui/core/styles';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
     paper: {
@@ -43,19 +41,14 @@ class ReturnNode extends React.Component {
 
         return (
             <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="var">Return Variable</InputLabel>
-                <Select
+                <TextField
+                    id="standard-name"
+                    label="Return Variable"
+                    className={classes.textField}
                     value={this.state.variableSelected}
                     onChange={(event) => this.setState({variableSelected: event.target.value})}
-                    inputProps={{
-                    name: 'var',
-                    id: 'var'
-                }}>
-                    <MenuItem value="">
-                        <em>None</em>
-                    </MenuItem>
-                    {varList.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                </Select>
+                    margin="none"
+                />
                 <br/>
 
                 <div className={classes.rightIcon}>
