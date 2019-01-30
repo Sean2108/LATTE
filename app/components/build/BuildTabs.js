@@ -5,13 +5,12 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import BuildDiagram from './BuildDiagram';
-import RequiresList from './RequiresList';
-import VariableList from './VariableList';
-import VariableBox from './VariableBox';
 import StructList from './StructList';
-import Grid from '@material-ui/core/Grid';
 import DefaultBuildTab from './DefaultBuildTab';
+import Popover from '@material-ui/core/Popover';
+import AddIcon from '@material-ui/icons/Add';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 function TabContainer(props) {
     return (
@@ -36,6 +35,16 @@ const styles = theme => ({
         width: '97%',
         backgroundColor: theme.palette.background.paper,
     },
+    textField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit
+    },
+    button: {
+        margin: 0
+    },
+    rightIcon: {
+        marginLeft: theme.spacing.unit
+    },
 });
 
 class BuildTabs extends React.Component {
@@ -44,7 +53,10 @@ class BuildTabs extends React.Component {
             variables: [],
             constructorParams: [],
             entities: {},
-            events: {}
+            events: {},
+            tabs: [],
+            addTabPopoverAnchor: null,
+            popoverContent: ''
         };
 
         handleChange = (event, value) => {
@@ -52,6 +64,10 @@ class BuildTabs extends React.Component {
                 value
             });
         };
+
+        componentWillMount() {
+            this.setState({tabs: ['Global State', 'Initial State']})
+        }
 
         render() {
             const {
@@ -73,15 +89,17 @@ class BuildTabs extends React.Component {
                     value
                 }
                 onChange = {
-                    this.handleChange
+                    (event, value) => {
+                        if (value !== this.state.tabs.length) {
+                            this.handleChange(event, value);
+                        }
+                    }
                 }
                 indicatorColor = "primary"
                 textColor = "primary"
                 scrollable scrollButtons = "auto" >
-                <
-                Tab label = "Global State" / >
-                <
-                Tab label = "Initial State" / > < Tab label = "Delegate" / > < Tab label = "Vote" / > < Tab label = "Winning Proposal" / > < Tab label = "Winner Name" / > < Tab label = "+" / > < /Tabs> < /AppBar > {
+                {this.state.tabs.map((label) => <Tab label={label} key={label}/>)}
+                <Tab onClick={(event) => this.setState({addTabPopoverAnchor: event.currentTarget})} label='+'/> < /Tabs> < /AppBar > {
         value === 0 && < TabContainer > < StructList header = {
             "Entities"
         } updateVariables = {(entities) => this.setState({...this.state, entities : entities})}
@@ -89,58 +107,52 @@ class BuildTabs extends React.Component {
             "Events"
         } updateVariables = {(events) => this.setState({...this.state, events : events})}
         initialVars = {this.state.events}/ > <br/>
-        < Grid container spacing = {
-            24
-        } > < Grid item xs = {
-            6
-        } > < VariableBox header = {
-            "Variables"
-        }
-        updateVariables = {
-            (vars) => this.setState({...this.state, variables: vars})
-        }
-        initialVars = {this.state.variables}
-        // VariableList header = {   "Global State Objects" } isInput = {   false }
-        /> < /Grid > < Grid item xs = {
-            6
-        } > <
-        // VariableList header = {   "Constructor Parameters" } isInput = {   true }
-        VariableBox header = {
-            "Constructor Parameters"
-        } 
-        updateVariables = {
-            (vars) => this.setState({...this.state, constructorParams: vars})
-        }
-        initialVars = {this.state.constructorParams}/> < /
-                    Grid > <
-                    /Grid >  < /TabContainer>} 
-                    {
-                        value === 1 && <TabContainer>
-                        < RequiresList updateVariables = {
-                            this.updateVariables
-                        }
-                        header = {
-                            "Checking Phase"
-                        }
-                        vars = {
-                            this.state.variables
-                        } /> < br / > < BuildDiagram varList = {
-                            this.state.variables
-                        } 
-                        events = {this.state.events}
-                        / >
+        < /TabContainer>} 
+        {[...Array(this.state.tabs.length - 1).keys()].map((i) => 
+                        value === i + 1 && <TabContainer key = {i}>
+                        <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} />
                         </TabContainer>
-                    }
-                    {
-                    value === 2 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
-                    value === 3 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
-    }
-    {
-        value === 4 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>} {
-                    value === 5 && <TabContainer> <DefaultBuildTab varList = {this.state.variables} events = {this.state.events} /> </TabContainer>
-    }
-    {
-        value === 6 && < TabContainer > + < /TabContainer>} < /div >);
+                    )}
+        <Popover
+          id="simple-popper"
+          open={Boolean(this.state.addTabPopoverAnchor)}
+          anchorEl={this.state.addTabPopoverAnchor}
+          onClose={() => this.setState({addTabPopoverAnchor: null})}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+        >
+          
+          < TextField id = "standard-name"
+            label = "Function Name"
+            className = {
+                classes.textField
+            }
+            onChange = {
+                (event) => this.setState({popoverContent: event.target.value})
+            }
+            value = {
+                this.state.popoverContent
+            }
+            margin = "normal" / > < Button variant = "contained" color = "primary" className = {
+                classes.button
+            }
+            onClick = {
+                () => {
+                    if (this.state.popoverContent && !this.state.tabs.map(tab => tab.toLowerCase()).includes(this.state.popoverContent.toLowerCase())) 
+                        this.setState({tabs: [...this.state.tabs, this.state.popoverContent], popoverContent: '', addTabPopoverAnchor: null});
+                }
+            } > Add < AddIcon className = {
+                classes.rightIcon
+            } /> < /Button>
+
+        </Popover>
+     < /div >);
     }
 }
 

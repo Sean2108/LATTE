@@ -30,7 +30,7 @@ class DefaultBuildTab extends React.Component {
 
         return ( < div > <
          VariableBox header = {
-            "Function Parameters"
+            "Function Inputs"
         }
         updateVariables = {
             (vars) => this.setState({params: vars})

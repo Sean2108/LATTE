@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import RequireRow from './RequireRow';
+import RawRequireRow from './RawRequireRow';
 
 const styles = theme => ({
   paper: {
@@ -46,7 +46,7 @@ class RequiresList extends React.Component {
               header
             } < /Typography> {
               
-            this.state.variables.map(element => <RequireRow key = {element} vars = {vars} showMessage = {true}/>)
+            this.state.variables.map(element => <RawRequireRow key = {element} vars = {vars} showMessage = {true}/>)
           }
 
           <

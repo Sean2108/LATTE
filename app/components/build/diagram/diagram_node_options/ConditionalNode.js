@@ -6,7 +6,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import RequireRow from '../../RequireRow';
+import RawRequireRow from '../../RawRequireRow';
 
 const styles = theme => ({
     paper: {
@@ -42,7 +42,7 @@ class ConditionalNode extends React.Component {
 
         return (
             <FormControl className={classes.formControl}>
-                < RequireRow
+                < RawRequireRow
                 vars = {
                     varList
                 }
