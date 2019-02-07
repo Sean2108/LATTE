@@ -11,6 +11,7 @@
  * @flow
  */
 import { app, BrowserWindow } from 'electron';
+import { platform } from 'os';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -89,3 +90,7 @@ app.on('ready', async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 });
+
+if (platform() === 'linux') {
+  app.disableHardwareAcceleration();
+}

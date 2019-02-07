@@ -108,7 +108,7 @@ class RawStateRow extends React.Component {
             id="standard-name"
             label="Variable 2"
             className={classes.textField}
-            value={this.state.var1}
+            value={this.state.var2}
             onChange={this.handleChange('var2')}
             margin="none"
           /> < /
