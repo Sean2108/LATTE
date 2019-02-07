@@ -26,7 +26,7 @@ class DefaultBuildTab extends React.Component {
   }
 
     render() {
-        const {classes, theme, varList, events} = this.props;
+        const {classes, theme, varList, events, onChangeLogic} = this.props;
 
         return ( < div > <
          VariableBox header = {
@@ -43,7 +43,8 @@ class DefaultBuildTab extends React.Component {
         } /> < br / > < BuildDiagram varList = {
             varList.concat(this.state.params)
         }
-        events = {events} / > < /div>
+        events = {events}
+        onChangeLogic = {onChangeLogic} / > < /div>
         );
       }
     }
@@ -52,7 +53,8 @@ class DefaultBuildTab extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       varList: PropTypes.array.isRequired,
-      events: PropTypes.object.isRequired
+      events: PropTypes.object.isRequired,
+      onChangeLogic: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

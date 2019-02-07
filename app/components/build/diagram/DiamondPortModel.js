@@ -2,25 +2,40 @@ import * as _ from "lodash";
 import { LinkModel, DiagramEngine, PortModel, DefaultLinkModel } from "storm-react-diagrams";
 
 export class DiamondPortModel extends PortModel {
-	position: string | "top" | "bottom" | "left" | "right";
+	in;
+	position;
+	label;
 
-	constructor(pos: string = "top") {
-		super(pos, "diamond");
+	constructor(pos, isInput, label) {
+		super(pos, "diamond", null, 1);
 		this.position = pos;
+		this.in = isInput;
+		this.label = label;
 	}
 
 	serialize() {
 		return _.merge(super.serialize(), {
-			position: this.position
+			position: this.position,
+			in: this.in,
+			label: this.label
 		});
 	}
 
 	deSerialize(data, engine) {
 		super.deSerialize(data, engine);
 		this.position = data.position;
+		this.in = object.in;
+		this.label = object.label;
 	}
 
-	createLinkModel(): LinkModel {
+	canLinkToPort(port) {
+		if (port instanceof DiamondPortModel) {
+			return this.in !== port.in;
+		}
+		return true;
+	}
+
+	createLinkModel() {
 		return new DefaultLinkModel();
 	}
 }

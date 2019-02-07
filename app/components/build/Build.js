@@ -33,6 +33,10 @@ const styles = theme => ({
 });
 
 class Build extends React.Component {
+  state = {
+      tabs: [],
+      tabsCode : []
+  };
 
   render() {
     const {
@@ -41,6 +45,11 @@ class Build extends React.Component {
       onback,
       connection
     } = this.props;
+
+    const {
+      tabs,
+      tabsCode
+    } = this.state;
 
     return ( <
       main align = "center"
@@ -62,13 +71,19 @@ class Build extends React.Component {
         classes.root
       } >
       <
-      BuildTabs / >
+      BuildTabs onTabsChange = {(value) => this.setState(value)} / >
       <
       BuildOptions onback = {
         onback
       }
       connection = {
         connection
+      }
+      tabs= {
+        tabs
+      }
+      tabsCode = {
+        tabsCode
       }
       /> <
       /div>

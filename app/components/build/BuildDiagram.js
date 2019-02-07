@@ -28,6 +28,7 @@ class BuildDiagram extends React.Component {
     }
 
     engine;
+    start;
 
     constructor(props) {
         super(props);
@@ -45,14 +46,13 @@ class BuildDiagram extends React.Component {
 
         // setup the diagram model
         const model = new DiagramModel();
-
-        var start = new DefaultNodeModel("Start", "rgb(0,192,255)");
-        var startOut = start.addOutPort(" ");
+        this.start = new DefaultNodeModel("Start", "rgb(0,192,255)");
+        var startOut = this.start.addOutPort(" ");
         startOut.setMaximumLinks(1);
-        start.setPosition(100, 100);
+        this.start.setPosition(100, 100);
 
         //4) add the models to the root graph
-        model.addAll(start);
+        model.addAll(this.start);
 
         // load model into engine and render
         this
@@ -88,6 +88,7 @@ class BuildDiagram extends React.Component {
 
     addNode(info) {
         let node = this.selectNode(this.state.type, info);
+        this.props.onChangeLogic(this.generateCode());
         node.x = this.state.points.x;
         node.y = this.state.points.y;
         this
@@ -95,6 +96,37 @@ class BuildDiagram extends React.Component {
             .getDiagramModel()
             .addNode(node);
         this.forceUpdate();
+    }
+
+    generateCode() {
+        let code = '';
+        let nextNode = this.traverseNextNode(this.start);
+        while (nextNode) {
+            code += nextNode instanceof DefaultNodeModel ? nextNode.name : nextNode.id + ';\n';
+            nextNode = this.traverseNextNode(nextNode);
+        }
+        console.log(code);
+        return code;
+    }
+
+    traverseNextNode(node) {
+        let outPort;
+        if (node instanceof DiamondNodeModel) {
+            outPort = node.outPortTrue;
+        }
+        else {
+            if (node.getOutPorts.length === 0) {
+                return null;
+            }
+            outPort = node.getOutPorts()[0];
+        }
+        let links = Object.values(outPort.getLinks());
+        if (links.length === 0) {
+            return null;
+        }
+        else {
+            return links[0].targetPort.getNode();
+        }
     }
 
     render() {
@@ -135,11 +167,6 @@ class BuildDiagram extends React.Component {
                       event => {
                         var data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
                         this.setState({open: true, type: data.type, points: this.engine.getRelativeMousePoint(event)});
-                        // var nodesCount = _.keys(
-                        //   this.engine
-                        //     .getDiagramModel()
-                        //     .getNodes()
-                        // ).length;
                       }
                     }
                     onDragOver={
@@ -169,7 +196,8 @@ BuildDiagram.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
     varList: PropTypes.array.isRequired,
-    events: PropTypes.object.isRequired
+    events: PropTypes.object.isRequired,
+    onChangeLogic: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {withTheme: true})(BuildDiagram);

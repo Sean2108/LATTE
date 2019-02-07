@@ -96,7 +96,7 @@ class ReturnNode extends React.Component {
                         variant="contained"
                         color="primary"
                         className={classes.button}
-                        onClick={() => {close(); submit(`${this.state.variableSelected} = ${this.state.assignedVal};`)}}>
+                        onClick={() => {close(); submit(`${this.state.variableSelected} = ${this.state.assignedVal}`)}}>
                         Done
                         <DoneIcon/>
                     </Button>
