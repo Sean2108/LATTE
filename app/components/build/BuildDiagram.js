@@ -123,7 +123,7 @@ class BuildDiagram extends React.Component {
             if (!falseNextNode || !trueNextNode) {
                 return '';
             }
-            return `if (${node.name}) {\n${this.traverseNextNode(trueNextNode)}\n} else {\n${this.traverseNextNode(falseNextNode)}\n}`;
+            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode)}\n} else {\n${this.traverseNextNode(falseNextNode)}\n}`;
         }
         if (!node) {
             return '';
@@ -160,6 +160,10 @@ class BuildDiagram extends React.Component {
                 return `${this.parseVariable(rhs)}.transfer(${this.parseVariable(lhs)});`;
             case "Return":
                 return `return ${code}`;
+            case "Compare":
+                let comp;
+                [lhs, comp, rhs] = code.split(/ ([><=]=|>|<) /);
+                return `${this.parseVariable(lhs)} ${comp} ${this.parseVariable(rhs)}`;
         }
         return '';
     }
@@ -167,6 +171,12 @@ class BuildDiagram extends React.Component {
     parseVariable(variable) {
         if (variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'" || !isNaN(variable)) {
             return variable;
+        }
+        for (let operator of ['*', '/', '+', '-']) {
+            if (variable.indexOf(operator) > 0) {
+                [lhs, rhs] = code.split(operator);
+                return `${this.parseVariable(lhs)} ${operator} ${this.parseVariable(rhs)}`;
+            }
         }
         return variable.toLowerCase().replace(/\s/g, '_');
     }
