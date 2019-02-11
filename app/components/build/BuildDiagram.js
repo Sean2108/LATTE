@@ -53,6 +53,25 @@ class BuildDiagram extends React.Component {
 
         //4) add the models to the root graph
         model.addAll(this.start);
+        model.addListener({
+            nodesUpdated: () => {
+                let code = this.traverseNextNode(this.start);
+                console.log(code);
+                this.props.onChangeLogic(code);
+            },
+            linksUpdated: () => {
+                setTimeout(() => {
+                    let code = this.traverseNextNode(this.start);
+                    console.log(code);
+                    this.props.onChangeLogic(code);
+                }, 3000);
+            },
+            entityRemoved: () => {
+                let code = this.traverseNextNode(this.start);
+                console.log(code);
+                this.props.onChangeLogic(code);
+            },
+       });
 
         // load model into engine and render
         this
@@ -77,9 +96,9 @@ class BuildDiagram extends React.Component {
             case "event":
                 return this.createDefaultNode(`Emit Event: ${desc}`, "rgb(0,192,0)", false);
             case "transfer":
-                return this.createDefaultNode(`Transfer ${desc}`, "rgb(255,100,0)", false);
+                return this.createDefaultNode(`Transfer: ${desc}`, "rgb(255,100,0)", false);
             case "return":
-                return this.createDefaultNode(`Return ${desc}`, "rgb(192,255,0)", true);
+                return this.createDefaultNode(`Return: ${desc}`, "rgb(192,255,0)", true);
             case "conditional":
                 return new DiamondNodeModel(`${desc}`);
         }
@@ -88,7 +107,6 @@ class BuildDiagram extends React.Component {
 
     addNode(info) {
         let node = this.selectNode(this.state.type, info);
-        this.props.onChangeLogic(this.generateCode());
         node.x = this.state.points.x;
         node.y = this.state.points.y;
         this
@@ -98,35 +116,59 @@ class BuildDiagram extends React.Component {
         this.forceUpdate();
     }
 
-    generateCode() {
-        let code = '';
-        let nextNode = this.traverseNextNode(this.start);
-        while (nextNode) {
-            code += nextNode instanceof DefaultNodeModel ? nextNode.name : nextNode.id + ';\n';
-            nextNode = this.traverseNextNode(nextNode);
-        }
-        console.log(code);
-        return code;
-    }
-
     traverseNextNode(node) {
-        let outPort;
         if (node instanceof DiamondNodeModel) {
-            outPort = node.outPortTrue;
-        }
-        else {
-            if (node.getOutPorts.length === 0) {
-                return null;
+            let falseNextNode = this.getNextNode(node.outPortFalse);
+            let trueNextNode = this.getNextNode(node.outPortTrue);
+            if (!falseNextNode || !trueNextNode) {
+                return '';
             }
-            outPort = node.getOutPorts()[0];
+            return `if (${node.name}) {\n${this.traverseNextNode(trueNextNode)}\n} else {\n${this.traverseNextNode(falseNextNode)}\n}`;
         }
+        if (!node) {
+            return '';
+        }
+        let curNodeCode = node.name === 'Start' ? '' : this.parseNode(node.name) + '\n';
+        if (node.getOutPorts().length === 0) {
+            return curNodeCode;
+        }
+        let nextNode = this.getNextNode(node.getOutPorts()[0]);
+        return curNodeCode + this.traverseNextNode(nextNode);
+    }
+    
+    getNextNode(outPort) {
         let links = Object.values(outPort.getLinks());
-        if (links.length === 0) {
+        if (links.length === 0 || !links[0].targetPort) {
             return null;
         }
         else {
             return links[0].targetPort.getNode();
         }
+    }
+
+    parseNode(nodeCode) {
+        let type, code, lhs, rhs;
+        [type, code] = nodeCode.split(': ');
+        switch (type) {
+            case "Assignment":
+                [lhs, rhs] = code.split(' = ');
+                return `${this.parseVariable(lhs)} = ${this.parseVariable(rhs)};`;
+            case "Emit Event":
+                return `emit ${code};`
+            case "Transfer":
+                [lhs, rhs] = code.split(' to ');
+                return `${this.parseVariable(rhs)}.transfer(${this.parseVariable(lhs)});`;
+            case "Return":
+                return `return ${code}`;
+        }
+        return '';
+    }
+
+    parseVariable(variable) {
+        if (variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'" || !isNaN(variable)) {
+            return variable;
+        }
+        return variable.toLowerCase().replace(/\s/g, '_');
     }
 
     render() {

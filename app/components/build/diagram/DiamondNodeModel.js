@@ -5,9 +5,11 @@ export class DiamondNodeModel extends NodeModel {
 
 	outPortTrue; 
 	outPortFalse;
+	name;
 
 	constructor(message) {
 		super("diamond", message);
+		this.name = message;
 		this.addPort(new DiamondPortModel("top", true, ""));
 		this.addPort(new DiamondPortModel("left", true, ""));
 		this.outPortTrue = this.addPort(new DiamondPortModel("bottom", false, "True"));
