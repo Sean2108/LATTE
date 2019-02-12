@@ -37,7 +37,8 @@ class Build extends React.Component {
       tabs: [],
       tabsCode : [],
       variables: {},
-      tabsParams: []
+      tabsParams: [],
+      tabsReturn: []
   };
 
   render() {

@@ -24,14 +24,14 @@ class BuildDiagram extends React.Component {
     state = {
         open: false,
         type: '',
-        points: null,
-        returnType: ''
+        points: null
     }
 
     engine;
     start;
     varList;
     variables;
+    returnVar;
 
     constructor(props) {
         super(props);
@@ -60,8 +60,10 @@ class BuildDiagram extends React.Component {
             linksUpdated: () => {
                 setTimeout(() => {
                     this.variables = {};
+                    this.returnVar = null;
                     let code = this.traverseNextNode(this.start);
                     this.props.onChangeLogic(code);
+                    this.props.onChangeReturn(this.returnVar);
                 }, 5000);
             }
        });
@@ -186,7 +188,7 @@ class BuildDiagram extends React.Component {
                 return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
             case "Return":
                 let returnVar = this.parseVariable(code);
-                this.setState({returnType: returnVar.type});
+                this.returnVar = returnVar.type;
                 return `return ${returnVar.name};`;
             case "Compare":
                 let comp;
@@ -326,7 +328,8 @@ BuildDiagram.propTypes = {
     varList: PropTypes.object.isRequired,
     events: PropTypes.object.isRequired,
     onChangeLogic: PropTypes.func.isRequired,
-    onVariablesChange: PropTypes.func.isRequired
+    onVariablesChange: PropTypes.func.isRequired,
+    onChangeReturn: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {withTheme: true})(BuildDiagram);

@@ -49,13 +49,15 @@ class BuildOptions extends React.Component {
 
   formCode() {
     let buildState = this.props.buildState;
+    console.log(buildState.tabsReturn);
     let code = 'pragma solidity ^0.4.22;\ncontract Purchase {\n';
     for (const [name, type] of Object.entries(buildState.variables)) {
       code += `${type} public ${name};\n`;
     }
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : this.toLowerCamelCase(buildState.tabs[i + 1]);
-      code += `${functionName}(${buildState.tabsParams[i].map(element => `${element.type} ${element.name}`).join(', ')}) public payable {\n${buildState.tabsCode[i]}}\n`;
+      let returnCode = buildState.tabsReturn[i] ? `returns (${buildState.tabsReturn[i]})` : '';
+      code += `${functionName}(${buildState.tabsParams[i].map(element => `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {\n${buildState.tabsCode[i]}}\n`;
     }
     return code;
   }
