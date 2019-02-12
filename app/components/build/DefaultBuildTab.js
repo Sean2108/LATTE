@@ -25,26 +25,41 @@ class DefaultBuildTab extends React.Component {
     params: []
   }
 
-    render() {
-        const {classes, theme, varList, events, onChangeLogic} = this.props;
+  varList;
 
+  componentDidMount() {
+    this.varList = this.props.varList;
+  }
+
+  flattenParamsToObject() {
+    return this.state.params
+    .filter((element) => element.name)
+    .reduce((result, currentObject) => {
+        result[currentObject.name] = currentObject.type;
+        return result;
+    }, {});
+  }
+
+    render() {
+        const {classes, theme, varList, events, onChangeLogic, onChangeParams, onVariablesChange} = this.props;
+        let variables = this.flattenParamsToObject();
         return ( < div > <
-         VariableBox header = {
+         VariableList header = {
             "Function Inputs"
         }
         updateVariables = {
-            (vars) => this.setState({params: vars})
-        }
-        initialVars = {this.state.params} / > < br / > < RequiresList header = {
+            (vars) => this.setState({params: vars}, () => onChangeParams(this.state.params))
+        } / > < br / > < RequiresList header = {
             "Checking Phase"
         }
         vars = {
-            varList.concat(this.state.params)
+            {...varList, ...variables}
         } /> < br / > < BuildDiagram varList = {
-            varList.concat(this.state.params)
+            {...this.varList, ...variables}
         }
         events = {events}
-        onChangeLogic = {onChangeLogic} / > < /div>
+        onChangeLogic = {onChangeLogic}
+        onVariablesChange = {onVariablesChange} / > < /div>
         );
       }
     }
@@ -52,9 +67,11 @@ class DefaultBuildTab extends React.Component {
     DefaultBuildTab.propTypes = {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
-      varList: PropTypes.array.isRequired,
+      varList: PropTypes.object.isRequired,
       events: PropTypes.object.isRequired,
-      onChangeLogic: PropTypes.func.isRequired
+      onChangeLogic: PropTypes.func.isRequired,
+      onChangeParams: PropTypes.func.isRequired,
+      onVariablesChange: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

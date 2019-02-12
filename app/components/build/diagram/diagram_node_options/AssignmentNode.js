@@ -110,7 +110,7 @@ ReturnNode.propTypes = {
     classes: PropTypes.object.isRequired,
     close: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
-    varList: PropTypes.array
+    varList: PropTypes.object
 };
 
 export default withStyles(styles, {withTheme: true})(ReturnNode);

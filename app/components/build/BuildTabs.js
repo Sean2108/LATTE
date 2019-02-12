@@ -50,12 +50,12 @@ const styles = theme => ({
 class BuildTabs extends React.Component {
         state = {
             value: 0,
-            variables: [],
             constructorParams: [],
             entities: {},
             events: {},
             tabs: [],
             tabsCode : [],
+            tabsParams: [],
             addTabPopoverAnchor: null,
             popoverContent: ''
         };
@@ -75,7 +75,9 @@ class BuildTabs extends React.Component {
         render() {
             const {
                 classes,
-                onTabsChange
+                variables,
+                onTabsChange,
+                onVariablesChange
             } = this.props;
             const {
                 value
@@ -114,13 +116,22 @@ class BuildTabs extends React.Component {
         < /TabContainer>} 
         {[...Array(this.state.tabs.length - 1).keys()].map((i) => 
                         value === i + 1 && <TabContainer key = {i}>
-                        <DefaultBuildTab varList = {this.state.variables} events = {this.state.events}
+                        <DefaultBuildTab varList = {variables} events = {this.state.events}
                         onChangeLogic = {(newCode) => {
                             let tabsCode = this.state.tabsCode;
                             tabsCode[i] = newCode;
                             this.setState({tabsCode: tabsCode});
                             onTabsChange({tabsCode: tabsCode});
-                        }} />
+                        }}
+                        onChangeParams = {(newParams) => {
+                            let tabsParams = this.state.tabsParams;
+                            tabsParams[i] = newParams;
+                            this.setState({tabsParams: tabsParams});
+                            onTabsChange({tabsParams: tabsParams});
+                        }
+
+                        }
+                        onVariablesChange = {onVariablesChange} />
                         </TabContainer>
                     )}
         <Popover
@@ -155,8 +166,8 @@ class BuildTabs extends React.Component {
             onClick = {
                 () => {
                     if (this.state.popoverContent && !this.state.tabs.map(tab => tab.toLowerCase()).includes(this.state.popoverContent.toLowerCase())) {
-                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, '']};
-                        this.setState({newTabsState, popoverContent: '', addTabPopoverAnchor: null});
+                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, ''], tabsParams: [...this.state.tabsParams, {}]};
+                        this.setState({...newTabsState, popoverContent: '', addTabPopoverAnchor: null});
                         onTabsChange(newTabsState);
                     }
                 }
@@ -171,7 +182,9 @@ class BuildTabs extends React.Component {
 
 BuildTabs.propTypes = {
     classes: PropTypes.object.isRequired,
-    onTabsChange: PropTypes.func.isRequired
+    variables: PropTypes.object.isRequired,
+    onTabsChange: PropTypes.func.isRequired,
+    onVariablesChange: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(BuildTabs);

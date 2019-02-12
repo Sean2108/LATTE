@@ -27,14 +27,7 @@ const styles = theme => ({
 
 class GlobalStateTab extends React.Component {
     state = {
-      nextKey: 1,
-      variables: [ < StateRow key = {
-          0
-        }
-        isInput = {
-          this.props.isInput
-        }
-        />]
+      variables: [{name: '', type: 'int'}]
       }
 
       render() {
@@ -42,7 +35,7 @@ class GlobalStateTab extends React.Component {
           classes,
           theme,
           header,
-          isInput
+          updateVariables
         } = this.props;
 
         return ( <
@@ -54,7 +47,12 @@ class GlobalStateTab extends React.Component {
             noWrap > {
               header
             } < /Typography> {
-            this.state.variables.map(element => element)
+            this.state.variables.map((element, index) => <StateRow key = {index} updateVariables={(val) => {
+                let variables = this.state.variables;
+                variables[index] = val;
+                this.setState({variables: variables});
+                updateVariables(variables);
+            }}/>)
           }
 
           <
@@ -65,14 +63,7 @@ class GlobalStateTab extends React.Component {
         }
         onClick = {
           () => this.setState({
-              variables: [...this.state.variables, < StateRow key = {
-                  this.state.nextKey
-                }
-                isInput = {
-                  isInput
-                }
-                />],
-                nextKey: this.state.nextKey + 1
+              variables: [...this.state.variables, {name: '', type: 'int'}]
               })
           } >
           +
@@ -89,7 +80,7 @@ class GlobalStateTab extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       header: PropTypes.string.isRequired,
-      isInput: PropTypes.bool.isRequired
+      updateVariables: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

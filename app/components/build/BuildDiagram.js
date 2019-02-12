@@ -24,11 +24,14 @@ class BuildDiagram extends React.Component {
     state = {
         open: false,
         type: '',
-        points: null
+        points: null,
+        returnType: ''
     }
 
     engine;
     start;
+    varList;
+    variables;
 
     constructor(props) {
         super(props);
@@ -54,23 +57,13 @@ class BuildDiagram extends React.Component {
         //4) add the models to the root graph
         model.addAll(this.start);
         model.addListener({
-            nodesUpdated: () => {
-                let code = this.traverseNextNode(this.start);
-                console.log(code);
-                this.props.onChangeLogic(code);
-            },
             linksUpdated: () => {
                 setTimeout(() => {
+                    this.variables = {};
                     let code = this.traverseNextNode(this.start);
-                    console.log(code);
                     this.props.onChangeLogic(code);
-                }, 3000);
-            },
-            entityRemoved: () => {
-                let code = this.traverseNextNode(this.start);
-                console.log(code);
-                this.props.onChangeLogic(code);
-            },
+                }, 5000);
+            }
        });
 
         // load model into engine and render
@@ -162,39 +155,91 @@ class BuildDiagram extends React.Component {
     }
 
     parseNode(nodeCode) {
-        let type, code, lhs, rhs;
+        let type, code, lhs, rhs, parsedLhs, parsedRhs;
         [type, code] = nodeCode.split(': ');
         switch (type) {
             case "Assignment":
                 [lhs, rhs] = code.split(' = ');
-                return `${this.parseVariable(lhs)} = ${this.parseVariable(rhs)};`;
+                parsedLhs = this.parseVariable(lhs);
+                parsedRhs = this.parseVariable(rhs);
+                if (parsedLhs.type === 'var') {
+                    this.variables[parsedLhs.name] = parsedRhs.type;
+                    this.props.onVariablesChange(this.variables);
+                    return `${parsedLhs.name} = ${parsedRhs.name};`;
+                }
+                if (parsedLhs.type !== parsedRhs.type) {
+                    alert('invalid assignment');
+                }
+                return `${parsedLhs.name} = ${parsedRhs.name};`;
             case "Emit Event":
                 return `emit ${code};`
             case "Transfer":
                 [lhs, rhs] = code.split(' to ');
-                return `${this.parseVariable(rhs)}.transfer(${this.parseVariable(lhs)});`;
+                parsedLhs = this.parseVariable(lhs);
+                parsedRhs = this.parseVariable(rhs);
+                if (parsedLhs.type !== 'int') {
+                    alert('value should be an integer');
+                }
+                if (parsedRhs.type !== 'address') {
+                    alert('transfer target should be an address');
+                }
+                return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
             case "Return":
-                return `return ${this.parseVariable(code)};`;
+                let returnVar = this.parseVariable(code);
+                this.setState({returnType: returnVar.type});
+                return `return ${returnVar.name};`;
             case "Compare":
                 let comp;
                 [lhs, comp, rhs] = code.split(/ ([><=]=|>|<) /);
-                return `${this.parseVariable(lhs)} ${comp} ${this.parseVariable(rhs)}`;
+                parsedLhs = this.parseVariable(lhs);
+                parsedRhs = this.parseVariable(rhs);
+                if (parsedLhs.type !== parsedRhs.type) {
+                    alert('comparing different types');
+                }
+                return `${parsedLhs.name} ${comp} ${parsedRhs.name}`;
         }
         return '';
     }
 
     parseVariable(variable) {
-        if (variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'" || !isNaN(variable)) {
-            return variable;
+        let variables = {...this.props.varList, ...this.variables};
+        if (variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'") {
+            return {name: variable, type: 'string'};
+        }
+        if (!isNaN(variable)) {
+            return {name: variable.trim(), type: 'int'};
         }
         for (let operator of ['*', '/', '+', '-']) {
             if (variable.indexOf(operator) > 0) {
                 let lhs, rhs;
                 [lhs, rhs] = variable.split(operator);
-                return `${this.parseVariable(lhs)} ${operator} ${this.parseVariable(rhs)}`;
+                let parsedLhs = this.parseVariable(lhs);
+                let parsedRhs = this.parseVariable(rhs);
+                if (parsedLhs.type !== parsedRhs.type) {
+                    alert('invalid types');
+                    return {name: variable, type: 'invalid'};
+                }
+                if (parsedLhs === 'string' && operator !== '+') {
+                    let varName = `${parsedLhs.name}_${parsedRhs.name}`;
+                    if (!(varName in variables)) {
+                        return {name: varName, type: 'var'};
+                    }
+                    return {name: varName, type: variables[varName]};
+                }
+                return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: parsedLhs.type};
             }
         }
-        return variable.toLowerCase().replace(/\s/g, '_');
+        let varName = variable.toLowerCase().trim().replace(/\s/g, '_');
+        if (varName === 'messagesender' || varName === 'msgsender' || varName === 'sender') {
+            return {name: 'msg.sender', type: 'address'};
+        }
+        if (varName === 'messagevalue' || varName === 'msgvalue' || varName === 'value') {
+            return {name: 'msg.value', type: 'int'};
+        }
+        if (!(varName in variables)) {
+            return {name: varName, type: 'var'};
+        }
+        return {name: varName, type: variables[varName]};
     }
 
     // TODO: allow traversal for diamond nodes
@@ -278,9 +323,10 @@ class BuildDiagram extends React.Component {
 BuildDiagram.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
-    varList: PropTypes.array.isRequired,
+    varList: PropTypes.object.isRequired,
     events: PropTypes.object.isRequired,
-    onChangeLogic: PropTypes.func.isRequired
+    onChangeLogic: PropTypes.func.isRequired,
+    onVariablesChange: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {withTheme: true})(BuildDiagram);

@@ -35,7 +35,9 @@ const styles = theme => ({
 class Build extends React.Component {
   state = {
       tabs: [],
-      tabsCode : []
+      tabsCode : [],
+      variables: {},
+      tabsParams: []
   };
 
   render() {
@@ -48,7 +50,8 @@ class Build extends React.Component {
 
     const {
       tabs,
-      tabsCode
+      tabsCode,
+      variables
     } = this.state;
 
     return ( <
@@ -71,7 +74,7 @@ class Build extends React.Component {
         classes.root
       } >
       <
-      BuildTabs onTabsChange = {(value) => this.setState(value)} / >
+      BuildTabs variables = {variables} onVariablesChange = {(value) => this.setState({variables: value})} onTabsChange = {(value) => this.setState(value)} / >
       <
       BuildOptions onback = {
         onback
@@ -79,11 +82,8 @@ class Build extends React.Component {
       connection = {
         connection
       }
-      tabs= {
-        tabs
-      }
-      tabsCode = {
-        tabsCode
+      buildState = {
+        this.state
       }
       /> <
       /div>

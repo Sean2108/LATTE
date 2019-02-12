@@ -94,7 +94,7 @@ DiagramModal.propTypes = {
     close: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
-    varList: PropTypes.array,
+    varList: PropTypes.object,
     events: PropTypes.object
 };
 

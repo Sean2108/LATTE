@@ -75,7 +75,7 @@ class RequiresList extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       header: PropTypes.string.isRequired,
-      vars: PropTypes.array.isRequired
+      vars: PropTypes.object.isRequired
     };
 
     export default withStyles(styles, {

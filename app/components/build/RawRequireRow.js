@@ -141,7 +141,7 @@ class RawStateRow extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       key: PropTypes.any,
-      vars: PropTypes.array.isRequired,
+      vars: PropTypes.object.isRequired,
       showMessage: PropTypes.bool,
       submit: PropTypes.func
     };

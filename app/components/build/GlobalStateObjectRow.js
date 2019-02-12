@@ -26,14 +26,14 @@ class StateRow extends React.Component {
 
   state = {
     varName: '',
-    varType: 'uint'
+    varType: 'int'
   }
 
   render() {
     const {
       classes,
       theme,
-      isInput
+      updateVariables
     } = this.props;
     return ( <
       div >
@@ -46,9 +46,12 @@ class StateRow extends React.Component {
       InputLabel htmlFor = "name-simple" > Variable Name < /InputLabel> <
       Input id = "varName"
       onChange = {
-        event => this.setState({ ...this.state,
+        event => {
+          this.setState({
           varName: event.target.value
         })
+        updateVariables({name: event.target.value, type: this.state.varType});
+      }
       }
       /> < /
       FormControl >
@@ -63,9 +66,12 @@ class StateRow extends React.Component {
         this.state.varType
       }
       onChange = {
-        event => this.setState({ ...this.state,
+        event => {
+          this.setState({
           varType: event.target.value
         })
+        updateVariables({name: this.state.varName, type: event.target.value});
+      }
       }
       inputProps = {
         {
@@ -74,10 +80,10 @@ class StateRow extends React.Component {
         }
       } >
       <
-      MenuItem value = "uint" > Integer < /MenuItem> <
+      MenuItem value = "int" > Integer < /MenuItem> <
       MenuItem value = "bool" > Boolean < /MenuItem> <
       MenuItem value = "address" > Address < /MenuItem> <
-      MenuItem value = "bytes32" > String < /MenuItem> {!isInput && < MenuItem value = "mapping" > Mapping < /MenuItem>} {!isInput && < MenuItem value = "new" > New Type... < /MenuItem>} < /
+      MenuItem value = "string" > String < /MenuItem> < /
       Select > <
       /FormControl>
 
@@ -91,7 +97,7 @@ class StateRow extends React.Component {
 StateRow.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
-  isInput: PropTypes.bool.isRequired
+  updateVariables: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {
