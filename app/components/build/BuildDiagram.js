@@ -123,16 +123,24 @@ class BuildDiagram extends React.Component {
             if (!falseNextNode || !trueNextNode) {
                 return '';
             }
-            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode)}\n} else {\n${this.traverseNextNode(falseNextNode)}\n}`;
+            let trueWhileCode = this.generateCodeForCycle(node, true);
+            if (trueWhileCode) {
+                return `while (${this.parseNode('Compare: ' + node.name)}) {\n${trueWhileCode}}\n${this.traverseNextNode(falseNextNode)}`;
+            }
+            let falseWhileCode = this.generateCodeForCycle(node, false);
+            if (falseWhileCode) {
+                return `while (!(${this.parseNode('Compare: ' + node.name)})) {\n${falseWhileCode}}\n${this.traverseNextNode(trueNextNode)}`;
+            }
+            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode)}} else {\n${this.traverseNextNode(falseNextNode)}}\n`;
         }
         if (!node) {
             return '';
         }
         let curNodeCode = node.name === 'Start' ? '' : this.parseNode(node.name) + '\n';
-        if (node.getOutPorts().length === 0) {
+        let nextNode = this.getNextNodeForDefaultNode(node);
+        if (!nextNode) {
             return curNodeCode;
         }
-        let nextNode = this.getNextNode(node.getOutPorts()[0]);
         return curNodeCode + this.traverseNextNode(nextNode);
     }
     
@@ -144,6 +152,13 @@ class BuildDiagram extends React.Component {
         else {
             return links[0].targetPort.getNode();
         }
+    }
+
+    getNextNodeForDefaultNode(node) {
+        if (node.getOutPorts().length === 0) {
+            return null;
+        }
+        return this.getNextNode(node.getOutPorts()[0]);
     }
 
     parseNode(nodeCode) {
@@ -159,7 +174,7 @@ class BuildDiagram extends React.Component {
                 [lhs, rhs] = code.split(' to ');
                 return `${this.parseVariable(rhs)}.transfer(${this.parseVariable(lhs)});`;
             case "Return":
-                return `return ${code}`;
+                return `return ${this.parseVariable(code)};`;
             case "Compare":
                 let comp;
                 [lhs, comp, rhs] = code.split(/ ([><=]=|>|<) /);
@@ -174,11 +189,27 @@ class BuildDiagram extends React.Component {
         }
         for (let operator of ['*', '/', '+', '-']) {
             if (variable.indexOf(operator) > 0) {
-                [lhs, rhs] = code.split(operator);
+                let lhs, rhs;
+                [lhs, rhs] = variable.split(operator);
                 return `${this.parseVariable(lhs)} ${operator} ${this.parseVariable(rhs)}`;
             }
         }
         return variable.toLowerCase().replace(/\s/g, '_');
+    }
+
+    // TODO: allow traversal for diamond nodes
+    generateCodeForCycle(start, isTrue) {
+        let outPort = isTrue ? start.outPortTrue : start.outPortFalse;
+        let node = this.getNextNode(outPort);
+        let code = '';
+        while (node) {
+            if (node === start) {
+                return code;
+            }
+            code += this.parseNode(node.name) + '\n';
+            node = this.getNextNodeForDefaultNode(node);
+        }
+        return null;
     }
 
     render() {
