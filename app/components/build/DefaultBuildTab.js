@@ -41,7 +41,7 @@ class DefaultBuildTab extends React.Component {
   }
 
     render() {
-        const {classes, theme, varList, events, onChangeLogic, onChangeParams, onVariablesChange, onChangeReturn} = this.props;
+        const {classes, theme, varList, events, onChangeLogic, onChangeParams, onChangeRequire, onVariablesChange, onChangeReturn} = this.props;
         let variables = this.flattenParamsToObject();
         return ( < div > <
          VariableList header = {
@@ -54,7 +54,9 @@ class DefaultBuildTab extends React.Component {
         }
         vars = {
             {...varList, ...variables}
-        } /> < br / > < BuildDiagram varList = {
+        }
+        onChangeRequire = {onChangeRequire}
+        /> < br / > < BuildDiagram varList = {
             {...this.varList, ...variables}
         }
         events = {events}
@@ -72,6 +74,7 @@ class DefaultBuildTab extends React.Component {
       events: PropTypes.object.isRequired,
       onChangeLogic: PropTypes.func.isRequired,
       onChangeParams: PropTypes.func.isRequired,
+      onChangeRequire: PropTypes.func.isRequired,
       onVariablesChange: PropTypes.func.isRequired,
       onChangeReturn: PropTypes.func.isRequired
     };

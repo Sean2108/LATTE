@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import RawRequireRow from './RawRequireRow';
+import { BuildParser } from './BuildParser';
 
 const styles = theme => ({
   paper: {
@@ -24,17 +25,20 @@ const styles = theme => ({
 
 class RequiresList extends React.Component {
     state = {
-      nextKey: 1,
-      variables: [0]
+      variables: [{var1: '', comp: '==', var2: '', requireMessage: ''}]
       }
+
+      buildParser = new BuildParser(null);
 
       render() {
         const {
           classes,
           theme,
           header,
-          vars
+          vars,
+          onChangeRequire
         } = this.props;
+        this.buildParser.reset(this.props.vars);
 
         return ( <
             Paper className = {
@@ -46,7 +50,14 @@ class RequiresList extends React.Component {
               header
             } < /Typography> {
               
-            this.state.variables.map(element => <RawRequireRow key = {element} vars = {vars} showMessage = {true}/>)
+            this.state.variables.map((element, index) => <RawRequireRow key = {index} vars = {vars} showMessage = {true}
+            updateRequire = {(val) => {
+              let variables = this.state.variables;
+              variables[index] = val;
+              this.setState({variables: variables});
+              onChangeRequire(variables);
+            }}
+            parseVariable = {this.buildParser.parseVariable}/>)
           }
 
           <
@@ -57,8 +68,7 @@ class RequiresList extends React.Component {
         }
         onClick = {
           () => this.setState({
-              variables: [...this.state.variables, this.state.nextKey],
-                nextKey: this.state.nextKey + 1
+              variables: [...this.state.variables, {var1: '', comp: '==', var2: '', requireMessage: ''}]
               })
           } >
           +
@@ -75,7 +85,8 @@ class RequiresList extends React.Component {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       header: PropTypes.string.isRequired,
-      vars: PropTypes.object.isRequired
+      vars: PropTypes.object.isRequired,
+      onChangeRequire: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

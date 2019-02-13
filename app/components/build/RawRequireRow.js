@@ -35,18 +35,31 @@ class RawStateRow extends React.Component {
         var2: '',
         requireMessage: '',
       }
-      
-      changeCondition = (newState) => {
-        this.props.submit(`${newState.var1} ${newState.comp} ${newState.var2}`)
-      };
+
+      validate() {
+        let lhs = this.props.parseVariable(this.state.var1);
+        let rhs = this.props.parseVariable(this.state.var2);
+        if (lhs.type === 'var') {
+          alert('left variable type is unknown');
+        }
+        if (rhs.type === 'var') {
+          alert('right variable type is unknown');
+        }
+        if (lhs.type !== rhs.type) {
+          alert('left and right variables are of differing types');
+        }
+      }
 
       handleChange = name => event => {
-        let newState = {
-          ...this.state,
-          [name]: event.target.value
-        };
-          this.setState(newState);
-          this.changeCondition(newState);
+          this.setState({
+            ...this.state,
+            [name]: event.target.value
+          }, () => {
+            let state = {...this.state};
+            state.var1 = this.props.parseVariable(state.var1).name;
+            state.var2 = this.props.parseVariable(state.var2).name;
+            this.props.updateRequire(state);
+          });
       };
 
       render() {
@@ -123,9 +136,7 @@ class RawStateRow extends React.Component {
             InputLabel htmlFor = "name-simple" > Failure Message < /InputLabel> <
             Input id = "requireMessage"
             multiline fullWidth onChange = {
-              event => this.setState({ ...this.state,
-                failureMessage: event.target.value
-              })
+              this.handleChange('requireMessage')
             }
             /> < /
             FormControl >
@@ -143,7 +154,8 @@ class RawStateRow extends React.Component {
       key: PropTypes.any,
       vars: PropTypes.object.isRequired,
       showMessage: PropTypes.bool,
-      submit: PropTypes.func
+      updateRequire: PropTypes.func.isRequired,
+      parseVariable: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

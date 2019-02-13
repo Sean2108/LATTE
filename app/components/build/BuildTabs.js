@@ -57,6 +57,7 @@ class BuildTabs extends React.Component {
             tabsCode : [],
             tabsParams: [],
             tabsReturn: [],
+            tabsRequire: [],
             addTabPopoverAnchor: null,
             popoverContent: ''
         };
@@ -67,8 +68,15 @@ class BuildTabs extends React.Component {
             });
         };
 
+        handleOnChange = (newState, i, state) => {
+            let tabsState = [...this.state[state]];
+            tabsState[i] = newState;
+            this.setState({[state]: tabsState});
+            this.props.onTabsChange({[state]: tabsState});
+        }
+
         componentWillMount() {
-            let newTabsState = {tabs: ['Global State', 'Initial State'], tabsCode: [''], tabsParams: [[]], tabsReturn: [null]};
+            let newTabsState = {tabs: ['Global State', 'Initial State'], tabsCode: [''], tabsParams: [[]], tabsReturn: [null], tabsRequire: [[]]};
             this.setState(newTabsState);
             this.props.onTabsChange(newTabsState);
         }
@@ -118,24 +126,10 @@ class BuildTabs extends React.Component {
         {[...Array(this.state.tabs.length - 1).keys()].map((i) => 
                         value === i + 1 && <TabContainer key = {i}>
                         <DefaultBuildTab varList = {variables} events = {this.state.events}
-                        onChangeLogic = {(newCode) => {
-                            let tabsCode = this.state.tabsCode;
-                            tabsCode[i] = newCode;
-                            this.setState({tabsCode: tabsCode});
-                            onTabsChange({tabsCode: tabsCode});
-                        }}
-                        onChangeParams = {(newParams) => {
-                            let tabsParams = this.state.tabsParams;
-                            tabsParams[i] = newParams;
-                            this.setState({tabsParams: tabsParams});
-                            onTabsChange({tabsParams: tabsParams});
-                        }}
-                        onChangeReturn = {(newReturn) =>{
-                            let tabsReturn = this.state.tabsReturn;
-                            tabsReturn[i] = newReturn;
-                            this.setState({tabsReturn: tabsReturn});
-                            onTabsChange({tabsReturn: tabsReturn});
-                        }}
+                        onChangeLogic = {(newCode) => this.handleOnChange(newCode, i, 'tabsCode')}
+                        onChangeParams = {(newParams) => this.handleOnChange(newParams, i, 'tabsParams')}
+                        onChangeReturn = {(newReturn) => this.handleOnChange(newReturn, i, 'tabsReturn')}
+                        onChangeRequire = {(newRequire) => this.handleOnChange(newRequire, i, 'tabsRequire')}
                         onVariablesChange = {onVariablesChange} />
                         </TabContainer>
                     )}
@@ -171,7 +165,7 @@ class BuildTabs extends React.Component {
             onClick = {
                 () => {
                     if (this.state.popoverContent && !this.state.tabs.map(tab => tab.toLowerCase()).includes(this.state.popoverContent.toLowerCase())) {
-                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, ''], tabsParams: [...this.state.tabsParams, []]};
+                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, ''], tabsParams: [...this.state.tabsParams, []], tabsRequire: [...this.state.tabsRequire, []]};
                         this.setState({...newTabsState, popoverContent: '', addTabPopoverAnchor: null});
                         onTabsChange(newTabsState);
                     }
