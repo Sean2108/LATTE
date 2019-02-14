@@ -10,9 +10,10 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { platform } from 'os';
 import MenuBuilder from './menu';
+import {compile} from 'solc';
 
 let mainWindow = null;
 
@@ -94,3 +95,24 @@ app.on('ready', async () => {
 if (platform() === 'linux') {
   app.disableHardwareAcceleration();
 }
+
+ipcMain.on('request-compile', (event, arg) => {
+  if (mainWindow) {
+      let input = {
+        language: 'Solidity',
+        sources: {
+            'code.sol': {
+                content: arg
+            }
+        },
+        settings: {
+            outputSelection: {
+                '*': {
+                    '*': [ '*' ]
+                }
+            }
+        }
+    }
+    mainWindow.webContents.send('request-compile-complete', compile(JSON.stringify(input)));
+  }
+});
