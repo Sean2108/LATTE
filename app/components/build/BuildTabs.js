@@ -11,6 +11,7 @@ import Popover from '@material-ui/core/Popover';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import InitialStateTab from './InitialStateTab';
 
 function TabContainer(props) {
     return (
@@ -115,13 +116,12 @@ class BuildTabs extends React.Component {
                 scrollable scrollButtons = "auto" >
                 {this.state.tabs.map((label) => <Tab label={label} key={label}/>)}
                 <Tab onClick={(event) => this.setState({addTabPopoverAnchor: event.currentTarget})} label='+'/> < /Tabs> < /AppBar > {
-        value === 0 && < TabContainer > < StructList header = {
-            "Entities"
-        } updateVariables = {(entities) => this.setState({...this.state, entities : entities})}
-        initialVars = {this.state.entities}/ > <br/> < StructList header = {
-            "Events"
-        } updateVariables = {(events) => this.setState({...this.state, events : events})}
-        initialVars = {this.state.events}/ > <br/>
+        value === 0 && < TabContainer > 
+        <InitialStateTab 
+        entities={this.state.entities}
+        events={this.state.events}
+        updateEntities={(entities) => this.setState({...this.state, entities : entities})}
+        updateEvents={(events) => this.setState({...this.state, events : events})}/>
         < /TabContainer>} 
         {[...Array(this.state.tabs.length - 1).keys()].map((i) => 
                         value === i + 1 && <TabContainer key = {i}>
