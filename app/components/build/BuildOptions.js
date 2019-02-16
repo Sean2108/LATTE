@@ -32,11 +32,14 @@ class BuildOptions extends React.Component {
       this.web3.eth.defaultAccount = account;
       let code = this.formCode();
       console.log(code);
-      // var code = "pragma solidity ^0.5.4; contract FoodSafe {    struct Location{        string Name;        uint LocationId;        uint PreviousLocationId;        uint Timestamp;        string Secret;    }        mapping(uint => Location) Trail;    uint8 TrailCount=0;    function AddNewLocation(uint LocationId, string Name, string Secret)   {        Location memory newLocation;        newLocation.Name = Name;        newLocation.LocationId= LocationId;        newLocation.Secret= Secret;        newLocation.Timestamp = now;        if(TrailCount!=0)        {            newLocation.PreviousLocationId= Trail[TrailCount].LocationId;        }        Trail[TrailCount] = newLocation;        TrailCount++;    }    function GetTrailCount() returns(uint8){        return TrailCount;    }    function GetLocation(uint8 TrailNo) returns (string,uint,uint,uint,string)    {        return (Trail[TrailNo].Name, Trail[TrailNo].LocationId, Trail[TrailNo].PreviousLocationId, Trail[TrailNo].Timestamp,Trail[TrailNo].Secret);    }}";
-      // let foodSafeCompiled = this.web3.eth.compile.solidity(foodSafeSource);
       ipcRenderer.send('request-compile', code);
       ipcRenderer.on('request-compile-complete', (event, payload) => {
         let compiledCode = JSON.parse(payload);
+        console.log(compiledCode);
+        if ('errors' in compiledCode) {
+          alert(compiledCode['errors'][0]['formattedMessage']);
+          return;
+        }
         let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
         let contract = new this.web3.eth.Contract(abiDefinition);
         let byteCode = compiledCode.contracts['code.sol']['Code'].evm.bytecode;
@@ -54,15 +57,16 @@ class BuildOptions extends React.Component {
 
   formCode() {
     let buildState = this.props.buildState;
+    console.log(buildState.tabsReturn);
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
     for (const [name, type] of Object.entries(buildState.variables)) {
       code += `${type} public ${name};\n`;
     }
     for (let i = 0; i < buildState.tabsCode.length; i++) {
-      let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : this.toLowerCamelCase(buildState.tabs[i + 1]);
+      let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i] ? `returns (${buildState.tabsReturn[i]})` : '';
-      code += `${functionName}(${buildState.tabsParams[i].map(element => `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {\n
-        ${buildState.tabsRequire[i].map(req => `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`)}${buildState.tabsCode[i]}}\n`;
+      code += `${functionName}(${buildState.tabsParams[i].map(element => `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
+      ${buildState.tabsRequire[i].map(req => `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`)}${buildState.tabsCode[i]}}\n`;
     }
     return code + '}';
   }

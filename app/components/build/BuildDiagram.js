@@ -30,6 +30,7 @@ class BuildDiagram extends React.Component {
 
     engine;
     start;
+    buildParser;
 
     constructor(props) {
         super(props);
@@ -51,16 +52,16 @@ class BuildDiagram extends React.Component {
         var startOut = this.start.addOutPort(" ");
         startOut.setMaximumLinks(1);
         this.start.setPosition(100, 100);
-        let buildParser = new BuildParser(this.props.onVariablesChange);
+        this.buildParser = new BuildParser(this.props.onVariablesChange);
         //4) add the models to the root graph
         model.addAll(this.start);
         model.addListener({
             linksUpdated: () => {
                 setTimeout(() => {
-                    buildParser.reset(this.props.varList);
-                    let code = buildParser.traverseNextNode(this.start);
+                    this.buildParser.reset(this.props.varList);
+                    let code = this.buildParser.traverseNextNode(this.start);
                     this.props.onChangeLogic(code);
-                    this.props.onChangeReturn(buildParser.getReturnVar());
+                    this.props.onChangeReturn(this.buildParser.getReturnVar());
                 }, 5000);
             }
        });

@@ -27,7 +27,7 @@ class DefaultBuildTab extends React.Component {
 
   varList;
 
-  componentDidMount() {
+  componentWillMount() {
     this.varList = this.props.varList;
   }
 
