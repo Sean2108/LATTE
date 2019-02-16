@@ -41,10 +41,23 @@ class BuildOptions extends React.Component {
         }
         let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
         let contract = new this.web3.eth.Contract(abiDefinition);
-        let byteCode = compiledCode.contracts['code.sol']['Code'].evm.bytecode;
-        let deployedContract = contract.deploy([],{data: byteCode, from: this.web3.eth.accounts[0], gas: 4700000});
-        console.log(deployedContract);
-      });
+        let byteCode = compiledCode.contracts['code.sol']['Code'].evm.bytecode.object;
+        contract.deploy({data: byteCode})
+        .send({
+          from: account,
+          gas: 1500000,
+          gasPrice: '30000000000000'
+        })
+        .on('error', (error) => { console.log(error) })
+        .on('transactionHash', (transactionHash) => { console.log(transactionHash) })
+        .on('receipt', (receipt) => {
+          console.log(receipt.contractAddress) // contains the new contract address
+        })
+        .on('confirmation', (confirmationNumber, receipt) => { console.log(confirmationNumber) })
+        .then((newContractInstance) => {
+            console.log(newContractInstance.options.address) // instance with the new contract address
+        });
+        });
     });
   }
 
