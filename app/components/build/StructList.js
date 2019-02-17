@@ -71,7 +71,7 @@ class StructList extends React.Component {
     };
 
     render() {
-        const {classes, theme, header, updateVariables} = this.props;
+        const {classes, theme, header, updateVariables, initialVars} = this.props;
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > {
@@ -93,7 +93,8 @@ class StructList extends React.Component {
                         this.setState({entities: entities});
                         updateVariables(entities);
                     }
-                } / >
+                }
+                vars = {this.state.entities[key]} / >
                 </Grid>)
     }
         </Grid> 

@@ -10,7 +10,7 @@ import BuildOptions from './BuildOptions';
 import BuildDiagram from './BuildDiagram';
 import BuildTabs from './BuildTabs';
 import Button from '@material-ui/core/Button';
-import StateRow from './GlobalStateObjectRow';
+import VariableRow from './VariableRow';
 
 const styles = theme => ({
   paper: {
@@ -25,9 +25,13 @@ const styles = theme => ({
   },
 });
 
-class GlobalStateTab extends React.Component {
+class VariableList extends React.Component {
     state = {
-      variables: [{name: '', type: 'int'}]
+      variables: []
+      }
+
+      componentWillMount() {
+        this.setState({variables: this.props.vars.length > 0 ? this.props.vars : [{name: '', type: 'int'}]});
       }
 
       render() {
@@ -47,7 +51,7 @@ class GlobalStateTab extends React.Component {
             noWrap > {
               header
             } < /Typography> {
-            this.state.variables.map((element, index) => <StateRow key = {index} updateVariables={(val) => {
+            this.state.variables.map((element, index) => <VariableRow val = {this.state.variables[index]} key = {index} updateVariables={(val) => {
                 let variables = this.state.variables;
                 variables[index] = val;
                 this.setState({variables: variables});
@@ -76,13 +80,14 @@ class GlobalStateTab extends React.Component {
       }
     }
 
-    GlobalStateTab.propTypes = {
+    VariableList.propTypes = {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       header: PropTypes.string.isRequired,
-      updateVariables: PropTypes.func.isRequired
+      updateVariables: PropTypes.func.isRequired,
+      vars: PropTypes.array.isRequired
     };
 
     export default withStyles(styles, {
       withTheme: true
-    })(GlobalStateTab);
+    })(VariableList);

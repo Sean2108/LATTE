@@ -55,14 +55,10 @@ const styles = theme => ({
 });
 
 class ParamList extends React.Component {
-    state = {
-        params: []
-    };
 
     handleChange = (index) => event => {
-        let params = [...this.state.params];
+        let params = [...this.props.params];
         params[index].value = event.target.value;
-        this.setState({params: params});
         this.props.updateParams(params);
     };
 
@@ -78,7 +74,7 @@ class ParamList extends React.Component {
             header
         } < /Typography>
         <br/>
-        {this.state.params.map((param, index) => <div key={index}>
+        {params.map((param, index) => <div key={index}>
         <TextField
           id="value"
           label={`Value of ${param.name || ''}`}

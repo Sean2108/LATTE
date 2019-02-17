@@ -41,7 +41,7 @@ class DefaultBuildTab extends React.Component {
   }
 
     render() {
-        const {classes, theme, varList, events, onChangeLogic, onChangeParams, onChangeRequire, onVariablesChange, onChangeReturn} = this.props;
+        const {classes, theme, varList, events, onChangeLogic, onChangeParams, onChangeRequire, onVariablesChange, onChangeReturn, params} = this.props;
         let variables = this.flattenParamsToObject();
         return ( < div > <
          VariableList header = {
@@ -49,7 +49,8 @@ class DefaultBuildTab extends React.Component {
         }
         updateVariables = {
             (vars) => this.setState({params: vars}, () => onChangeParams(this.state.params))
-        } / > < br / > < RequiresList header = {
+        }
+        vars = {params} / > < br / > < RequiresList header = {
             "Checking Phase"
         }
         vars = {
@@ -76,7 +77,8 @@ class DefaultBuildTab extends React.Component {
       onChangeParams: PropTypes.func.isRequired,
       onChangeRequire: PropTypes.func.isRequired,
       onVariablesChange: PropTypes.func.isRequired,
-      onChangeReturn: PropTypes.func.isRequired
+      onChangeReturn: PropTypes.func.isRequired,
+      params: PropTypes.array.isRequired
     };
 
     export default withStyles(styles, {

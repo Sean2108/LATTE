@@ -10,6 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
   button: {
@@ -20,20 +21,20 @@ const styles = theme => ({
     minWidth: 120,
     maxWidth: 150
   },
+  textField: {
+      marginLeft: theme.spacing.unit,
+      marginRight: theme.spacing.unit
+  },
 });
 
-class StateRow extends React.Component {
-
-  state = {
-    varName: '',
-    varType: 'int'
-  }
+class VariableRow extends React.Component {
 
   render() {
     const {
       classes,
       theme,
-      updateVariables
+      updateVariables,
+      val
     } = this.props;
     return ( <
       div >
@@ -42,18 +43,13 @@ class StateRow extends React.Component {
       FormControl className = {
         classes.formControl
       } >
-      <
-      InputLabel htmlFor = "name-simple" > Variable Name < /InputLabel> <
-      Input id = "varName"
-      onChange = {
-        event => {
-          this.setState({
-          varName: event.target.value
-        })
-        updateVariables({name: event.target.value, type: this.state.varType});
-      }
-      }
-      /> < /
+      <TextField
+          label="Variable Name"
+          className={classes.textField}
+          value={val.name}
+          onChange={event => updateVariables({...val, name: event.target.value})}
+          margin="normal"
+        /> < /
       FormControl >
 
       <
@@ -63,15 +59,10 @@ class StateRow extends React.Component {
       <
       InputLabel htmlFor = "protocol" > Variable Type < /InputLabel> <
       Select value = {
-        this.state.varType
+        val.type
       }
       onChange = {
-        event => {
-          this.setState({
-          varType: event.target.value
-        })
-        updateVariables({name: this.state.varName, type: event.target.value});
-      }
+        event => updateVariables({...val, type: event.target.value})
       }
       inputProps = {
         {
@@ -94,12 +85,13 @@ class StateRow extends React.Component {
   }
 }
 
-StateRow.propTypes = {
+VariableRow.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
-  updateVariables: PropTypes.func.isRequired
+  updateVariables: PropTypes.func.isRequired,
+  val: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, {
   withTheme: true
-})(StateRow);
+})(VariableRow);
