@@ -52,7 +52,6 @@ class BuildDiagram extends React.Component {
         if (Object.entries(this.props.diagram).length > 0) {
             this.model.deSerializeDiagram(this.props.diagram, this.engine);
             this.start = this.findStart();
-            console.log(this.start);
         }
         if (!this.start) {
             this.start = new DefaultNodeModel("Start", "rgb(0,192,255)");
