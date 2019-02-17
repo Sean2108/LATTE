@@ -79,12 +79,11 @@ class ParamList extends React.Component {
         } < /Typography>
         <br/>
         {this.state.params.map((param, index) => <div key={index}>
-        <InputLabel htmlFor = "value" > {param.name}: </InputLabel>
         <TextField
           id="value"
-          label="Value"
+          label={`Value of ${param.name || ''}`}
           className={classes.textField}
-          value={param.value}
+          value={param.value || ''}
           onChange={this.handleChange(index)}
           margin="normal"
         /></div>)}

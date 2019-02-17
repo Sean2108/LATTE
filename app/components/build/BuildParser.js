@@ -80,7 +80,10 @@ export class BuildParser {
                 }
                 return `${parsedLhs.name} = ${parsedRhs.name};`;
             case "Emit Event":
-                return `emit ${code};`
+                let eventName, params;
+                [eventName, params] = code.split('(');
+                params = params.replace(')', '').split(', ').map(param => this.parseVariable(param).name).join(', ');
+                return `emit ${eventName}(${params});`
             case "Transfer":
                 [lhs, rhs] = code.split(' to ');
                 parsedLhs = this.parseVariable(lhs);

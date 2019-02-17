@@ -35,7 +35,7 @@ class BuildOptions extends React.Component {
       ipcRenderer.send('request-compile', code);
       ipcRenderer.on('request-compile-complete', (event, payload) => {
         let compiledCode = JSON.parse(payload);
-        if ('errors' in compiledCode) {
+        if ('errors' in compiledCode && !('contracts' in compiledCode)) {
           alert(compiledCode['errors'][0]['formattedMessage']);
           return;
         }
@@ -73,7 +73,6 @@ class BuildOptions extends React.Component {
 
   formCode() {
     let buildState = this.props.buildState;
-    console.log(buildState);
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
     for (const [name, type] of Object.entries(buildState.variables)) {
       code += `${type} public ${name};\n`;
@@ -84,7 +83,7 @@ class BuildOptions extends React.Component {
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i] ? `returns (${buildState.tabsReturn[i]})` : '';
-      code += `${functionName}(${buildState.tabsParams[i].map(element => `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
+      code += `${functionName}(${buildState.tabsParams[i].map(element => element.type === 'string' ? `${element.type} memory ${element.name}` : `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
       ${buildState.tabsRequire[i].map(req => `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`)}${buildState.tabsCode[i]}}\n`;
     }
     return code + '}';

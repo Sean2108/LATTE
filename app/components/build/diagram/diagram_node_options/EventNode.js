@@ -8,6 +8,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import ParamList from '../../ParamList';
 
 const styles = theme => ({
     paper: {
@@ -35,7 +36,8 @@ const styles = theme => ({
 
 class EventNode extends React.Component {
     state = {
-        variableSelected: ''
+        variableSelected: '',
+        emitStatement: ''
     }
 
     render() {
@@ -46,7 +48,7 @@ class EventNode extends React.Component {
                 <InputLabel htmlFor="var">Event to emit</InputLabel>
                 <Select
                     value={this.state.variableSelected}
-                    onChange={(event) => this.setState({variableSelected: event.target.value})}
+                    onChange={(event) => this.setState({variableSelected: event.target.value, emitStatement: `${event.target.value}()`})}
                     inputProps={{
                     name: 'var',
                     id: 'var'
@@ -57,6 +59,13 @@ class EventNode extends React.Component {
                     {Object.keys(varList).map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
                 </Select>
                 <br/>
+
+                {
+                    this.state.variableSelected !== '' && varList[this.state.variableSelected].length > 0 &&
+                    <ParamList header = {"Event Parameters"}
+                    params={varList[this.state.variableSelected]}
+                    updateParams={(params) => this.setState({emitStatement: `${this.state.variableSelected}(${params.map(param => param.value).join(', ')})`})}/>
+                }
 
                 <div className={classes.rightIcon}>
                     <Button
@@ -72,7 +81,12 @@ class EventNode extends React.Component {
                         variant="contained"
                         color="primary"
                         className={classes.button}
-                        onClick={() => {close(); submit(this.state.variableSelected)}}>
+                        onClick={() => {
+                            if (!this.state.variableSelected) {
+                                return;
+                            }
+                            close(); 
+                            submit(this.state.emitStatement)}}>
                         Done
                         <DoneIcon/>
                     </Button>
