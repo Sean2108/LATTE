@@ -30,6 +30,7 @@ class BuildDiagram extends React.Component {
 
     engine;
     start;
+    model;
     buildParser;
 
     constructor(props) {
@@ -47,15 +48,22 @@ class BuildDiagram extends React.Component {
             .registerNodeFactory(new DiamondNodeFactory());
 
         // setup the diagram model
-        const model = new DiagramModel();
-        this.start = new DefaultNodeModel("Start", "rgb(0,192,255)");
-        var startOut = this.start.addOutPort(" ");
-        startOut.setMaximumLinks(1);
-        this.start.setPosition(100, 100);
+        this.model = new DiagramModel();
+        if (Object.entries(this.props.diagram).length > 0) {
+            this.model.deSerializeDiagram(this.props.diagram, this.engine);
+            this.start = this.findStart();
+            console.log(this.start);
+        }
+        if (!this.start) {
+            this.start = new DefaultNodeModel("Start", "rgb(0,192,255)");
+            var startOut = this.start.addOutPort(" ");
+            startOut.setMaximumLinks(1);
+            this.start.setPosition(100, 100);
+            //4) add the models to the root graph
+            this.model.addAll(this.start);
+        }
         this.buildParser = new BuildParser(this.props.onVariablesChange);
-        //4) add the models to the root graph
-        model.addAll(this.start);
-        model.addListener({
+        this.model.addListener({
             linksUpdated: () => {
                 setTimeout(() => {
                     this.buildParser.reset(this.props.varList);
@@ -69,7 +77,20 @@ class BuildDiagram extends React.Component {
         // load model into engine and render
         this
             .engine
-            .setDiagramModel(model);
+            .setDiagramModel(this.model);
+    }
+
+    componentWillUnmount() {
+        this.props.updateDiagram(this.model.serializeDiagram());
+    }
+
+    findStart() {
+        for (let node of Object.values(this.model.getNodes())) {
+            if (node.name === 'Start') {
+                return node;
+            }
+        }
+        return null;
     }
 
     createDefaultNode(label, color, isReturn) {
@@ -179,7 +200,9 @@ BuildDiagram.propTypes = {
     events: PropTypes.object.isRequired,
     onChangeLogic: PropTypes.func.isRequired,
     onVariablesChange: PropTypes.func.isRequired,
-    onChangeReturn: PropTypes.func.isRequired
+    onChangeReturn: PropTypes.func.isRequired,
+    diagram: PropTypes.object.isRequired,
+    updateDiagram: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {withTheme: true})(BuildDiagram);

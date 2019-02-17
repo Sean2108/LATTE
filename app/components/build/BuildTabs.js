@@ -60,7 +60,8 @@ class BuildTabs extends React.Component {
             tabsReturn: [],
             tabsRequire: [],
             addTabPopoverAnchor: null,
-            popoverContent: ''
+            popoverContent: '',
+            diagrams: []
         };
 
         handleChange = (event, value) => {
@@ -86,7 +87,7 @@ class BuildTabs extends React.Component {
         }
 
         componentWillMount() {
-            let newTabsState = {tabs: ['Global State', 'Initial State'], tabsCode: [''], tabsParams: [[]], tabsReturn: [null], tabsRequire: [[]]};
+            let newTabsState = {tabs: ['Global State', 'Initial State'], tabsCode: [''], tabsParams: [[]], tabsReturn: [null], tabsRequire: [[]], diagrams: [{}]};
             this.setState(newTabsState);
             this.props.onTabsChange(newTabsState);
         }
@@ -145,7 +146,9 @@ class BuildTabs extends React.Component {
                         onChangeRequire = {(newRequire) => this.handleOnChange(newRequire, i, 'tabsRequire')}
                         onVariablesChange = {(variables) => onTabsChange({variables: variables})}
                         params = {this.state.tabsParams[i]}
-                        requires = {this.state.tabsRequire[i]} />
+                        requires = {this.state.tabsRequire[i]}
+                        diagram = {this.state.diagrams[i]}
+                        updateDiagram = {(diagram) => this.handleOnChange(diagram, i, 'diagrams')} />
                         </TabContainer>
                     )}
         <Popover
@@ -180,7 +183,8 @@ class BuildTabs extends React.Component {
             onClick = {
                 () => {
                     if (this.state.popoverContent && !this.state.tabs.map(tab => tab.toLowerCase()).includes(this.state.popoverContent.toLowerCase())) {
-                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, ''], tabsParams: [...this.state.tabsParams, []], tabsRequire: [...this.state.tabsRequire, []]};
+                        let newTabsState = {tabs: [...this.state.tabs, this.state.popoverContent], tabsCode: [...this.state.tabsCode, ''], 
+                        tabsParams: [...this.state.tabsParams, []], tabsRequire: [...this.state.tabsRequire, []], diagrams: [...this.diagrams, {}]};
                         this.setState({...newTabsState, popoverContent: '', addTabPopoverAnchor: null});
                         onTabsChange(newTabsState);
                     }
