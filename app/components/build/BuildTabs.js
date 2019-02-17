@@ -5,7 +5,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import StructList from './StructList';
+import StructList from './BoxStructList';
 import DefaultBuildTab from './DefaultBuildTab';
 import Popover from '@material-ui/core/Popover';
 import AddIcon from '@material-ui/icons/Add';
@@ -95,8 +95,7 @@ class BuildTabs extends React.Component {
             const {
                 classes,
                 variables,
-                onTabsChange,
-                onVariablesChange
+                onTabsChange
             } = this.props;
             const {
                 value
@@ -130,7 +129,7 @@ class BuildTabs extends React.Component {
         entities={this.state.entities}
         events={this.state.events}
         updateEntities={(entities) => this.setState({...this.state, entities : entities})}
-        updateEvents={(events) => this.setState({...this.state, events : events})}
+        updateEvents={(events) => this.setState({...this.state, events : events}, () => onTabsChange({events: this.state.events}))}
         params={this.state.constructorParams}
         updateParams={(params) => {
             this.setState({constructorParams: params}); 
@@ -144,7 +143,7 @@ class BuildTabs extends React.Component {
                         onChangeParams = {(newParams) => this.handleChangeParams(newParams, i)}
                         onChangeReturn = {(newReturn) => this.handleOnChange(newReturn, i, 'tabsReturn')}
                         onChangeRequire = {(newRequire) => this.handleOnChange(newRequire, i, 'tabsRequire')}
-                        onVariablesChange = {onVariablesChange} />
+                        onVariablesChange = {(variables) => onTabsChange({variables: variables})} />
                         </TabContainer>
                     )}
         <Popover
@@ -196,8 +195,7 @@ class BuildTabs extends React.Component {
 BuildTabs.propTypes = {
     classes: PropTypes.object.isRequired,
     variables: PropTypes.object.isRequired,
-    onTabsChange: PropTypes.func.isRequired,
-    onVariablesChange: PropTypes.func.isRequired
+    onTabsChange: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(BuildTabs);

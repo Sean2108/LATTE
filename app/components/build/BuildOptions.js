@@ -73,9 +73,13 @@ class BuildOptions extends React.Component {
 
   formCode() {
     let buildState = this.props.buildState;
+    console.log(buildState);
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
     for (const [name, type] of Object.entries(buildState.variables)) {
       code += `${type} public ${name};\n`;
+    }
+    for (const [name, params] of Object.entries(buildState.events)) {
+      code += `event ${name} (${params.map(param => `${param.type} ${param.name}`).join(', ')});\n`;
     }
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;

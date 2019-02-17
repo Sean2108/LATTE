@@ -40,7 +40,8 @@ class Build extends React.Component {
       tabsParams: [],
       tabsReturn: [],
       tabsRequire: [],
-      constructorParams: []
+      constructorParams: [],
+      events: {}
   };
 
   render() {

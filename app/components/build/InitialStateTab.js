@@ -22,10 +22,11 @@ class InitialStateTab extends React.Component {
     render() {
         const {classes, theme, entities, events, updateEntities, updateEvents, params, updateParams} = this.props;
         return ( < div > 
-        < StructList header = {
+        {/* < StructList header = {
             "Entities"
         } updateVariables = {updateEntities}
-        initialVars = {entities}/ > <br/> < StructList header = {
+        initialVars = {entities}/ > <br/>  */}
+        < StructList header = {
             "Events"
         } updateVariables = {updateEvents}
         initialVars = {events}/ > <br/>

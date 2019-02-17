@@ -10,7 +10,6 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
-import VariableList from './VariableList';
 
 const styles = theme => ({
     container: {
@@ -78,22 +77,100 @@ class StructList extends React.Component {
             header
         } < /Typography>
         <br/>
+        <Popover
+          id="simple-popper"
+          open={this.state.anchor != null}
+          anchorEl={this.state.anchor}
+          onClose={() => this.setState({anchor: null})}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+        >
+          < TextField id = "standard-name"
+    label = {header === "Entities" ? "Entity Property Name" : "Property to Display"}
+    className = {
+        classes.textField
+    }
+    onChange = {
+        this.handleChange('propcontents')
+    }
+    value = {
+        this.state.propcontents
+    }
+    margin = "normal" / > < Button variant = "contained" color = "primary" className = {
+        classes.button
+    }
+    onClick = {
+        () => {
+            if (!this.state.propcontents || this.state.entities[this.state.modalAdd].includes(this.state.propcontents)) 
+                return;
+            let newVars = {...this.state.entities};
+            newVars[this.state.modalAdd].push(this.state.propcontents);
+            this.setState({entities: newVars, propcontents: '', anchor: null});
+            updateVariables(newVars);
+        }
+    } > Add < AddIcon className = {
+        classes.rightIcon
+    } /> < /Button>
+        </Popover>
         <Grid container spacing={24}>
         {
             Object.keys(this.state.entities).map((key) => 
-                    <Grid item xs={6} key={key}>
-                    <
-                VariableList header = {
-                    key
+            <Grid item xs={6} key={key}>
+            <Paper className = {
+                    classes.paper
+                }>
+                <div className = {classes.entityName}>
+                <Typography className = {classes.entityHeader} variant="display1" noWrap>{key}</Typography >< IconButton size = "small" className = {
+                    classes.button
                 }
-                updateVariables = {
-                    (vars) => {
-                        let entities = {...this.state.entities};
-                        entities[key] = vars;
-                        this.setState({entities: entities});
-                        updateVariables(entities);
+                onClick = {
+                    () => {
+                        let vars = {...this.state.entities};
+                        delete vars[key];
+                        this.setState({entities: vars});
+                        // updateVariables(vars);
                     }
-                } / >
+                } > < DeleteIcon / > < /IconButton>
+                < IconButton size = "small" className = {
+                    classes.button
+                }
+                onClick = {
+                    (event) => {
+                        this.setState({anchor: event.currentTarget, modalAdd: key});
+                    }
+                } > < AddIcon / > < /IconButton> </div> {
+                this
+                .state
+                .entities[key]
+                .map(element => < Paper key = {
+                    element
+                }
+                className = {
+                    classes.innerPaper
+                } > {
+                    element
+                } < IconButton size = "small" className = {
+                    classes.button
+                }
+                onClick = {
+                    () => {
+                        let vars = {...this.state.entities};
+                        var index = vars[key].indexOf(element);
+                        if (index !== -1) {
+                            vars[key].splice(index, 1);
+                            this.setState({entities: vars});
+                            updateVariables(vars);
+                        }
+                    }
+                } > < DeleteIcon / > < /IconButton> <
+              /Paper >)}
+              </Paper>
                 </Grid>)
     }
         </Grid> 
