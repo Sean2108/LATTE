@@ -42,7 +42,11 @@ class BuildOptions extends React.Component {
         let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
         let contract = new this.web3.eth.Contract(abiDefinition);
         let byteCode = compiledCode.contracts['code.sol']['Code'].evm.bytecode.object;
-        contract.deploy({data: byteCode})
+        let deploymentJson = {data: byteCode};
+        if (this.props.buildState.constructorParams.length) {
+          deploymentJson['arguments'] = this.props.buildState.constructorParams.map(param => param.type === 'int' ? parseInt(param.value) : param.value);
+        }
+        contract.deploy(deploymentJson)
         .send({
           from: account,
           gas: 1500000,

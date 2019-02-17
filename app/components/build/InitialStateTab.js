@@ -2,6 +2,7 @@ import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import StructList from './StructList';
+import ParamList from './ParamList';
 
 const styles = theme => ({
     paper: {
@@ -19,7 +20,7 @@ const styles = theme => ({
 class InitialStateTab extends React.Component {
 
     render() {
-        const {classes, theme, entities, events, updateEntities, updateEvents} = this.props;
+        const {classes, theme, entities, events, updateEntities, updateEvents, params, updateParams} = this.props;
         return ( < div > 
         < StructList header = {
             "Entities"
@@ -27,7 +28,10 @@ class InitialStateTab extends React.Component {
         initialVars = {entities}/ > <br/> < StructList header = {
             "Events"
         } updateVariables = {updateEvents}
-        initialVars = {events}/ > <br/> < /div>
+        initialVars = {events}/ > <br/>
+        {params && params.length > 0 && <ParamList header = {"Constructor Parameters"}
+        params={params}
+        updateParams={updateParams}/>} < /div>
         );
       }
     }
@@ -38,7 +42,9 @@ class InitialStateTab extends React.Component {
       entities: PropTypes.object.isRequired,
       events: PropTypes.object.isRequired,
       updateEntities: PropTypes.func.isRequired,
-      updateEvents: PropTypes.func.isRequired
+      updateEvents: PropTypes.func.isRequired,
+      params: PropTypes.array.isRequired,
+      updateParams: PropTypes.func.isRequired
     };
 
     export default withStyles(styles, {

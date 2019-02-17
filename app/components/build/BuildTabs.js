@@ -76,6 +76,15 @@ class BuildTabs extends React.Component {
             this.props.onTabsChange({[state]: tabsState});
         }
 
+        handleChangeParams = (newState, i) => {
+            this.handleOnChange(newState, i, 'tabsParams');
+            if (i == 0) {
+                let newParams = newState.map(param => {return {...param, value: ''}});
+                this.setState({constructorParams: newParams});
+                this.props.onTabsChange({constructorParams: newParams});
+            }
+        }
+
         componentWillMount() {
             let newTabsState = {tabs: ['Global State', 'Initial State'], tabsCode: [''], tabsParams: [[]], tabsReturn: [null], tabsRequire: [[]]};
             this.setState(newTabsState);
@@ -121,13 +130,18 @@ class BuildTabs extends React.Component {
         entities={this.state.entities}
         events={this.state.events}
         updateEntities={(entities) => this.setState({...this.state, entities : entities})}
-        updateEvents={(events) => this.setState({...this.state, events : events})}/>
+        updateEvents={(events) => this.setState({...this.state, events : events})}
+        params={this.state.constructorParams}
+        updateParams={(params) => {
+            this.setState({constructorParams: params}); 
+            this.props.onTabsChange({constructorParams: params
+            })}}/>
         < /TabContainer>} 
         {[...Array(this.state.tabs.length - 1).keys()].map((i) => 
                         value === i + 1 && <TabContainer key = {i}>
                         <DefaultBuildTab varList = {variables} events = {this.state.events}
                         onChangeLogic = {(newCode) => this.handleOnChange(newCode, i, 'tabsCode')}
-                        onChangeParams = {(newParams) => this.handleOnChange(newParams, i, 'tabsParams')}
+                        onChangeParams = {(newParams) => this.handleChangeParams(newParams, i)}
                         onChangeReturn = {(newReturn) => this.handleOnChange(newReturn, i, 'tabsReturn')}
                         onChangeRequire = {(newRequire) => this.handleOnChange(newRequire, i, 'tabsRequire')}
                         onVariablesChange = {onVariablesChange} />

@@ -39,7 +39,8 @@ class Build extends React.Component {
       variables: {},
       tabsParams: [],
       tabsReturn: [],
-      tabsRequire: []
+      tabsRequire: [],
+      constructorParams: []
   };
 
   render() {
@@ -76,7 +77,10 @@ class Build extends React.Component {
         classes.root
       } >
       <
-      BuildTabs variables = {variables} onVariablesChange = {(value) => this.setState({variables: value})} onTabsChange = {(value) => this.setState(value)} / >
+      BuildTabs 
+        variables = {variables} 
+        onVariablesChange = {(value) => this.setState({variables: value})} 
+        onTabsChange = {(value) => this.setState(value)} / >
       <
       BuildOptions onback = {
         onback
