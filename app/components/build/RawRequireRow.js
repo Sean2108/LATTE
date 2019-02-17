@@ -45,10 +45,12 @@ class RawStateRow extends React.Component {
 
       handleChange = name => event => {
         let state = {...this.props.require, [name]: event.target.value};
-        state.var1 = this.props.parseVariable(state.var1).name;
-        state.var2 = this.props.parseVariable(state.var2).name;
+        if (this.props.parseVariable) {
+          state.var1 = this.props.parseVariable(state.var1).name;
+          state.var2 = this.props.parseVariable(state.var2).name;
+        }
         this.props.updateRequire(state);
-      };
+      }; 
 
       render() {
         const {
@@ -145,7 +147,7 @@ class RawStateRow extends React.Component {
       vars: PropTypes.object.isRequired,
       showMessage: PropTypes.bool,
       updateRequire: PropTypes.func.isRequired,
-      parseVariable: PropTypes.func.isRequired,
+      parseVariable: PropTypes.func,
       require: PropTypes.object.isRequired
     };
 

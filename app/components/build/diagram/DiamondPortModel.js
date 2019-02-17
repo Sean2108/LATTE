@@ -24,8 +24,8 @@ export class DiamondPortModel extends PortModel {
 	deSerialize(data, engine) {
 		super.deSerialize(data, engine);
 		this.position = data.position;
-		this.in = object.in;
-		this.label = object.label;
+		this.in = data.in;
+		this.label = data.label;
 	}
 
 	canLinkToPort(port) {

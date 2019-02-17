@@ -33,8 +33,10 @@ const styles = theme => ({
 });
 
 class ConditionalNode extends React.Component {
-    state = {
-        condition: ''
+    state = {	
+        comp: '==',	
+        var1: '',	
+        var2: '',	
     }
 
     render() {
@@ -47,7 +49,8 @@ class ConditionalNode extends React.Component {
                     varList
                 }
                     showMessage = {false}
-                    submit = {(cond) => this.setState({condition: cond})}
+                    updateRequire = {(state) => this.setState(state)}
+                    require = {this.state}
                 />
                 <br/>
 
@@ -65,7 +68,7 @@ class ConditionalNode extends React.Component {
                         variant="contained"
                         color="primary"
                         className={classes.button}
-                        onClick={() => {close(); submit(this.state.condition)}}>
+                        onClick={() => {close(); submit(`${this.state.var1} ${this.state.comp} ${this.state.var2}`)}}>
                         Done
                         <DoneIcon/>
                     </Button>

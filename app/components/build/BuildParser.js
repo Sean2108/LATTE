@@ -107,6 +107,9 @@ export class BuildParser {
                 if (parsedLhs.type !== parsedRhs.type) {
                     alert('comparing different types');
                 }
+                if (parsedLhs.type === 'string' && parsedRhs.type === 'string' && comp === '==') {
+                    return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
+                }
                 return `${parsedLhs.name} ${comp} ${parsedRhs.name}`;
         }
         return '';
