@@ -25,7 +25,11 @@ const styles = theme => ({
 
 class RequiresList extends React.Component {
     state = {
-      variables: [{var1: '', comp: '==', var2: '', requireMessage: ''}]
+      variables: []
+      }
+
+      componentWillMount() {
+        this.setState({variables: this.props.requires.length > 0 ? this.props.requires : [{var1: '', comp: '==', var2: '', requireMessage: ''}]});
       }
 
       buildParser = new BuildParser(null);
@@ -36,7 +40,8 @@ class RequiresList extends React.Component {
           theme,
           header,
           vars,
-          onChangeRequire
+          onChangeRequire,
+          requires
         } = this.props;
         this.buildParser.reset(this.props.vars);
 
@@ -50,7 +55,7 @@ class RequiresList extends React.Component {
               header
             } < /Typography> {
               
-            this.state.variables.map((element, index) => <RawRequireRow key = {index} vars = {vars} showMessage = {true}
+            this.state.variables.map((element, index) => <RawRequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
             updateRequire = {(val) => {
               let variables = this.state.variables;
               variables[index] = val;
@@ -86,7 +91,8 @@ class RequiresList extends React.Component {
       theme: PropTypes.object.isRequired,
       header: PropTypes.string.isRequired,
       vars: PropTypes.object.isRequired,
-      onChangeRequire: PropTypes.func.isRequired
+      onChangeRequire: PropTypes.func.isRequired,
+      requires: PropTypes.array.isRequired
     };
 
     export default withStyles(styles, {

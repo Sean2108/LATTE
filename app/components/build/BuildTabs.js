@@ -144,7 +144,8 @@ class BuildTabs extends React.Component {
                         onChangeReturn = {(newReturn) => this.handleOnChange(newReturn, i, 'tabsReturn')}
                         onChangeRequire = {(newRequire) => this.handleOnChange(newRequire, i, 'tabsRequire')}
                         onVariablesChange = {(variables) => onTabsChange({variables: variables})}
-                        params = {this.state.tabsParams[i]} />
+                        params = {this.state.tabsParams[i]}
+                        requires = {this.state.tabsRequire[i]} />
                         </TabContainer>
                     )}
         <Popover

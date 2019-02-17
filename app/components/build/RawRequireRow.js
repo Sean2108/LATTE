@@ -29,16 +29,9 @@ const styles = theme => ({
 
 class RawStateRow extends React.Component {
 
-      state = {
-        comp: '==',
-        var1: '',
-        var2: '',
-        requireMessage: '',
-      }
-
       validate() {
-        let lhs = this.props.parseVariable(this.state.var1);
-        let rhs = this.props.parseVariable(this.state.var2);
+        let lhs = this.props.parseVariable(this.props.var1);
+        let rhs = this.props.parseVariable(this.props.var2);
         if (lhs.type === 'var') {
           alert('left variable type is unknown');
         }
@@ -51,15 +44,10 @@ class RawStateRow extends React.Component {
       }
 
       handleChange = name => event => {
-          this.setState({
-            ...this.state,
-            [name]: event.target.value
-          }, () => {
-            let state = {...this.state};
-            state.var1 = this.props.parseVariable(state.var1).name;
-            state.var2 = this.props.parseVariable(state.var2).name;
-            this.props.updateRequire(state);
-          });
+        let state = {...this.props.require, [name]: event.target.value};
+        state.var1 = this.props.parseVariable(state.var1).name;
+        state.var2 = this.props.parseVariable(state.var2).name;
+        this.props.updateRequire(state);
       };
 
       render() {
@@ -69,7 +57,8 @@ class RawStateRow extends React.Component {
           key,
           vars,
           showMessage,
-          submit
+          submit,
+          require
         } = this.props;
         return ( <
           div >
@@ -82,7 +71,7 @@ class RawStateRow extends React.Component {
             id="standard-name"
             label="Variable 1"
             className={classes.textField}
-            value={this.state.var1}
+            value={require.var1}
             onChange={this.handleChange('var1')}
             margin="none"
           /> < /
@@ -95,7 +84,7 @@ class RawStateRow extends React.Component {
           <
           InputLabel htmlFor = "protocol" > Comparator < /InputLabel> <
           Select value = {
-            this.state.comp
+            require.comp
           }
           onChange = {this.handleChange('comp')}
           inputProps = {
@@ -121,7 +110,7 @@ class RawStateRow extends React.Component {
             id="standard-name"
             label="Variable 2"
             className={classes.textField}
-            value={this.state.var2}
+            value={require.var2}
             onChange={this.handleChange('var2')}
             margin="none"
           /> < /
@@ -132,13 +121,14 @@ class RawStateRow extends React.Component {
             FormControl className = {
               classes.formControl
             } >
-            <
-            InputLabel htmlFor = "name-simple" > Failure Message < /InputLabel> <
-            Input id = "requireMessage"
-            multiline fullWidth onChange = {
-              this.handleChange('requireMessage')
-            }
-            /> < /
+            <TextField
+            id="standard-name"
+            label="Failure Message"
+            className={classes.textField}
+            value={require.requireMessage}
+            onChange={this.handleChange('requireMessage')}
+            margin="none"
+          /> < /
             FormControl >
           }
           <
@@ -155,7 +145,8 @@ class RawStateRow extends React.Component {
       vars: PropTypes.object.isRequired,
       showMessage: PropTypes.bool,
       updateRequire: PropTypes.func.isRequired,
-      parseVariable: PropTypes.func.isRequired
+      parseVariable: PropTypes.func.isRequired,
+      require: PropTypes.object.isRequired
     };
 
     export default withStyles(styles, {
