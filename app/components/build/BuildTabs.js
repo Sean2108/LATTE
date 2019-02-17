@@ -87,7 +87,7 @@ class BuildTabs extends React.Component {
             const {
                 value
             } = this.state;
-            console.log(buildState);
+            
             return ( <
                 div className = {
                     classes.tabs

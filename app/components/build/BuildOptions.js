@@ -83,10 +83,22 @@ class BuildOptions extends React.Component {
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i] ? `returns (${buildState.tabsReturn[i]})` : '';
+      let requires = buildState.tabsRequire[i].map(req => {
+        if (this.isString(req.var1) && this.isString(req.var2) && req.comp == '==') {
+          return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
+        }
+        return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`
+      });
       code += `${functionName}(${buildState.tabsParams[i].map(element => element.type === 'string' ? `${element.type} memory ${element.name}` : `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
-      ${buildState.tabsRequire[i].map(req => `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`)}${buildState.tabsCode[i]}}\n`;
+      ${requires}${buildState.tabsCode[i]}}\n`;
     }
     return code + '}';
+  }
+
+  isString(variable) {
+    variable = variable.trim();
+    return variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'" ||
+    this.props.buildState.variables[variable] === 'string';
   }
 
   render() {
