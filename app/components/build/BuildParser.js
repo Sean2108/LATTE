@@ -148,7 +148,10 @@ export class BuildParser {
             return {name: 'msg.sender', type: 'address'};
         }
         if (varName === 'message_value' || varName === 'msg_value' || varName === 'value') {
-            return {name: 'msg.value', type: 'int'};
+            return {name: 'msg.value', type: 'uint'};
+        }
+        if (varName === 'current_balance' || varName === 'contract_balance' || varName === 'balance') {
+            return {name: 'address(this).balance', type: 'uint'};
         }
         if (!(varName in variables)) {
             return {name: varName, type: 'var'};
