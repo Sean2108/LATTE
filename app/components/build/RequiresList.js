@@ -15,7 +15,7 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2,
     textAlign: 'center',
     color: theme.palette.text.secondary,
-    maxHeight: '20vw',
+    maxHeight: '40vw',
     overflow: 'auto',
   },
   button: {

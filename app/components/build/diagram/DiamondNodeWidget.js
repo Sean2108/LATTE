@@ -3,7 +3,7 @@ import {
   DiamondNodeModel
 } from "./DiamondNodeModel";
 import {
-  PortWidget
+  PortWidget, DefaultPortLabel
 } from "storm-react-diagrams";
 
 export interface DiamonNodeWidgetProps {
@@ -117,9 +117,12 @@ export class DiamonNodeWidget extends React.Component < DiamonNodeWidgetProps, D
         }
       } >
       <
-      PortWidget name = "right"
+      DefaultPortLabel name = "right"
       node = {
         this.props.node
+      }
+      model = {
+        this.props.node.outPortFalse
       }
       /> <
       /div> <
@@ -132,9 +135,12 @@ export class DiamonNodeWidget extends React.Component < DiamonNodeWidgetProps, D
         }
       } >
       <
-      PortWidget name = "bottom"
+      DefaultPortLabel name = "bottom"
       node = {
         this.props.node
+      }
+      model = {
+        this.props.node.outPortTrue
       }
       /> <
       /div> <
