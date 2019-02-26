@@ -29,7 +29,7 @@ class InitialStateTab extends React.Component {
         < StructList header = {
             "Entities"
         } updateVariables = {updateEntities}
-        initialVars = {entities}/ >
+        initialVars = {entities}/ > <br/>
         {params && params.length > 0 && <ParamList header = {"Constructor Parameters"}
         params={params}
         updateParams={updateParams}/>} < /div>
