@@ -17,7 +17,10 @@ export class BuildParser {
         return this.returnVar;
     }
 
-    traverseNextNode(node) {
+    traverseNextNode(node, stopNode = null) {
+        if (stopNode && node === stopNode) {
+            return '';
+        }
         if (node instanceof DiamondNodeModel) {
             let falseNextNode = this.getNextNode(node.outPortFalse);
             let trueNextNode = this.getNextNode(node.outPortTrue);
@@ -26,13 +29,17 @@ export class BuildParser {
             }
             let trueWhileCode = this.generateCodeForCycle(node, true);
             if (trueWhileCode) {
-                return `while (${this.parseNode('Compare: ' + node.name)}) {\n${trueWhileCode}}\n${this.traverseNextNode(falseNextNode)}`;
+                return `while (${this.parseNode('Compare: ' + node.name)}) {\n${trueWhileCode}}\n${this.traverseNextNode(falseNextNode, stopNode)}`;
             }
             let falseWhileCode = this.generateCodeForCycle(node, false);
             if (falseWhileCode) {
-                return `while (!(${this.parseNode('Compare: ' + node.name)})) {\n${falseWhileCode}}\n${this.traverseNextNode(trueNextNode)}`;
+                return `while (!(${this.parseNode('Compare: ' + node.name)})) {\n${falseWhileCode}}\n${this.traverseNextNode(trueNextNode, stopNode)}`;
             }
-            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode)}} else {\n${this.traverseNextNode(falseNextNode)}}\n`;
+            let intersection = this.getIntersection(trueNextNode, falseNextNode);
+            if (intersection) {
+                return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, intersection)}} else {\n${this.traverseNextNode(falseNextNode, intersection)}}\n${this.traverseNextNode(intersection, stopNode)}`;
+            }
+            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} else {\n${this.traverseNextNode(falseNextNode, stopNode)}}\n`;
         }
         if (!node) {
             return '';
@@ -42,7 +49,7 @@ export class BuildParser {
         if (!nextNode) {
             return curNodeCode;
         }
-        return curNodeCode + this.traverseNextNode(nextNode);
+        return curNodeCode + this.traverseNextNode(nextNode, stopNode);
     }
     
     getNextNode(outPort) {
@@ -172,5 +179,39 @@ export class BuildParser {
             node = this.getNextNodeForDefaultNode(node);
         }
         return null;
+    }
+
+    getIntersection(nodeA, nodeB) {
+        let lengthDifference = this.getCount(nodeA) - this.getCount(nodeB);
+        if (lengthDifference > 0) {
+            return this.getIntersectionNodeTraversal(lengthDifference, nodeA, nodeB);
+        }
+        return this.getIntersectionNodeTraversal(-lengthDifference, nodeB, nodeA);
+    }
+
+    getCount(node) {
+        let count = 0;
+        while (node) {
+            count += 1;
+            node = this.getNextNodeForDefaultNode(node);
+        }
+        return count;
+    }
+
+    getIntersectionNodeTraversal(diff, longerNode, shorterNode) {
+        for(let i = 0; i < diff; i++) { 
+            if(!longerNode) 
+                return null; 
+            longerNode = this.getNextNodeForDefaultNode(longerNode);
+        } 
+        
+        while(longerNode && shorterNode) { 
+            if(longerNode == shorterNode) 
+                return longerNode; 
+            longerNode = this.getNextNodeForDefaultNode(longerNode); 
+            shorterNode = this.getNextNodeForDefaultNode(shorterNode);
+        } 
+        
+        return null; 
     }
 }
