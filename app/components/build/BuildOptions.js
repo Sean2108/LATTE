@@ -75,7 +75,12 @@ class BuildOptions extends React.Component {
     let buildState = this.props.buildState;
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
     for (const [name, type] of Object.entries(buildState.variables)) {
-      code += `${type} public ${name};\n`;
+      if (typeof type === 'object' && type.type === 'mapping') {
+        code += `mapping(${type.from} => ${type.to}) ${name};\n`;
+      }
+      else {
+        code += `${type} public ${name};\n`;
+      }
     }
     for (const [name, params] of Object.entries(buildState.events)) {
       code += `event ${name} (${params.map(param => `${param.type} ${param.name}`).join(', ')});\n`;

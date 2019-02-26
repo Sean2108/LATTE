@@ -80,9 +80,12 @@ export class BuildParser {
                 if (parsedLhs.type === 'var') {
                     this.variables[parsedLhs.name] = parsedRhs.type;
                     this.onVariablesChange(this.variables);
-                    return `${parsedLhs.name} = ${parsedRhs.name};`;
                 }
-                if (parsedLhs.type !== parsedRhs.type) {
+                else if (parsedLhs.type === 'map') {
+                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
+                    this.onVariablesChange(this.variables);
+                }
+                else if (parsedLhs.type !== parsedRhs.type) {
                     alert('invalid assignment');
                 }
                 return `${parsedLhs.name} = ${parsedRhs.name};`;
@@ -149,6 +152,19 @@ export class BuildParser {
                 }
                 return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: parsedLhs.type};
             }
+        }
+        if (/('s | for )/.test(variable)) {
+            let map, key;
+            if (variable.indexOf('\'s ') > 0) {
+                [key, map] = variable.split('\'s ');
+            }
+            else {
+                [map, key] = variable.split(' for ');
+            }
+            let parsedMap = this.parseVariable(map);
+            let parsedKey = this.parseVariable(key);
+            let type = variables[parsedMap.name] ? variables[parsedMap.name]['to'] : 'map';
+            return {name: `${parsedMap.name}[${parsedKey.name}]`, mapName: parsedMap.name, keyType: parsedKey.type, type: type};
         }
         let varName = variable.toLowerCase().trim().replace(/\s/g, '_');
         if (varName === 'message_sender' || varName === 'msg_sender' || varName === 'sender') {
