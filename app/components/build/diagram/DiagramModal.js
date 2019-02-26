@@ -8,6 +8,7 @@ import AssignmentNode from './diagram_node_options/AssignmentNode';
 import TransferNode from './diagram_node_options/TransferNode';
 import ConditionalNode from './diagram_node_options/ConditionalNode';
 import EventNode from './diagram_node_options/EventNode';
+import EntityNode from './diagram_node_options/EntityNode';
 
 function getModalStyle() {
     return {top: '50%', left: '50%', transform: 'translate(-50%, -50%)'};
@@ -39,7 +40,7 @@ class DiagramModal extends React.Component {
     }
 
     render() {
-        const {classes, open, close, submit, type, varList, events} = this.props;
+        const {classes, open, close, submit, type, varList, events, entities} = this.props;
 
         return (
             <div>
@@ -54,7 +55,7 @@ class DiagramModal extends React.Component {
                                 .toUpperCase() + type.substr(1)}&nbsp; Node
                         </Typography>
                         <Typography variant="caption" id="modal-title">
-                            {this.getTypeFields(type, classes, varList, events, close, submit)}
+                            {this.getTypeFields(type, classes, varList, events, entities, close, submit)}
                         </Typography>
                     </div>
                 </Modal>
@@ -62,7 +63,7 @@ class DiagramModal extends React.Component {
         );
     }
 
-    getTypeFields(type, classes, varList, events, close, submit) {
+    getTypeFields(type, classes, varList, events, entities, close, submit) {
         switch (type) {
             case "assignment":
                 return (
@@ -71,6 +72,10 @@ class DiagramModal extends React.Component {
             case "event":
                 return (
                     <EventNode close={close} submit={submit} varList={events}/>
+                );
+            case "entity":
+                return (
+                    <EntityNode close={close} submit={submit} varList={entities}/>
                 );
             case "transfer":
                 return (
@@ -95,7 +100,8 @@ DiagramModal.propTypes = {
     submit: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
     varList: PropTypes.object,
-    events: PropTypes.object
+    events: PropTypes.object,
+    entities: PropTypes.object
 };
 
 export default withStyles(styles, {withTheme: true})(DiagramModal);

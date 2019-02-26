@@ -44,7 +44,11 @@ const styles = theme => ({
     varSelect: {
         margin: theme.spacing.unit,
         minWidth: 150
-    }
+    },
+    textField: {
+        marginLeft: 0,
+        marginRight: 0
+    },
 });
 
 class ReturnNode extends React.Component {

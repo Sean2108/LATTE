@@ -42,6 +42,7 @@ class Build extends React.Component {
       tabsRequire: [[]],
       constructorParams: [],
       events: {},
+      entities: {},
       diagrams: [{}]
   };
 

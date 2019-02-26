@@ -70,7 +70,7 @@ export class BuildParser {
     }
 
     parseNode(nodeCode) {
-        let type, code, lhs, rhs, parsedLhs, parsedRhs;
+        let type, code, lhs, rhs, parsedLhs, parsedRhs, params;
         [type, code] = nodeCode.split(': ');
         switch (type) {
             case "Assignment":
@@ -86,23 +86,32 @@ export class BuildParser {
                     this.onVariablesChange(this.variables);
                 }
                 else if (parsedLhs.type !== parsedRhs.type) {
-                    alert('invalid assignment');
+                    alert(`invalid assignment at node ${nodeCode}`);
                 }
                 return `${parsedLhs.name} = ${parsedRhs.name};`;
             case "Emit Event":
-                let eventName, params;
+                let eventName;
                 [eventName, params] = code.split('(');
                 params = params.replace(')', '').split(', ').map(param => this.parseVariable(param).name).join(', ');
-                return `emit ${eventName}(${params});`
+                return `emit ${eventName}(${params});`;
+            case "New Entity":
+                let entityName;
+                [lhs, rhs] = code.split(' = ');
+                [entityName, params] = rhs.split('(');
+                parsedLhs = this.parseVariable(lhs);
+                this.variables[parsedLhs.name] = entityName;
+                this.onVariablesChange(this.variables);
+                params = params.replace(')', '').split(', ').map(param => this.parseVariable(param).name).join(', ');
+                return `${parsedLhs.name} = ${entityName}(${params});`;
             case "Transfer":
                 [lhs, rhs] = code.split(' to ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== 'int') {
-                    alert('value should be an integer');
+                    alert(`value should be an integer at node ${nodeCode}`);
                 }
                 if (parsedRhs.type !== 'address') {
-                    alert('transfer target should be an address');
+                    alert(`transfer target should be an address at node ${nodeCode}`);
                 }
                 return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
             case "Return":
@@ -115,7 +124,7 @@ export class BuildParser {
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== parsedRhs.type) {
-                    alert('comparing different types');
+                    alert(`comparing different types at node ${nodeCode}`);
                 }
                 if (parsedLhs.type === 'string' && parsedRhs.type === 'string' && comp === '==') {
                     return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
@@ -140,7 +149,7 @@ export class BuildParser {
                 let parsedLhs = this.parseVariable(lhs);
                 let parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== parsedRhs.type) {
-                    alert('invalid types');
+                    alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
                     return {name: variable, type: 'invalid'};
                 }
                 if (parsedLhs === 'string' && operator !== '+') {

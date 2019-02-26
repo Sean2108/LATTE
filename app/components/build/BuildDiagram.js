@@ -108,6 +108,8 @@ class BuildDiagram extends React.Component {
                 return this.createDefaultNode(`Assignment: ${desc}`, "rgb(192,0,0)", false);
             case "event":
                 return this.createDefaultNode(`Emit Event: ${desc}`, "rgb(0,192,0)", false);
+            case "entity":
+                return this.createDefaultNode(`New Entity: ${desc}`, "rgb(100,100,0)", false);
             case "transfer":
                 return this.createDefaultNode(`Transfer: ${desc}`, "rgb(255,100,0)", false);
             case "return":
@@ -130,12 +132,14 @@ class BuildDiagram extends React.Component {
     }
 
     render() {
-        const {classes, theme, varList, events} = this.props;
+        const {classes, theme, varList, events, entities} = this.props;
 
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > Action Phase < /Typography>
-        <DiagramModal open={this.state.open} close={() => {this.setState({open: false})}} submit={(info)=>this.addNode(info)} type={this.state.type} varList={varList} events={events} addNode={this.addNode}/ > < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > 
+        <DiagramModal open={this.state.open} close={() => {this.setState({open: false})}} submit={(info)=>this.addNode(info)} 
+        type={this.state.type} varList={varList} events={events} entities={entities} addNode={this.addNode}/ > 
+        < div className = "body" > < div className = "header" > < div className = "title" > Nodes < /div > < /div > < div className = "content" > < TrayWidget > 
         < TrayItemWidget model = {
             {
                 type: "assignment"
@@ -147,6 +151,11 @@ class BuildDiagram extends React.Component {
             }
         }
         name = "Event Node" color = "rgb(0,192,0)" /> < TrayItemWidget model = {
+            {
+                type: "entity"
+            }
+        }
+        name = "New Entity Node" color = "rgb(100,100,0)" />< TrayItemWidget model = {
             {
                 type: "transfer"
             }
@@ -197,6 +206,7 @@ BuildDiagram.propTypes = {
     theme: PropTypes.object.isRequired,
     varList: PropTypes.object.isRequired,
     events: PropTypes.object.isRequired,
+    entities: PropTypes.object.isRequired,
     onChangeLogic: PropTypes.func.isRequired,
     onVariablesChange: PropTypes.func.isRequired,
     onChangeReturn: PropTypes.func.isRequired,

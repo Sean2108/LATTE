@@ -51,8 +51,6 @@ const styles = theme => ({
 class BuildTabs extends React.Component {
         state = {
             value: 0,
-            constructorParams: [],
-            entities: {},
             addTabPopoverAnchor: null,
             popoverContent: ''
         };
@@ -113,9 +111,9 @@ class BuildTabs extends React.Component {
                 <Tab onClick={(event) => this.setState({addTabPopoverAnchor: event.currentTarget})} label='+'/> < /Tabs> < /AppBar > {
         value === 0 && < TabContainer > 
         <InitialStateTab 
-        entities={this.state.entities}
+        entities={buildState.entities}
         events={buildState.events}
-        updateEntities={(entities) => this.setState({...this.state, entities : entities})}
+        updateEntities={(entities) => onTabsChange({...buildState, entities : entities})}
         updateEvents={(events) => onTabsChange({...buildState, events : events})}
         params={buildState.constructorParams}
         updateParams={(params) => {
@@ -125,7 +123,10 @@ class BuildTabs extends React.Component {
         < /TabContainer>} 
         {[...Array(buildState.tabs.length - 1).keys()].map((i) => 
                         value === i + 1 && <TabContainer key = {i}>
-                        <DefaultBuildTab varList = {variables} events = {buildState.events}
+                        <DefaultBuildTab 
+                        varList = {variables} 
+                        events = {buildState.events}
+                        entities = {buildState.entities}
                         onChangeLogic = {(newCode) => this.handleOnChange(newCode, i, 'tabsCode')}
                         onChangeParams = {(newParams) => this.handleChangeParams(newParams, i)}
                         onChangeReturn = {(newReturn) => this.handleOnChange(newReturn, i, 'tabsReturn')}
