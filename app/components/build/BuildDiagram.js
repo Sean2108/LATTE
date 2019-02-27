@@ -34,7 +34,6 @@ class BuildDiagram extends React.Component {
     buildParser;
 
     componentWillMount() {
-        // setup the diagram engine
         this.engine = new DiagramEngine();
         this
             .engine
@@ -46,7 +45,6 @@ class BuildDiagram extends React.Component {
             .engine
             .registerNodeFactory(new DiamondNodeFactory());
 
-        // setup the diagram model
         this.model = new DiagramModel();
         if (Object.entries(this.props.diagram).length > 0) {
             this.model.deSerializeDiagram(this.props.diagram, this.engine);
@@ -57,7 +55,6 @@ class BuildDiagram extends React.Component {
             var startOut = this.start.addOutPort(" ");
             startOut.setMaximumLinks(1);
             this.start.setPosition(100, 100);
-            // add the models to the root graph
             this.model.addAll(this.start);
         }
         this.buildParser = new BuildParser(this.props.onVariablesChange);
@@ -73,7 +70,6 @@ class BuildDiagram extends React.Component {
             }
        });
 
-        // load model into engine and render
         this
             .engine
             .setDiagramModel(this.model);

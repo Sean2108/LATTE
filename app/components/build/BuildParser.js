@@ -185,6 +185,9 @@ export class BuildParser {
         if (varName === 'current_balance' || varName === 'contract_balance' || varName === 'balance') {
             return {name: 'address(this).balance', type: 'uint'};
         }
+        if (varName === 'current_time' || varName === 'today' || varName === 'now') {
+            return {name: 'now', type: 'uint'};
+        }
         if (!(varName in variables)) {
             return {name: varName, type: 'var'};
         }

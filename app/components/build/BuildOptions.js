@@ -92,13 +92,13 @@ class BuildOptions extends React.Component {
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName = buildState.tabs[i + 1] === 'Initial State' ? 'constructor' : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i] ? `returns (${buildState.tabsReturn[i]})` : '';
-      let requires = buildState.tabsRequire[i].map(req => {
+      let requires = buildState.tabsRequire[i].filter(req => req.var1 && req.var2 && req.comp).map(req => {
         if (this.isString(req.var1) && this.isString(req.var2) && req.comp == '==') {
           return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
         }
-        return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`
+        return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
       });
-      code += `${functionName}(${buildState.tabsParams[i].map(element => element.type === 'string' ? `${element.type} memory ${element.name}` : `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
+      code += `${functionName}(${buildState.tabsParams[i].filter(element => element.name).map(element => element.type === 'string' ? `${element.type} memory ${element.name}` : `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
       ${requires}${buildState.tabsCode[i]}}\n`;
     }
     return code + '}';
