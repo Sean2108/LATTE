@@ -57,7 +57,7 @@ class BuildDiagram extends React.Component {
             var startOut = this.start.addOutPort(" ");
             startOut.setMaximumLinks(1);
             this.start.setPosition(100, 100);
-            //4) add the models to the root graph
+            // add the models to the root graph
             this.model.addAll(this.start);
         }
         this.buildParser = new BuildParser(this.props.onVariablesChange);

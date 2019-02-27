@@ -27,12 +27,6 @@ const styles = theme => ({
 
 class VariableList extends React.Component {
 
-      componentWillMount() {
-        if (this.props.vars.length === 0) {
-          this.props.updateVariables([{name: '', type: 'int'}]);
-        }
-      }
-
       render() {
         const {
           classes,
@@ -41,6 +35,10 @@ class VariableList extends React.Component {
           updateVariables,
           vars
         } = this.props;
+
+        if (this.props.vars.length === 0) {
+          this.props.updateVariables([{name: '', type: 'int'}]);
+        }
 
         return ( <
             Paper className = {

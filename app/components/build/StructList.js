@@ -71,7 +71,6 @@ class StructList extends React.Component {
 
     render() {
         const {classes, theme, header, updateVariables, initialVars} = this.props;
-        console.log(initialVars);
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > {

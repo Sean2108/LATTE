@@ -25,12 +25,6 @@ const styles = theme => ({
 
 class RequiresList extends React.Component {
 
-      componentWillMount() {
-        if (this.props.requires.length === 0) {
-          this.props.onChangeRequire([{var1: '', comp: '==', var2: '', requireMessage: ''}]);
-        }
-      }
-
       buildParser = new BuildParser(null);
 
       render() {
@@ -43,6 +37,10 @@ class RequiresList extends React.Component {
           requires
         } = this.props;
         this.buildParser.reset(this.props.vars);
+
+        if (this.props.requires.length === 0) {
+          this.props.onChangeRequire([{var1: '', comp: '==', var2: '', requireMessage: ''}]);
+        }
 
         return ( <
             Paper className = {

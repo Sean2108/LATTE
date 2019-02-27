@@ -74,7 +74,7 @@ class ParamList extends React.Component {
             header
         } < /Typography>
         <br/>
-        {params.map((param, index) => <div key={index}>
+        {params.filter(param => param.name).map((param, index) => <div key={index}>
         <TextField
           id="value"
           label={`Value of ${param.name || ''}`}
