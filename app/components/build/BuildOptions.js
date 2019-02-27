@@ -5,6 +5,7 @@ import {
 } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { ipcRenderer } from 'electron';
+import { readFile, writeFile } from 'fs';
 
 const styles = theme => ({
   button: {
@@ -115,7 +116,8 @@ class BuildOptions extends React.Component {
       classes,
       theme,
       onback,
-      buildState
+      buildState,
+      loadState
     } = this.props;
     return ( <
       div >
@@ -132,13 +134,48 @@ class BuildOptions extends React.Component {
       /Button>
 
       <
+      Button variant = "outlined"
+      color = "secondary"
+      className = {
+        classes.button
+      }
+      onClick = {
+        () => {
+          readFile('data.json', (err, data) => {  
+            if (err) throw err;
+            loadState(JSON.parse(data));
+            console.log('Data loaded');
+          });
+        }
+      } >
+      Load <
+      /Button>
+
+      <
+      Button variant = "outlined"
+      color = "secondary"
+      className = {
+        classes.button
+      }
+      onClick = {
+        () => {
+          let data = JSON.stringify(buildState);
+          writeFile('data.json', data, (err) => {  
+            if (err) throw err;
+            console.log('Data written to file');
+          });
+        }
+      } >
+      Save <
+      /Button>
+
+      <
       Button variant = "contained"
       color = "primary"
       className = {
         classes.button
       }
       onClick = {
-        // () => console.log(this.formCode())
         this.deploySmartContract
       } >
       Build <
@@ -154,7 +191,8 @@ BuildOptions.propTypes = {
   theme: PropTypes.object.isRequired,
   onback: PropTypes.func.isRequired,
   connection: PropTypes.object.isRequired,
-  buildState: PropTypes.object.isRequired
+  buildState: PropTypes.object.isRequired,
+  loadState: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {

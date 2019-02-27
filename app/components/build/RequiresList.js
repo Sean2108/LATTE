@@ -24,12 +24,11 @@ const styles = theme => ({
 });
 
 class RequiresList extends React.Component {
-    state = {
-      variables: []
-      }
 
       componentWillMount() {
-        this.setState({variables: this.props.requires.length > 0 ? this.props.requires : [{var1: '', comp: '==', var2: '', requireMessage: ''}]});
+        if (this.props.requires.length === 0) {
+          this.props.onChangeRequire([{var1: '', comp: '==', var2: '', requireMessage: ''}]);
+        }
       }
 
       buildParser = new BuildParser(null);
@@ -55,11 +54,10 @@ class RequiresList extends React.Component {
               header
             } < /Typography> {
               
-            this.state.variables.map((element, index) => <RawRequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
+            requires.map((element, index) => <RawRequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
             updateRequire = {(val) => {
-              let variables = this.state.variables;
+              let variables = [...requires];
               variables[index] = val;
-              this.setState({variables: variables});
               onChangeRequire(variables);
             }}
             parseVariable = {this.buildParser.parseVariable}/>)
@@ -72,9 +70,7 @@ class RequiresList extends React.Component {
           classes.button
         }
         onClick = {
-          () => this.setState({
-              variables: [...this.state.variables, {var1: '', comp: '==', var2: '', requireMessage: ''}]
-              })
+          () => onChangeRequire([...requires, {var1: '', comp: '==', var2: '', requireMessage: ''}])
           } >
           +
           <

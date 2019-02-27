@@ -26,12 +26,11 @@ const styles = theme => ({
 });
 
 class VariableList extends React.Component {
-    state = {
-      variables: []
-      }
 
       componentWillMount() {
-        this.setState({variables: this.props.vars.length > 0 ? this.props.vars : [{name: '', type: 'int'}]});
+        if (this.props.vars.length === 0) {
+          this.props.updateVariables([{name: '', type: 'int'}]);
+        }
       }
 
       render() {
@@ -39,7 +38,8 @@ class VariableList extends React.Component {
           classes,
           theme,
           header,
-          updateVariables
+          updateVariables,
+          vars
         } = this.props;
 
         return ( <
@@ -51,10 +51,9 @@ class VariableList extends React.Component {
             noWrap > {
               header
             } < /Typography> {
-            this.state.variables.map((element, index) => <VariableRow val = {this.state.variables[index]} key = {index} updateVariables={(val) => {
-                let variables = this.state.variables;
+            vars.map((element, index) => <VariableRow val = {element} key = {index} updateVariables={(val) => {
+                let variables = [...vars];
                 variables[index] = val;
-                this.setState({variables: variables});
                 updateVariables(variables);
             }}/>)
           }
@@ -66,10 +65,7 @@ class VariableList extends React.Component {
           classes.button
         }
         onClick = {
-          () => this.setState({
-              variables: [...this.state.variables, {name: '', type: 'int'}]
-              })
-          } >
+          () => updateVariables([...vars, {name: '', type: 'int'}])} >
           +
           <
           /Button> <

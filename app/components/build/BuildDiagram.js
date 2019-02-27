@@ -33,8 +33,7 @@ class BuildDiagram extends React.Component {
     model;
     buildParser;
 
-    constructor(props) {
-        super(props);
+    componentWillMount() {
         // setup the diagram engine
         this.engine = new DiagramEngine();
         this
@@ -70,6 +69,7 @@ class BuildDiagram extends React.Component {
                     this.props.onChangeLogic(code);
                     this.props.onChangeReturn(this.buildParser.getReturnVar());
                 }, 5000);
+                this.props.updateDiagram(this.model.serializeDiagram());
             }
        });
 
@@ -77,10 +77,6 @@ class BuildDiagram extends React.Component {
         this
             .engine
             .setDiagramModel(this.model);
-    }
-
-    componentWillUnmount() {
-        this.props.updateDiagram(this.model.serializeDiagram());
     }
 
     findStart() {

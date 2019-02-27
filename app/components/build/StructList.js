@@ -59,7 +59,6 @@ const styles = theme => ({
 
 class StructList extends React.Component {
     state = {
-        entities: this.props.initialVars,
         contents: '',
         propcontents: '',
         modalAdd: '',
@@ -80,21 +79,16 @@ class StructList extends React.Component {
         <br/>
         <Grid container spacing={24}>
         {
-            Object.keys(this.state.entities).map((key) => 
+            Object.keys(initialVars).map((key) => 
                     <Grid item xs={6} key={key}>
                     <
                 VariableList header = {
                     key
                 }
                 updateVariables = {
-                    (vars) => {
-                        let entities = {...this.state.entities};
-                        entities[key] = vars;
-                        this.setState({entities: entities});
-                        updateVariables(entities);
-                    }
+                    (vars) => updateVariables({...initialVars, [key]: vars})
                 }
-                vars = {this.state.entities[key]} / >
+                vars = {initialVars[key]} / >
                 </Grid>)
     }
         </Grid> 
@@ -114,14 +108,13 @@ class StructList extends React.Component {
     }
     onClick = {
         () => {
-            if (!this.state.contents || this.state.contents in this.state.entities) 
+            if (!this.state.contents || this.state.contents in initialVars) 
                 return;
-            let newVars = {
-                ...this.state.entities,
+            this.setState({contents: ''});
+            updateVariables({
+                initialVars,
                 [this.state.contents]: []
-            };
-            this.setState({entities: newVars, contents: ''});
-            updateVariables(newVars);
+            });
         }
     } > Add < AddIcon className = {
         classes.rightIcon

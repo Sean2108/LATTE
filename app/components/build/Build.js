@@ -69,10 +69,7 @@ class Build extends React.Component {
       div className = {
         classes.toolbar
       }
-      /> {
-        /* <Typography variant="title" noWrap>Build Your Smart Contract</Typography>
-                    <br/> */
-      } <
+      /> <
       div >
 
       <
@@ -94,6 +91,9 @@ class Build extends React.Component {
       }
       buildState = {
         this.state
+      }
+      loadState = {
+        (state) => this.setState(state)
       }
       /> <
       /div>
