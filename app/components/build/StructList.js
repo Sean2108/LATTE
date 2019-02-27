@@ -71,6 +71,7 @@ class StructList extends React.Component {
 
     render() {
         const {classes, theme, header, updateVariables, initialVars} = this.props;
+        console.log(initialVars);
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > {
@@ -110,11 +111,11 @@ class StructList extends React.Component {
         () => {
             if (!this.state.contents || this.state.contents in initialVars) 
                 return;
-            this.setState({contents: ''});
             updateVariables({
-                initialVars,
+                ...initialVars,
                 [this.state.contents]: []
             });
+            this.setState({contents: ''});
         }
     } > Add < AddIcon className = {
         classes.rightIcon
