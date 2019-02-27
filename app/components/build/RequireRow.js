@@ -10,6 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
   button: {
@@ -20,33 +21,36 @@ const styles = theme => ({
     minWidth: 120,
     maxWidth: 150
   },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+  },
 });
 
-class StateRow extends React.Component {
+class RequireRow extends React.Component {
 
-      state = {
-        comp: '==',
-        var1: '',
-        var2: '',
-        requireMessage: '',
-      }
-      
-      changeCondition = (newState) => {
-        this.props.submit(`${newState.var1} ${newState.comp} ${newState.var2}`)
-      };
-
-      wrapMenuItems = (vars) => {
-        return [...vars.map((element, index) => < MenuItem key = {
-          index
+      validate() {
+        let lhs = this.props.parseVariable(this.props.var1);
+        let rhs = this.props.parseVariable(this.props.var2);
+        if (lhs.type === 'var') {
+          alert('left variable type is unknown');
         }
-        value = {
-          element
-        } > {
-          element
-        } < /MenuItem>), <MenuItem key={this.props.vars.length} value="msg.sender">Message sender</MenuItem >,
-        <MenuItem key={this.props.vars.length + 1} value="msg.value">Message value</MenuItem >,
-        <MenuItem key={this.props.vars.length + 2} value="raw">Raw...</MenuItem > ];
-      };
+        if (rhs.type === 'var') {
+          alert('right variable type is unknown');
+        }
+        if (lhs.type !== rhs.type) {
+          alert('left and right variables are of differing types');
+        }
+      }
+
+      handleChange = name => event => {
+        let state = {...this.props.require, [name]: event.target.value};
+        if (this.props.parseVariable) {
+          state.var1 = this.props.parseVariable(state.displayVar1).name;
+          state.var2 = this.props.parseVariable(state.displayVar2).name;
+        }
+        this.props.updateRequire(state);
+      }; 
 
       render() {
         const {
@@ -55,9 +59,9 @@ class StateRow extends React.Component {
           key,
           vars,
           showMessage,
-          submit
+          submit,
+          require
         } = this.props;
-        let varMenuItems = this.wrapMenuItems(vars);
         return ( <
           div >
 
@@ -65,30 +69,14 @@ class StateRow extends React.Component {
           FormControl className = {
             classes.formControl
           } >
-          <
-          InputLabel htmlFor = "protocol" > Variable 1 < /InputLabel> <
-          Select value = {
-            this.state.var1
-          }
-          onChange = {
-            event => {
-              let newState = {
-                ...this.state,
-                var1: event.target.value
-              }
-              this.setState(newState);
-              this.changeCondition(newState);
-            }
-          }
-          inputProps = {
-            {
-              name: 'Variable 1',
-              id: 'var1',
-            }
-          } > {
-            varMenuItems
-          } <
-          /Select> < /
+          <TextField
+            id="standard-name"
+            label="Variable 1"
+            className={classes.textField}
+            value={require.displayVar1}
+            onChange={this.handleChange('displayVar1')}
+            margin="none"
+          /> < /
           FormControl >
 
           <
@@ -98,18 +86,9 @@ class StateRow extends React.Component {
           <
           InputLabel htmlFor = "protocol" > Comparator < /InputLabel> <
           Select value = {
-            this.state.comp
+            require.comp
           }
-          onChange = {
-            event => {
-              let newState = {
-                ...this.state,
-                comp: event.target.value
-              };
-              this.setState(newState);
-              this.changeCondition(newState);
-            }
-          }
+          onChange = {this.handleChange('comp')}
           inputProps = {
             {
               name: 'Comparator',
@@ -129,30 +108,14 @@ class StateRow extends React.Component {
           FormControl className = {
             classes.formControl
           } >
-          <
-          InputLabel htmlFor = "protocol" > Variable 2 < /InputLabel> <
-          Select value = {
-            this.state.var2
-          }
-          onChange = {
-            event => {
-              let newState = {
-                ...this.state,
-                var2: event.target.value
-              }
-              this.setState(newState);
-              this.changeCondition(newState);
-            }
-          }
-          inputProps = {
-            {
-              name: 'Variable 2',
-              id: 'var2',
-            }
-          } > {
-            varMenuItems
-          } <
-          /Select> < /
+          <TextField
+            id="standard-name"
+            label="Variable 2"
+            className={classes.textField}
+            value={require.displayVar2}
+            onChange={this.handleChange('displayVar2')}
+            margin="none"
+          /> < /
           FormControl >
 
           {showMessage && 
@@ -160,15 +123,14 @@ class StateRow extends React.Component {
             FormControl className = {
               classes.formControl
             } >
-            <
-            InputLabel htmlFor = "name-simple" > Failure Message < /InputLabel> <
-            Input id = "requireMessage"
-            multiline fullWidth onChange = {
-              event => this.setState({ ...this.state,
-                failureMessage: event.target.value
-              })
-            }
-            /> < /
+            <TextField
+            id="standard-name"
+            label="Failure Message"
+            className={classes.textField}
+            value={require.requireMessage}
+            onChange={this.handleChange('requireMessage')}
+            margin="none"
+          /> < /
             FormControl >
           }
           <
@@ -178,15 +140,17 @@ class StateRow extends React.Component {
       }
     }
 
-    StateRow.propTypes = {
+    RequireRow.propTypes = {
       classes: PropTypes.object.isRequired,
       theme: PropTypes.object.isRequired,
       key: PropTypes.any,
-      vars: PropTypes.array.isRequired,
+      vars: PropTypes.object.isRequired,
       showMessage: PropTypes.bool,
-      submit: PropTypes.func
+      updateRequire: PropTypes.func.isRequired,
+      parseVariable: PropTypes.func,
+      require: PropTypes.object.isRequired
     };
 
     export default withStyles(styles, {
       withTheme: true
-    })(StateRow);
+    })(RequireRow);

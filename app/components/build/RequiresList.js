@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import RawRequireRow from './RawRequireRow';
+import RequireRow from './RequireRow';
 import { BuildParser } from './BuildParser';
 
 const styles = theme => ({
@@ -38,8 +38,8 @@ class RequiresList extends React.Component {
         } = this.props;
         this.buildParser.reset(this.props.vars);
 
-        if (this.props.requires.length === 0) {
-          this.props.onChangeRequire([{var1: '', comp: '==', var2: '', requireMessage: ''}]);
+        if (requires.length === 0) {
+          requires.push({var1: '', displayVar1: '', comp: '==', var2: '', displayVar2: '', requireMessage: ''});
         }
 
         return ( <
@@ -52,7 +52,7 @@ class RequiresList extends React.Component {
               header
             } < /Typography> {
               
-            requires.map((element, index) => <RawRequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
+            requires.map((element, index) => <RequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
             updateRequire = {(val) => {
               let variables = [...requires];
               variables[index] = val;
@@ -68,7 +68,7 @@ class RequiresList extends React.Component {
           classes.button
         }
         onClick = {
-          () => onChangeRequire([...requires, {var1: '', comp: '==', var2: '', requireMessage: ''}])
+          () => onChangeRequire([...requires, {var1: '', displayVar1: '', comp: '==', var2: '', displayVar2: '', requireMessage: ''}])
           } >
           +
           <

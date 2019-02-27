@@ -6,7 +6,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import RawRequireRow from '../../RawRequireRow';
+import RequireRow from '../../RequireRow';
 
 const styles = theme => ({
     paper: {
@@ -35,8 +35,10 @@ const styles = theme => ({
 class ConditionalNode extends React.Component {
     state = {	
         comp: '==',	
-        var1: '',	
-        var2: '',	
+        displayVar1: '',
+        var1: '',
+        displayVar2: '',
+        var2: '',
     }
 
     render() {
@@ -44,7 +46,7 @@ class ConditionalNode extends React.Component {
 
         return (
             <FormControl className={classes.formControl}>
-                < RawRequireRow
+                < RequireRow
                 vars = {
                     varList
                 }
@@ -68,7 +70,7 @@ class ConditionalNode extends React.Component {
                         variant="contained"
                         color="primary"
                         className={classes.button}
-                        onClick={() => {close(); submit(`${this.state.var1} ${this.state.comp} ${this.state.var2}`)}}>
+                        onClick={() => {close(); submit(`${this.state.displayVar1} ${this.state.comp} ${this.state.displayVar2}`)}}>
                         Done
                         <DoneIcon/>
                     </Button>

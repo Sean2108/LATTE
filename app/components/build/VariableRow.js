@@ -47,8 +47,8 @@ class VariableRow extends React.Component {
       <TextField
           label="Variable Name"
           className={classes.textField}
-          value={val.name}
-          onChange={event => updateVariables({...val, name: event.target.value})}
+          value={val.displayName}
+          onChange={event => updateVariables({...val, displayName: event.target.value, name: event.target.value.toLowerCase().trim().replace(/\s/g, '_')})}
           margin="normal"
         /> < /
       FormControl >

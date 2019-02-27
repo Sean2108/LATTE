@@ -21,18 +21,14 @@ const styles = theme => ({
 
 class DefaultBuildTab extends React.Component {
 
-  state = {
-    params: []
-  }
-
   varList;
 
   componentWillMount() {
     this.varList = this.props.varList;
   }
 
-  flattenParamsToObject() {
-    return this.state.params
+  flattenParamsToObject(params) {
+    return params
     .filter((element) => element.name)
     .reduce((result, currentObject) => {
         result[currentObject.name] = currentObject.type;
@@ -43,13 +39,13 @@ class DefaultBuildTab extends React.Component {
     render() {
         const {classes, theme, varList, events, entities, onChangeLogic, onChangeParams, onChangeRequire, 
             onVariablesChange, onChangeReturn, params, requires, diagram, updateDiagram} = this.props;
-        let variables = this.flattenParamsToObject();
+        let variables = this.flattenParamsToObject(params);
         return ( < div > <
          VariableList header = {
             "Function Inputs"
         }
         updateVariables = {
-            (vars) => this.setState({params: vars}, () => onChangeParams(this.state.params))
+            (vars) => onChangeParams(vars)
         }
         vars = {params} / > < br / > < RequiresList header = {
             "Checking Phase"

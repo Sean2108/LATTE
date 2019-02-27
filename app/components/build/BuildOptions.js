@@ -97,7 +97,7 @@ class BuildOptions extends React.Component {
           return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
         }
         return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
-      });
+      }).join('');
       code += `${functionName}(${buildState.tabsParams[i].filter(element => element.name).map(element => element.type === 'string' ? `${element.type} memory ${element.name}` : `${element.type} ${element.name}`).join(', ')}) public payable ${returnCode} {
       ${requires}${buildState.tabsCode[i]}}\n`;
     }
