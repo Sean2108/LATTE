@@ -63,6 +63,10 @@ export class BuildParser {
     }
 
     getNextNodeForDefaultNode(node) {
+        // TODO: find better way to get next node for diamond
+        if (node instanceof DiamondNodeModel) {
+            return this.getNextNode(node.outPortTrue);
+        }
         if (node.getOutPorts().length === 0) {
             return null;
         }
