@@ -1,0 +1,1 @@
+{"tabs":["Global State","Initial State"],"tabsCode":[""],"variables":{},"tabsParams":[[]],"tabsReturn":[null],"tabsRequire":[[]],"constructorParams":[],"events":{"HighestBidIncreased":[{"name":"bidder","type":"address"},{"name":"amount","type":"int"}],"AuctionEnded":[{"name":"winner","type":"address"},{"name":"amount","type":"int"}]},"entities":{},"diagrams":[{}]}

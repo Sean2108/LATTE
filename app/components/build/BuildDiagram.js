@@ -65,8 +65,8 @@ class BuildDiagram extends React.Component {
                     let code = this.buildParser.traverseNextNode(this.start);
                     this.props.onChangeLogic(code);
                     this.props.onChangeReturn(this.buildParser.getReturnVar());
+                    this.props.updateDiagram(this.model.serializeDiagram());
                 }, 5000);
-                this.props.updateDiagram(this.model.serializeDiagram());
             }
        });
 

@@ -153,8 +153,14 @@ export class BuildParser {
                 let parsedLhs = this.parseVariable(lhs);
                 let parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== parsedRhs.type) {
+                    // one of them is a uint
+                    if (parsedLhs.type.slice(-3) === 'int' && parsedRhs.type.slice(-3) === 'int') {
+                        return parsedLhs.type === 'int' ? 
+                        {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'} :
+                        {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'};
+                    }
                     alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
-                    return {name: variable, type: 'invalid'};
+                    return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: 'invalid'};
                 }
                 if (parsedLhs === 'string' && operator !== '+') {
                     let varName = `${parsedLhs.name}_${parsedRhs.name}`;
