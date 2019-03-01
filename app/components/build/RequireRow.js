@@ -97,6 +97,7 @@ class RequireRow extends React.Component {
           } >
           <
           MenuItem value = "==" > is < /MenuItem> <
+          MenuItem value = "!=" > is not < /MenuItem> <
           MenuItem value = ">" > greater than < /MenuItem> <
           MenuItem value = "<" > less than < /MenuItem> <
           MenuItem value = ">=" > greater than or equals to < /MenuItem> <

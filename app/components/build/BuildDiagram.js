@@ -168,6 +168,7 @@ class BuildDiagram extends React.Component {
                       event => {
                         var data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
                         this.setState({open: true, type: data.type, points: this.engine.getRelativeMousePoint(event)});
+                        this.model.clearSelection();
                       }
                     }
                     onDragOver={
