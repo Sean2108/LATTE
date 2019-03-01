@@ -81,7 +81,7 @@ export class BuildParser {
                 [lhs, rhs] = code.split(' = ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
-                if (parsedLhs.type === 'var') {
+                if (parsedLhs.type === 'var' ||!(parsedLhs.name in this.variables)) {
                     this.variables[parsedLhs.name] = parsedRhs.type;
                     this.onVariablesChange(this.variables);
                 }
@@ -124,7 +124,7 @@ export class BuildParser {
                 return `return ${returnVar.name};`;
             case "Compare":
                 let comp;
-                [lhs, comp, rhs] = code.split(/ ([><=]=|>|<) /);
+                [lhs, comp, rhs] = code.split(/ ([!><=]=|>|<) /);
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== parsedRhs.type) {
@@ -159,6 +159,8 @@ export class BuildParser {
                         {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'} :
                         {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'};
                     }
+                    console.log(parsedLhs);
+                    console.log(parsedRhs);
                     alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
                     return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: 'invalid'};
                 }
@@ -186,17 +188,17 @@ export class BuildParser {
             return {name: `${parsedMap.name}[${parsedKey.name}]`, mapName: parsedMap.name, keyType: parsedKey.type, type: type};
         }
         let varName = variable.toLowerCase().trim().replace(/\s/g, '_');
-        if (varName === 'message_sender' || varName === 'msg_sender' || varName === 'sender') {
-            return {name: 'msg.sender', type: 'address'};
-        }
-        if (varName === 'message_value' || varName === 'msg_value' || varName === 'value') {
-            return {name: 'msg.value', type: 'uint'};
-        }
-        if (varName === 'current_balance' || varName === 'contract_balance' || varName === 'balance') {
-            return {name: 'address(this).balance', type: 'uint'};
-        }
-        if (varName === 'current_time' || varName === 'today' || varName === 'now') {
-            return {name: 'now', type: 'uint'};
+        const keywords = [
+            {name: 'msg.sender', type: 'address', strings: ['message_sender', 'msg_sender', 'sender']},
+            {name: 'msg.value', type: 'uint', strings: ['message_value', 'msg_value', 'value']},
+            {name: 'address(this).balance', type: 'uint', strings: ['current_balance', 'contract_balance', 'balance']},
+            {name: 'now', type: 'uint', strings: ['current_time', 'today', 'now']},
+            {name: 'address(0)', type: 'address', strings: ['address', 'type_address', 'address_type', 'an_address']} 
+        ]
+        for (const keyword of keywords) {
+            if (keyword.strings.includes(varName)) {
+                return {name: keyword.name, type: keyword.type};
+            }
         }
         if (!(varName in variables)) {
             return {name: varName, type: 'var'};
