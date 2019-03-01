@@ -3,14 +3,15 @@ import { DiamondNodeModel } from "./diagram/DiamondNodeModel";
 export class BuildParser {
 
     constructor(onVariablesChange) {
-        this.reset();
+        this.reset({});
         this.onVariablesChange = onVariablesChange;
     }
 
-    reset(varList) {
+    reset(varList, functionParams) {
         this.variables = {};
         this.returnVar = null;
         this.varList = varList;
+        this.functionParams = functionParams;
     }
 
     getReturnVar() {
@@ -81,7 +82,7 @@ export class BuildParser {
                 [lhs, rhs] = code.split(' = ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
-                if (parsedLhs.type === 'var' ||!(parsedLhs.name in this.variables)) {
+                if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
                     this.variables[parsedLhs.name] = parsedRhs.type;
                     this.onVariablesChange(this.variables);
                 }
@@ -139,7 +140,7 @@ export class BuildParser {
     }
 
     parseVariable(variable) {
-        let variables = {...this.varList, ...this.variables};
+        let variables = {...this.varList, ...this.variables, ...this.functionParams};
         if (variable[0] === '\"' && variable[variable.length - 1] === '\"' || variable[0] === "\'" && variable[variable.length - 1] === "\'") {
             return {name: variable, type: 'string'};
         }

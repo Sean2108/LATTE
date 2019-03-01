@@ -61,7 +61,7 @@ class BuildDiagram extends React.Component {
         this.model.addListener({
             linksUpdated: () => {
                 setTimeout(() => {
-                    this.buildParser.reset(this.props.varList);
+                    this.buildParser.reset(this.props.varList, this.props.functionParams);
                     let code = this.buildParser.traverseNextNode(this.start);
                     this.props.onChangeLogic(code);
                     this.props.onChangeReturn(this.buildParser.getReturnVar());
@@ -198,6 +198,7 @@ BuildDiagram.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
     varList: PropTypes.object.isRequired,
+    functionParams: PropTypes.object.isRequired,
     events: PropTypes.object.isRequired,
     entities: PropTypes.object.isRequired,
     onChangeLogic: PropTypes.func.isRequired,

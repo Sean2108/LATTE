@@ -55,9 +55,9 @@ class DefaultBuildTab extends React.Component {
         }
         onChangeRequire = {onChangeRequire}
         requires = {requires}
-        /> < br / > < BuildDiagram varList = {
-            {...this.varList, ...variables}
-        }
+        /> < br / > < BuildDiagram 
+        varList = {this.varList}
+        functionParams = {variables}
         events = {events}
         entities = {entities}
         onChangeLogic = {onChangeLogic}

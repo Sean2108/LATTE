@@ -36,7 +36,7 @@ class RequiresList extends React.Component {
           onChangeRequire,
           requires
         } = this.props;
-        this.buildParser.reset(this.props.vars);
+        this.buildParser.reset(this.props.vars, {});
 
         if (requires.length === 0) {
           requires.push({var1: '', displayVar1: '', comp: '==', var2: '', displayVar2: '', requireMessage: ''});
