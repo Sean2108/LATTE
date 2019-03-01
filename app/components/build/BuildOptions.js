@@ -32,7 +32,6 @@ class BuildOptions extends React.Component {
       let account = accounts[0];
       this.web3.eth.defaultAccount = account;
       let code = this.formCode();
-      console.log(code);
       ipcRenderer.send('request-compile', code);
       ipcRenderer.on('request-compile-complete', (event, payload) => {
         let compiledCode = JSON.parse(payload);
@@ -175,9 +174,21 @@ class BuildOptions extends React.Component {
         classes.button
       }
       onClick = {
+        () => console.log(this.formCode())
+      } >
+      Generate Code <
+      /Button>
+
+      <
+      Button variant = "contained"
+      color = "primary"
+      className = {
+        classes.button
+      }
+      onClick = {
         this.deploySmartContract
       } >
-      Build <
+      Deploy <
       /Button> <
       /div>
 
