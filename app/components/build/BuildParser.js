@@ -38,7 +38,8 @@ export class BuildParser {
             }
             let intersection = this.getIntersection(trueNextNode, falseNextNode);
             if (intersection) {
-                return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, intersection)}} else {\n${this.traverseNextNode(falseNextNode, intersection)}}\n${this.traverseNextNode(intersection, stopNode)}`;
+                let elseCode = this.traverseNextNode(falseNextNode, intersection);
+                return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, intersection)}} ${elseCode !== '' ? `else {\n${elseCode}}`: ''}\n${this.traverseNextNode(intersection, stopNode)}`;
             }
             return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} else {\n${this.traverseNextNode(falseNextNode, stopNode)}}\n`;
         }
@@ -82,11 +83,14 @@ export class BuildParser {
                 [lhs, rhs] = code.split(' = ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
-                if (parsedLhs.type === 'map') {
+                if ('mapName' in parsedLhs) {
+                    console.log(parsedLhs);
+                    console.log(parsedRhs);
                     this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
                     this.onVariablesChange(this.variables);
                 }
                 else if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
+                    console.log(parsedLhs);
                     this.variables[parsedLhs.name] = parsedRhs.type;
                     this.onVariablesChange(this.variables);
                 }
@@ -129,6 +133,12 @@ export class BuildParser {
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if (parsedLhs.type !== parsedRhs.type) {
+                    let mismatch = this.checkIntUintMismatch(parsedLhs, parsedRhs, 
+                        `uint(${parsedLhs.name}) ${comp} ${parsedRhs.name}`,
+                        `${parsedLhs.name} ${comp} uint(${parsedRhs.name})`);
+                    if (mismatch) {
+                        return mismatch;
+                    }
                     alert(`comparing different types at node ${nodeCode}`);
                 }
                 if (parsedLhs.type === 'string' && parsedRhs.type === 'string' && comp === '==') {
@@ -153,12 +163,16 @@ export class BuildParser {
                 [lhs, rhs] = variable.split(operator);
                 let parsedLhs = this.parseVariable(lhs);
                 let parsedRhs = this.parseVariable(rhs);
+                console.log(parsedLhs);
+                console.log(parsedRhs);
                 if (parsedLhs.type !== parsedRhs.type) {
                     // one of them is a uint
-                    if (parsedLhs.type.slice(-3) === 'int' && parsedRhs.type.slice(-3) === 'int') {
-                        return parsedLhs.type === 'int' ? 
-                        {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'} :
-                        {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'};
+                    let mismatch = this.checkIntUintMismatch(parsedLhs, parsedRhs, 
+                        {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'},
+                        {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'});
+                    if (mismatch) {
+                        console.log(mismatch);
+                        return mismatch;
                     }
                     if (parsedLhs.type === 'map' || parsedRhs.type === 'map') {
                         return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: parsedLhs.type === 'map' ? parsedRhs.type : parsedLhs.type};
@@ -208,7 +222,6 @@ export class BuildParser {
         return {name: varName, type: variables[varName]};
     }
 
-    // TODO: allow traversal for diamond nodes
     generateCodeForCycle(start, isTrue) {
         let outPort = isTrue ? start.outPortTrue : start.outPortFalse;
         let node = this.getNextNode(outPort);
@@ -219,6 +232,13 @@ export class BuildParser {
             }
             code += this.parseNode(node.name) + '\n';
             node = this.getNextNodeForDefaultNode(node);
+        }
+        return null;
+    }
+
+    checkIntUintMismatch(parsedLhs, parsedRhs, leftIntReturn, rightIntReturn) {
+        if (parsedLhs.type.slice(-3) === 'int' && parsedRhs.type.slice(-3) === 'int') {
+            return parsedLhs.type === 'int' ? leftIntReturn : rightIntReturn;
         }
         return null;
     }
