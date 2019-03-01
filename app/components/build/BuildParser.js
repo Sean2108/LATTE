@@ -115,8 +115,8 @@ export class BuildParser {
                 if (parsedLhs.type !== 'uint') {
                     alert(`value should be an integer at node ${nodeCode}`);
                 }
-                if (parsedRhs.type !== 'address') {
-                    alert(`transfer target should be an address at node ${nodeCode}`);
+                if (parsedRhs.type !== 'address payable') {
+                    alert(`transfer target should be a payable address at node ${nodeCode}`);
                 }
                 return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
             case "Return":
@@ -162,15 +162,12 @@ export class BuildParser {
                 [lhs, rhs] = variable.split(operator);
                 let parsedLhs = this.parseVariable(lhs);
                 let parsedRhs = this.parseVariable(rhs);
-                console.log(parsedLhs);
-                console.log(parsedRhs);
                 if (parsedLhs.type !== parsedRhs.type) {
                     // one of them is a uint
                     let mismatch = this.checkIntUintMismatch(parsedLhs, parsedRhs, 
                         {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'},
                         {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'});
                     if (mismatch) {
-                        console.log(mismatch);
                         return mismatch;
                     }
                     if (parsedLhs.type === 'map' || parsedRhs.type === 'map') {
