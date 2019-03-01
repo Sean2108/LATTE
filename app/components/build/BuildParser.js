@@ -152,7 +152,10 @@ export class BuildParser {
             return {name: variable, type: 'string'};
         }
         if (!isNaN(variable)) {
-            return {name: variable.trim(), type: 'int'};
+            if (parseInt(variable) < 0) {
+                return {name: variable.trim(), type: 'int'};
+            }
+            return {name: variable.trim(), type: 'uint'};
         }
         for (let operator of ['*', '/', '+', '-']) {
             if (variable.indexOf(operator) > 0) {

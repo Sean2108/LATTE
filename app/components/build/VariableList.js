@@ -37,7 +37,7 @@ class VariableList extends React.Component {
         } = this.props;
 
         if (vars.length === 0) {
-          vars.push({name: '', displayName: '', type: 'int'});
+          vars.push({name: '', displayName: '', type: 'uint'});
         }
 
         return ( <
@@ -63,7 +63,7 @@ class VariableList extends React.Component {
           classes.button
         }
         onClick = {
-          () => updateVariables([...vars, {name: '', displayName: '', type: 'int'}])} >
+          () => updateVariables([...vars, {name: '', displayName: '', type: 'uint'}])} >
           +
           <
           /Button> <

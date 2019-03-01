@@ -2,7 +2,6 @@ import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import VariableList from './VariableList';
-import VariableBox from './VariableBox';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './RequiresList';
 
