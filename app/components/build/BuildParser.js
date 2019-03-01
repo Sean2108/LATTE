@@ -3,7 +3,7 @@ import { DiamondNodeModel } from "./diagram/DiamondNodeModel";
 export class BuildParser {
 
     constructor(onVariablesChange) {
-        this.reset({});
+        this.reset({}, {});
         this.onVariablesChange = onVariablesChange;
     }
 
@@ -84,15 +84,12 @@ export class BuildParser {
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if ('mapName' in parsedLhs) {
-                    console.log(parsedLhs);
-                    console.log(parsedRhs);
                     this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
-                    this.onVariablesChange(this.variables);
+                    this.onVariablesChange({...this.variables, ...this.varList});
                 }
                 else if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
-                    console.log(parsedLhs);
                     this.variables[parsedLhs.name] = parsedRhs.type;
-                    this.onVariablesChange(this.variables);
+                    this.onVariablesChange({...this.variables, ...this.varList});
                 }
                 else if (parsedLhs.type !== parsedRhs.type) {
                     alert(`invalid assignment at node ${nodeCode}`);
@@ -109,7 +106,7 @@ export class BuildParser {
                 [entityName, params] = rhs.split('(');
                 parsedLhs = this.parseVariable(lhs);
                 this.variables[parsedLhs.name] = entityName;
-                this.onVariablesChange(this.variables);
+                this.onVariablesChange({...this.variables, ...this.varList});
                 params = params.replace(')', '').split(', ').map(param => this.parseVariable(param).name).join(', ');
                 return `${parsedLhs.name} = ${entityName}(${params});`;
             case "Transfer":
