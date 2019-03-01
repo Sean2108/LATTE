@@ -1,11 +1,11 @@
-pragma solidity ^0.4.22;
+pragma solidity >=0.4.22 <0.6.0;
 
 contract SimpleAuction {
     // Parameters of the auction. Times are either
     // absolute unix timestamps (seconds since 1970-01-01)
     // or time periods in seconds.
     address payable public beneficiary;
-    uint public auctionEnd;
+    uint public auctionEndTime;
 
     // Current state of the auction.
     address public highestBidder;
@@ -14,10 +14,11 @@ contract SimpleAuction {
     // Allowed withdrawals of previous bids
     mapping(address => uint) pendingReturns;
 
-    // Set to true at the end, disallows any change
+    // Set to true at the end, disallows any change.
+    // By default initialized to `false`.
     bool ended;
 
-    // Events that will be fired on changes.
+    // Events that will be emitted on changes.
     event HighestBidIncreased(address bidder, uint amount);
     event AuctionEnded(address winner, uint amount);
 
@@ -31,10 +32,10 @@ contract SimpleAuction {
     /// beneficiary address `_beneficiary`.
     constructor(
         uint _biddingTime,
-        address _beneficiary
+        address payable _beneficiary
     ) public {
         beneficiary = _beneficiary;
-        auctionEnd = now + _biddingTime;
+        auctionEndTime = now + _biddingTime;
     }
 
     /// Bid on the auction with the value sent
@@ -51,7 +52,7 @@ contract SimpleAuction {
         // Revert the call if the bidding
         // period is over.
         require(
-            now <= auctionEnd,
+            now <= auctionEndTime,
             "Auction already ended."
         );
 
@@ -76,16 +77,21 @@ contract SimpleAuction {
     }
 
     /// Withdraw a bid that was overbid.
-    function withdraw() public {
+    function withdraw() public returns (bool) {
         uint amount = pendingReturns[msg.sender];
         if (amount > 0) {
             // It is important to set this to zero because the recipient
             // can call this function again as part of the receiving call
-            // before `transfer` returns.
+            // before `send` returns.
             pendingReturns[msg.sender] = 0;
 
-            msg.sender.transfer(amount);
+            if (!msg.sender.send(amount)) {
+                // No need to call throw here, just reset the amount owing
+                pendingReturns[msg.sender] = amount;
+                return false;
+            }
         }
+        return true;
     }
 
     /// End the auction and send the highest bid
@@ -105,7 +111,7 @@ contract SimpleAuction {
         // external contracts.
 
         // 1. Conditions
-        require(now >= auctionEnd, "Auction not yet ended.");
+        require(now >= auctionEndTime, "Auction not yet ended.");
         require(!ended, "auctionEnd has already been called.");
 
         // 2. Effects
