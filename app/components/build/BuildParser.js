@@ -82,12 +82,12 @@ export class BuildParser {
                 [lhs, rhs] = code.split(' = ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
-                if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
-                    this.variables[parsedLhs.name] = parsedRhs.type;
+                if (parsedLhs.type === 'map') {
+                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
                     this.onVariablesChange(this.variables);
                 }
-                else if (parsedLhs.type === 'map') {
-                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
+                else if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
+                    this.variables[parsedLhs.name] = parsedRhs.type;
                     this.onVariablesChange(this.variables);
                 }
                 else if (parsedLhs.type !== parsedRhs.type) {
@@ -160,8 +160,9 @@ export class BuildParser {
                         {name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`, type: 'uint'} :
                         {name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`, type: 'uint'};
                     }
-                    console.log(parsedLhs);
-                    console.log(parsedRhs);
+                    if (parsedLhs.type === 'map' || parsedRhs.type === 'map') {
+                        return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: parsedLhs.type === 'map' ? parsedRhs.type : parsedLhs.type};
+                    }
                     alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
                     return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: 'invalid'};
                 }
