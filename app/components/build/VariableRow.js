@@ -74,7 +74,7 @@ class VariableRow extends React.Component {
       <
       MenuItem value = "uint" > Integer < /MenuItem> <
       MenuItem value = "bool" > Boolean < /MenuItem> <
-      MenuItem value = "address" > Address < /MenuItem> <
+      MenuItem value = "address payable" > Address < /MenuItem> <
       MenuItem value = "string" > String < /MenuItem> < /
       Select > <
       /FormControl>

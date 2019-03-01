@@ -25,9 +25,6 @@ export class BuildParser {
         if (node instanceof DiamondNodeModel) {
             let falseNextNode = this.getNextNode(node.outPortFalse);
             let trueNextNode = this.getNextNode(node.outPortTrue);
-            if (!falseNextNode || !trueNextNode) {
-                return '';
-            }
             let trueWhileCode = this.generateCodeForCycle(node, true);
             if (trueWhileCode) {
                 return `while (${this.parseNode('Compare: ' + node.name)}) {\n${trueWhileCode}}\n${this.traverseNextNode(falseNextNode, stopNode)}`;
@@ -41,7 +38,8 @@ export class BuildParser {
                 let elseCode = this.traverseNextNode(falseNextNode, intersection);
                 return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, intersection)}} ${elseCode !== '' ? `else {\n${elseCode}}`: ''}\n${this.traverseNextNode(intersection, stopNode)}`;
             }
-            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} else {\n${this.traverseNextNode(falseNextNode, stopNode)}}\n`;
+            let elseCode = this.traverseNextNode(falseNextNode, stopNode);
+            return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} ${elseCode !== '' ? `else {\n${elseCode}}`: ''}\n`;
         }
         if (!node) {
             return '';
@@ -84,7 +82,8 @@ export class BuildParser {
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
                 if ('mapName' in parsedLhs) {
-                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: parsedLhs.keyType, to: parsedRhs.type};
+                    let lhsType = parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
+                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: lhsType, to: parsedRhs.type};
                     this.onVariablesChange({...this.variables, ...this.varList});
                 }
                 else if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
@@ -113,7 +112,7 @@ export class BuildParser {
                 [lhs, rhs] = code.split(' to ');
                 parsedLhs = this.parseVariable(lhs);
                 parsedRhs = this.parseVariable(rhs);
-                if (parsedLhs.type !== 'int') {
+                if (parsedLhs.type !== 'uint') {
                     alert(`value should be an integer at node ${nodeCode}`);
                 }
                 if (parsedRhs.type !== 'address') {
@@ -205,11 +204,13 @@ export class BuildParser {
         }
         let varName = variable.toLowerCase().trim().replace(/\s/g, '_');
         const keywords = [
-            {name: 'msg.sender', type: 'address', strings: ['message_sender', 'msg_sender', 'sender']},
+            {name: 'msg.sender', type: 'address payable', strings: ['message_sender', 'msg_sender', 'sender']},
             {name: 'msg.value', type: 'uint', strings: ['message_value', 'msg_value', 'value']},
             {name: 'address(this).balance', type: 'uint', strings: ['current_balance', 'contract_balance', 'balance']},
             {name: 'now', type: 'uint', strings: ['current_time', 'today', 'now']},
-            {name: 'address(0)', type: 'address', strings: ['address', 'type_address', 'address_type', 'an_address']} 
+            {name: 'address(uint160(0))', type: 'address payable', strings: ['address', 'type_address', 'address_type', 'an_address']},
+            {name: 'true', type: 'bool', strings: ['true']},
+            {name: 'false', type: 'bool', strings: ['false']}
         ]
         for (const keyword of keywords) {
             if (keyword.strings.includes(varName)) {

@@ -4,7 +4,7 @@ contract SimpleAuction {
     // Parameters of the auction. Times are either
     // absolute unix timestamps (seconds since 1970-01-01)
     // or time periods in seconds.
-    address public beneficiary;
+    address payable public beneficiary;
     uint public auctionEnd;
 
     // Current state of the auction.
@@ -76,21 +76,16 @@ contract SimpleAuction {
     }
 
     /// Withdraw a bid that was overbid.
-    function withdraw() public returns (bool) {
+    function withdraw() public {
         uint amount = pendingReturns[msg.sender];
         if (amount > 0) {
             // It is important to set this to zero because the recipient
             // can call this function again as part of the receiving call
-            // before `send` returns.
+            // before `transfer` returns.
             pendingReturns[msg.sender] = 0;
 
-            if (!msg.sender.send(amount)) {
-                // No need to call throw here, just reset the amount owing
-                pendingReturns[msg.sender] = amount;
-                return false;
-            }
+            msg.sender.transfer(amount);
         }
-        return true;
     }
 
     /// End the auction and send the highest bid
