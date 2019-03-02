@@ -29,10 +29,6 @@ const styles = theme => ({
 
 class BuildOptionsPopover extends React.Component {
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value });
-  };
-
   render() {
     const {
       classes,
