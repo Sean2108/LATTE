@@ -20,12 +20,12 @@ const styles = theme => ({
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 120,
+    minWidth: 200,
   },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    width: 400,
+    width: 200,
   },
 });
 
@@ -33,7 +33,7 @@ class BuildOptions extends React.Component {
 
   state = {
     anchorEl: null,
-    isSave: false,
+    dataOp: 1,
     fileName: '',
     files: []
   };
@@ -132,10 +132,10 @@ class BuildOptions extends React.Component {
     this.props.buildState.variables[variable] === 'string';
   }
 
-  handleClick = (event, isSave) => {
+  handleClick = (event, dataOp) => {
     this.setState({
       anchorEl: event.currentTarget,
-      isSave: isSave
+      dataOp: dataOp
     });
   };
 
@@ -166,8 +166,15 @@ class BuildOptions extends React.Component {
       buildState,
       loadState
     } = this.props;
-    const { anchorEl, isSave, fileName, files } = this.state;
+    const { anchorEl, dataOp, fileName, files } = this.state;
     const open = Boolean(anchorEl);
+
+    const DATA_OP = {
+      LOAD_DATA: 1,
+      SAVE_DATA: 2,
+      SAVE_CONTRACT: 3
+    }
+
     return ( <
       div >
 
@@ -185,7 +192,7 @@ class BuildOptions extends React.Component {
             horizontal: 'center',
           }}
         >
-          {isSave ? 
+          {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? 
             <TextField
               id="standard-name"
               label="File Name"
@@ -220,22 +227,36 @@ class BuildOptions extends React.Component {
             }
             onClick = {
               () => {
-                if (isSave) {
-                  let data = JSON.stringify(buildState);
-                  writeFile(join('saved_data', fileName.replace(/\s+/g,"_") + '.json'), data, (err) => {  
-                    if (err) throw err;
-                    this.handleClose();
-                    console.log('Data written to file');
-                    this.getFiles();
-                  });
-                }
-                else if (!isSave) {
-                  readFile(join('saved_data', fileName), (err, data) => {  
-                    if (err) throw err;
-                    this.handleClose();
-                    loadState(JSON.parse(data));
-                    console.log('Data loaded');
-                  });
+                let filename;
+                switch (dataOp) {
+                  case DATA_OP.SAVE_DATA:
+                    let data = JSON.stringify(buildState);
+                    filename = fileName.replace(/\s+/g,"_") + '.json';
+                    writeFile(join('saved_data', filename), data, (err) => {  
+                      if (err) throw err;
+                      this.handleClose();
+                      console.log(`Data written to file ${filename}`);
+                      this.getFiles();
+                    });
+                    break;
+                  case DATA_OP.LOAD_DATA:
+                    readFile(join('saved_data', fileName), (err, data) => {  
+                      if (err) throw err;
+                      this.handleClose();
+                      loadState(JSON.parse(data));
+                      console.log(`Data loaded from ${fileName}`);
+                    });
+                    break;
+                  case DATA_OP.SAVE_CONTRACT:
+                    let code = this.formCode();
+                    console.log(code);
+                    filename = fileName.replace(/\s+/g,"_") + '.sol';
+                    writeFile(join('saved_contracts', filename), code, (err) => {  
+                      if (err) throw err;
+                      this.handleClose();
+                      console.log(`Contract written to file ${filename}`);
+                      this.getFiles();
+                    });
                 }
               }
             } >
@@ -263,7 +284,7 @@ class BuildOptions extends React.Component {
       }
       onClick = {
         (event) => {
-          this.handleClick(event, false);
+          this.handleClick(event, DATA_OP.LOAD_DATA);
         }
       } >
       Load <
@@ -277,7 +298,7 @@ class BuildOptions extends React.Component {
       }
       onClick = {
         (event) => {
-          this.handleClick(event, true);
+          this.handleClick(event, DATA_OP.SAVE_DATA);
         }
       } >
       Save <
@@ -290,7 +311,9 @@ class BuildOptions extends React.Component {
         classes.button
       }
       onClick = {
-        () => alert(this.formCode())
+        (event) => {
+          this.handleClick(event, DATA_OP.SAVE_CONTRACT);
+        }
       } >
       Generate Code <
       /Button>
