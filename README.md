@@ -5,7 +5,7 @@ Uses electron, react, solc and web3. Material-UI is used to style the applicatio
 
 View thesis.pdf for more details.
 
-##To run:
+## To run:
 - yarn dev - runs the application in development mode (with the console available)
 - yarn start - runs the application in production mode
 - yarn package - package application for current environment into the release directory
