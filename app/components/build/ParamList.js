@@ -68,6 +68,7 @@ class ParamList extends React.Component {
 
     render() {
         const {classes, theme, header, updateVariables, params, updateParams} = this.props;
+
         return (< Paper className = {
             classes.paper
         } > < Typography variant = "title" noWrap > {
@@ -77,7 +78,7 @@ class ParamList extends React.Component {
         {params.filter(param => param.name).map((param, index) => <div key={index}>
         <TextField
           id="value"
-          label={`Value of ${param.name || ''}`}
+          label={`Value of ${param.displayName || ''}`}
           className={classes.textField}
           value={param.value || ''}
           onChange={this.handleChange(index)}
