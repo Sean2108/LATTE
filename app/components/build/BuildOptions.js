@@ -62,14 +62,11 @@ class BuildOptions extends React.Component {
           gasPrice: '30000000000000'
         })
         .on('error', (error) => { console.log(error) })
-        .on('transactionHash', (transactionHash) => { alert(transactionHash) })
+        .on('transactionHash', (transactionHash) => { alert(`Transaction Hash: ${transactionHash}`) })
         .on('receipt', (receipt) => {
-          alert(receipt.contractAddress) // contains the new contract address
+          alert(`Contract Address: ${receipt.contractAddress}`) // contains the new contract address
         })
-        .on('confirmation', (confirmationNumber, receipt) => { alert(confirmationNumber) })
-        .then((newContractInstance) => {
-            alert(newContractInstance.options.address) // instance with the new contract address
-        });
+        .on('confirmation', (confirmationNumber, receipt) => { alert(`Confirmation Number: ${confirmationNumber}`) })
         });
     });
   }
