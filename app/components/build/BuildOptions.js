@@ -78,11 +78,11 @@ class BuildOptions extends React.Component {
         .on('error', (error) => { console.log(error) })
         .on('transactionHash', (transactionHash) => { alert(transactionHash) })
         .on('receipt', (receipt) => {
-          console.log(receipt.contractAddress) // contains the new contract address
+          alert(receipt.contractAddress) // contains the new contract address
         })
         .on('confirmation', (confirmationNumber, receipt) => { alert(confirmationNumber) })
         .then((newContractInstance) => {
-            console.log(newContractInstance.options.address) // instance with the new contract address
+            alert(newContractInstance.options.address) // instance with the new contract address
         });
         });
     });
@@ -290,7 +290,7 @@ class BuildOptions extends React.Component {
         classes.button
       }
       onClick = {
-        () => console.log(this.formCode())
+        () => alert(this.formCode())
       } >
       Generate Code <
       /Button>
