@@ -5,15 +5,38 @@ import {
 } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { ipcRenderer } from 'electron';
-import { readFile, writeFile } from 'fs';
+import Popover from '@material-ui/core/Popover';
+import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import { readdir, readFile, writeFile } from 'fs';
+import { join } from 'path';
 
 const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 120,
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+    width: 400,
+  },
 });
 
 class BuildOptions extends React.Component {
+
+  state = {
+    anchorEl: null,
+    isSave: false,
+    fileName: '',
+    files: []
+  };
 
   web3 = this.props.connection;
 
@@ -109,6 +132,32 @@ class BuildOptions extends React.Component {
     this.props.buildState.variables[variable] === 'string';
   }
 
+  handleClick = (event, isSave) => {
+    this.setState({
+      anchorEl: event.currentTarget,
+      isSave: isSave
+    });
+  };
+
+  handleChange = name => event => {
+    this.setState({ [name]: event.target.value });
+  };
+
+  handleClose = () => {
+    this.setState({
+      anchorEl: null,
+      fileName: ''
+    });
+  };
+
+  componentWillMount() {
+    this.getFiles();
+  }
+
+  getFiles() {
+    readdir('reference_contracts', (err, items) => this.setState({files: items.filter(item => item.slice(-5) === '.json')}));
+  }
+
   render() {
     const {
       classes,
@@ -117,8 +166,83 @@ class BuildOptions extends React.Component {
       buildState,
       loadState
     } = this.props;
+    const { anchorEl, isSave, fileName, files } = this.state;
+    const open = Boolean(anchorEl);
     return ( <
       div >
+
+      <Popover
+          id="simple-popper"
+          open={open}
+          anchorEl={anchorEl}
+          onClose={this.handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+        >
+          {isSave ? 
+            <TextField
+              id="standard-name"
+              label="File Name"
+              className={classes.textField}
+              value={this.state.fileName}
+              onChange={this.handleChange('fileName')}
+              margin="normal"
+            />
+            : 
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="filename-simple">File Name</InputLabel>
+              <Select
+                value={this.state.fileName}
+                onChange={this.handleChange('fileName')}
+                inputProps={{
+                  name: 'filename',
+                  id: 'filename-simple',
+                }}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {files.map(item => <MenuItem value={item} key={item}>{item}</MenuItem>)}
+              </Select>
+            </FormControl>
+          }
+            <
+            Button variant = "contained"
+            color = "primary"
+            className = {
+              classes.button
+            }
+            onClick = {
+              () => {
+                if (isSave) {
+                  let data = JSON.stringify(buildState);
+                  writeFile(join('reference_contracts', fileName.replace(/\s+/g,"_") + '.json'), data, (err) => {  
+                    if (err) throw err;
+                    console.log('Data written to file');
+                    this.getFiles();
+                    this.handleClose();
+                  });
+                }
+                else if (!isSave) {
+                  readFile(join('reference_contracts', fileName), (err, data) => {  
+                    if (err) throw err;
+                    loadState(JSON.parse(data));
+                    console.log('Data loaded');
+                    this.handleClose();
+                  });
+                }
+              }
+            } >
+            Done <
+            /Button>
+      </Popover>
+
       <
       Button variant = "outlined"
       color = "primary"
@@ -138,12 +262,8 @@ class BuildOptions extends React.Component {
         classes.button
       }
       onClick = {
-        () => {
-          readFile('data.json', (err, data) => {  
-            if (err) throw err;
-            loadState(JSON.parse(data));
-            console.log('Data loaded');
-          });
+        (event) => {
+          this.handleClick(event, false);
         }
       } >
       Load <
@@ -156,12 +276,8 @@ class BuildOptions extends React.Component {
         classes.button
       }
       onClick = {
-        () => {
-          let data = JSON.stringify(buildState);
-          writeFile('data.json', data, (err) => {  
-            if (err) throw err;
-            console.log('Data written to file');
-          });
+        (event) => {
+          this.handleClick(event, true);
         }
       } >
       Save <
