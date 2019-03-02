@@ -50,6 +50,23 @@ class Connect extends React.Component {
       protocol: 'http'
     };
 
+    promiseTimeout = (ms, promise) => {
+      // Create a promise that rejects in <ms> milliseconds
+      let timeout = new Promise((resolve, reject) => {
+        let id = setTimeout(() => {
+          clearTimeout(id);
+          this.setState({
+            connectionFailed: true
+          })
+        }, ms)
+      })
+      // Returns a race between our timeout and the passed in promise
+      return Promise.race([
+        promise,
+        timeout
+      ])
+    }
+
     login = () => {
       const address = document.getElementById('address').value;
       const port = document.getElementById('port').value;
@@ -61,16 +78,16 @@ class Connect extends React.Component {
         return;
       }
       let web3 = new Web3(new Web3.providers.HttpProvider(`${this.state.protocol}://${address}:${port}`));
-      web3.eth.net.isListening()
-        .then(res => {
-          this.setState({
-            connectionFailed: !res
-          });
-          this.props.onclick(web3);
-        })
-        .catch(err => this.setState({
-          connectionFailed: true
-        }));
+      this.promiseTimeout(2000, web3.eth.net.isListening()
+      .then(res => {
+        this.setState({
+          connectionFailed: !res
+        });
+        this.props.onclick(web3);
+      })
+      )
+
+      
     }
 
     changeProtocol = event => {
