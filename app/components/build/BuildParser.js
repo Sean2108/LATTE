@@ -18,8 +18,47 @@ export class BuildParser {
         return this.returnVar;
     }
 
+    parse(start) {
+        this.findVariables(start);
+        console.log(this.variables);
+        return this.traverseNextNode(start);
+    }
+
+    findVariables(start) {
+        let unparsedStatements = new Set();
+        this.traverseForVariables(start, unparsedStatements);
+        let hasChanged = false;
+        do {
+            for (let statement of unparsedStatements) {
+                if (this.parseNodeForVariables(statement)) {
+                    hasChanged = true;
+                    unparsedStatements.delete(statement);
+                }
+            }
+        } while (unparsedStatements.size > 0 && hasChanged);
+        this.onVariablesChange({...this.variables, ...this.varList});
+    }
+
+    traverseForVariables(node, unparsedStatements) {
+        if (!node) {
+            return;
+        }
+        if (node instanceof DiamondNodeModel) {
+            this.parseNode('Compare: ' + node.name);
+            let falseNextNode = this.getNextNode(node.outPortFalse);
+            let trueNextNode = this.getNextNode(node.outPortTrue);
+            this.traverseForVariables(falseNextNode, unparsedStatements);
+            this.traverseForVariables(trueNextNode, unparsedStatements);
+        }
+        if (!this.parseNodeForVariables(node.name)) {
+            unparsedStatements.add(node.name);
+        }
+        let nextNode = this.getNextNodeForDefaultNode(node);
+        this.traverseForVariables(nextNode, unparsedStatements);
+    }
+
     traverseNextNode(node, stopNode = null) {
-        if (stopNode && node === stopNode) {
+        if (!node || stopNode && node === stopNode) {
             return '';
         }
         if (node instanceof DiamondNodeModel) {
@@ -40,9 +79,6 @@ export class BuildParser {
             }
             let elseCode = this.traverseNextNode(falseNextNode, stopNode);
             return `if (${this.parseNode('Compare: ' + node.name)}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} ${elseCode !== '' ? `else {\n${elseCode}}`: ''}\n`;
-        }
-        if (!node) {
-            return '';
         }
         let curNodeCode = node.name === 'Start' ? '' : this.parseNode(node.name) + '\n';
         let nextNode = this.getNextNodeForDefaultNode(node);
@@ -71,6 +107,46 @@ export class BuildParser {
             return null;
         }
         return this.getNextNode(node.getOutPorts()[0]);
+    }
+
+    parseNodeForVariables(nodeCode) {
+        let type, code, lhs, rhs, parsedLhs, parsedRhs, params;
+        [type, code] = nodeCode.split(': ');
+        switch (type) {
+            case "Assignment":
+                [lhs, rhs] = code.split(' = ');
+                parsedLhs = this.parseVariable(lhs);
+                parsedRhs = this.parseVariable(rhs);
+                if ('mapName' in parsedLhs && parsedLhs.keyType !== 'var' && parsedRhs.type !== 'var') {
+                    let lhsType = parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
+                    this.variables[parsedLhs.mapName] = {type: 'mapping', from: lhsType, to: parsedRhs.type};
+                    return true;
+                }
+                if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
+                    this.variables[parsedLhs.name] = parsedRhs.type;
+                    return true;
+                }
+                return false;
+            case "New Entity":
+                let entityName;
+                [lhs, rhs] = code.split(' = ');
+                [entityName, params] = rhs.split('(');
+                parsedLhs = this.parseVariable(lhs);
+                this.variables[parsedLhs.name] = entityName;
+                return true;
+            case "Transfer":
+                [lhs, rhs] = code.split(' to ');
+                parsedLhs = this.parseVariable(lhs);
+                parsedRhs = this.parseVariable(rhs);
+                if (parsedLhs.type === 'var') {
+                    this.variables[parsedLhs.name] = 'uint';
+                }
+                if (parsedRhs.type === 'var') {
+                    this.variables[parsedRhs.name] = 'address payable';
+                }
+                return true;
+        }
+        return true;
     }
 
     parseNode(nodeCode) {
@@ -174,7 +250,7 @@ export class BuildParser {
                         return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: parsedLhs.type === 'map' ? parsedRhs.type : parsedLhs.type};
                     }
                     alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
-                    return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: 'invalid'};
+                    return {name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`, type: 'var'};
                 }
                 if (parsedLhs === 'string' && operator !== '+') {
                     let varName = `${parsedLhs.name}_${parsedRhs.name}`;

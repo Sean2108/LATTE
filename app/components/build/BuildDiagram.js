@@ -62,7 +62,7 @@ class BuildDiagram extends React.Component {
             linksUpdated: () => {
                 setTimeout(() => {
                     this.buildParser.reset(this.props.varList, this.props.functionParams);
-                    let code = this.buildParser.traverseNextNode(this.start);
+                    let code = this.buildParser.parse(this.start);
                     this.props.onChangeLogic(code);
                     this.props.onChangeReturn(this.buildParser.getReturnVar());
                     this.props.updateDiagram(this.model.serializeDiagram());
