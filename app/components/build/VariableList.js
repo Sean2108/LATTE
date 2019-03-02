@@ -6,9 +6,6 @@ import {
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import BuildOptions from './BuildOptions';
-import BuildDiagram from './BuildDiagram';
-import BuildTabs from './BuildTabs';
 import Button from '@material-ui/core/Button';
 import VariableRow from './VariableRow';
 

@@ -4,11 +4,8 @@ import {withStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
-import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
 import VariableList from './VariableList';
 
@@ -21,12 +18,6 @@ const styles = theme => ({
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit
     },
-    dense: {
-        marginTop: 16
-    },
-    menu: {
-        width: 200
-    },
     paper: {
         padding: theme.spacing.unit * 2,
         textAlign: 'center',
@@ -34,27 +25,12 @@ const styles = theme => ({
         maxHeight: '40vw',
         overflow: 'auto'
     },
-    innerPaper: {
-        height: 45,
-        width: 'max-content',
-        padding: theme.spacing.unit,
-        display: 'inline-block',
-        margin: theme.spacing.unit
-    },
     button: {
         margin: 0
     },
     rightIcon: {
         marginLeft: theme.spacing.unit
     },
-    entityName: {
-        display: 'flex',
-        'justify-content': 'center',
-        margin: 'auto'
-    },
-    entityHeader: {
-        'flex-grow': 2
-    }
 });
 
 class StructList extends React.Component {

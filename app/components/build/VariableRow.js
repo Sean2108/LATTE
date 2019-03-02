@@ -3,19 +3,13 @@ import PropTypes from 'prop-types';
 import {
   withStyles
 } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
-  button: {
-    margin: theme.spacing.unit,
-  },
   formControl: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,

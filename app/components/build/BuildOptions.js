@@ -13,15 +13,6 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
-  formControl: {
-    margin: theme.spacing.unit,
-    minWidth: 200,
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: 200,
-  },
 });
 
 class BuildOptions extends React.Component {

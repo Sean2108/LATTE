@@ -7,19 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
 
 const styles = theme => ({
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap'
-    },
     textField: {
         marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit
-    },
-    dense: {
-        marginTop: 16
-    },
-    menu: {
-        width: 200
+        marginRight: theme.spacing.unit,
+        width: 300
     },
     paper: {
         padding: theme.spacing.unit * 2,
@@ -28,30 +19,6 @@ const styles = theme => ({
         maxHeight: '20vw',
         overflow: 'auto'
     },
-    innerPaper: {
-        height: 45,
-        width: 'max-content',
-        padding: theme.spacing.unit,
-        display: 'inline-block',
-        margin: theme.spacing.unit
-    },
-    button: {
-        margin: 0
-    },
-    rightIcon: {
-        marginLeft: theme.spacing.unit
-    },
-    entityName: {
-        display: 'flex',
-        'justify-content': 'center',
-        margin: 'auto'
-    },
-    entityHeader: {
-        'flex-grow': 2
-    },
-    row: {
-        display: 'flex'
-    }
 });
 
 class ParamList extends React.Component {

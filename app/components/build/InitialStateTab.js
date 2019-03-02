@@ -4,18 +4,6 @@ import PropTypes from 'prop-types';
 import StructList from './StructList';
 import ParamList from './ParamList';
 
-const styles = theme => ({
-    paper: {
-        padding: theme.spacing.unit * 2,
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-        maxHeight: '20vw',
-        overflow: 'auto'
-    },
-    button: {
-        margin: theme.spacing.unit
-    }
-});
 
 class InitialStateTab extends React.Component {
 
@@ -38,8 +26,6 @@ class InitialStateTab extends React.Component {
     }
 
     InitialStateTab.propTypes = {
-      classes: PropTypes.object.isRequired,
-      theme: PropTypes.object.isRequired,
       entities: PropTypes.object.isRequired,
       events: PropTypes.object.isRequired,
       updateEntities: PropTypes.func.isRequired,
@@ -48,6 +34,4 @@ class InitialStateTab extends React.Component {
       updateParams: PropTypes.func.isRequired
     };
 
-    export default withStyles(styles, {
-      withTheme: true
-    })(InitialStateTab);
+    export default InitialStateTab;

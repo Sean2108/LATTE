@@ -5,19 +5,6 @@ import VariableList from './VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './RequiresList';
 
-const styles = theme => ({
-    paper: {
-        padding: theme.spacing.unit * 2,
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-        maxHeight: '20vw',
-        overflow: 'auto'
-    },
-    button: {
-        margin: theme.spacing.unit
-    }
-});
-
 class DefaultBuildTab extends React.Component {
 
   varList;
@@ -69,8 +56,6 @@ class DefaultBuildTab extends React.Component {
     }
 
     DefaultBuildTab.propTypes = {
-      classes: PropTypes.object.isRequired,
-      theme: PropTypes.object.isRequired,
       varList: PropTypes.object.isRequired,
       events: PropTypes.object.isRequired,
       entities: PropTypes.object.isRequired,
@@ -85,6 +70,4 @@ class DefaultBuildTab extends React.Component {
       updateDiagram: PropTypes.func.isRequired,
     };
 
-    export default withStyles(styles, {
-      withTheme: true
-    })(DefaultBuildTab);
+    export default DefaultBuildTab;

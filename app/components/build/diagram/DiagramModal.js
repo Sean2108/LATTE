@@ -22,16 +22,6 @@ const styles = theme => ({
         boxShadow: theme.shadows[5],
         padding: theme.spacing.unit * 4
     },
-    fab: {
-        margin: theme.spacing.unit
-    },
-    rightIcon: {
-        marginLeft: theme.spacing.unit
-    },
-    formControl: {
-        margin: theme.spacing.unit,
-        minWidth: 120
-    }
 });
 
 class DiagramModal extends React.Component {
