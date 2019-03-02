@@ -155,7 +155,7 @@ class BuildOptions extends React.Component {
   }
 
   getFiles() {
-    readdir('reference_contracts', (err, items) => this.setState({files: items.filter(item => item.slice(-5) === '.json')}));
+    readdir('saved_data', (err, items) => this.setState({files: items.filter(item => item.slice(-5) === '.json')}));
   }
 
   render() {
@@ -222,7 +222,7 @@ class BuildOptions extends React.Component {
               () => {
                 if (isSave) {
                   let data = JSON.stringify(buildState);
-                  writeFile(join('reference_contracts', fileName.replace(/\s+/g,"_") + '.json'), data, (err) => {  
+                  writeFile(join('saved_data', fileName.replace(/\s+/g,"_") + '.json'), data, (err) => {  
                     if (err) throw err;
                     this.handleClose();
                     console.log('Data written to file');
@@ -230,7 +230,7 @@ class BuildOptions extends React.Component {
                   });
                 }
                 else if (!isSave) {
-                  readFile(join('reference_contracts', fileName), (err, data) => {  
+                  readFile(join('saved_data', fileName), (err, data) => {  
                     if (err) throw err;
                     this.handleClose();
                     loadState(JSON.parse(data));
