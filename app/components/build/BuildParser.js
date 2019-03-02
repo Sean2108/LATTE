@@ -20,7 +20,6 @@ export class BuildParser {
 
     parse(start) {
         this.findVariables(start);
-        console.log(this.variables);
         return this.traverseNextNode(start);
     }
 
