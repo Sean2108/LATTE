@@ -5,12 +5,7 @@ import {
 } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { ipcRenderer } from 'electron';
-import Popover from '@material-ui/core/Popover';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
+import BuildOptionsPopover from './BuildOptionsPopover';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
 
@@ -178,91 +173,44 @@ class BuildOptions extends React.Component {
     return ( <
       div >
 
-      <Popover
-          id="simple-popper"
-          open={open}
-          anchorEl={anchorEl}
-          onClose={this.handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? 
-            <TextField
-              id="standard-name"
-              label="File Name"
-              className={classes.textField}
-              value={this.state.fileName}
-              onChange={this.handleChange('fileName')}
-              margin="normal"
-            />
-            : 
-            <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="filename-simple">File Name</InputLabel>
-              <Select
-                value={this.state.fileName}
-                onChange={this.handleChange('fileName')}
-                inputProps={{
-                  name: 'filename',
-                  id: 'filename-simple',
-                }}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {files.map(item => <MenuItem value={item} key={item}>{item}</MenuItem>)}
-              </Select>
-            </FormControl>
-          }
-            <
-            Button variant = "contained"
-            color = "primary"
-            className = {
-              classes.button
-            }
-            onClick = {
-              () => {
-                let filename;
-                switch (dataOp) {
-                  case DATA_OP.SAVE_DATA:
-                    let data = JSON.stringify(buildState);
-                    filename = fileName.replace(/\s+/g,"_") + '.json';
-                    writeFile(join('saved_data', filename), data, (err) => {  
-                      if (err) throw err;
-                      this.handleClose();
-                      console.log(`Data written to file ${filename}`);
-                      this.getFiles();
-                    });
-                    break;
-                  case DATA_OP.LOAD_DATA:
-                    readFile(join('saved_data', fileName), (err, data) => {  
-                      if (err) throw err;
-                      this.handleClose();
-                      loadState(JSON.parse(data));
-                      console.log(`Data loaded from ${fileName}`);
-                    });
-                    break;
-                  case DATA_OP.SAVE_CONTRACT:
-                    let code = this.formCode();
-                    console.log(code);
-                    filename = fileName.replace(/\s+/g,"_") + '.sol';
-                    writeFile(join('saved_contracts', filename), code, (err) => {  
-                      if (err) throw err;
-                      this.handleClose();
-                      console.log(`Contract written to file ${filename}`);
-                      this.getFiles();
-                    });
-                }
-              }
-            } >
-            Done <
-            /Button>
-      </Popover>
+      <BuildOptionsPopover
+        anchorEl = {anchorEl}
+        dataOp = {dataOp}
+        fileName = {fileName}
+        files = {files}
+        handleClose = {this.handleClose}
+        handleChange = {this.handleChange}
+        saveData = {() => {
+          let data = JSON.stringify(buildState);
+          let filename = fileName.replace(/\s+/g,"_") + '.json';
+          writeFile(join('saved_data', filename), data, (err) => {  
+            if (err) throw err;
+            this.handleClose();
+            console.log(`Data written to file ${filename}`);
+            this.getFiles();
+          })
+        }}
+        loadData = {() =>
+          readFile(join('saved_data', fileName), (err, data) => {  
+            if (err) throw err;
+            this.handleClose();
+            loadState(JSON.parse(data));
+            console.log(`Data loaded from ${fileName}`);
+          })
+        }
+        saveContract = {() => {
+          let code = this.formCode();
+          console.log(code);
+          let filename = fileName.replace(/\s+/g,"_") + '.sol';
+          writeFile(join('saved_contracts', filename), code, (err) => {  
+            if (err) throw err;
+            this.handleClose();
+            console.log(`Contract written to file ${filename}`);
+            this.getFiles();
+          });
+        }}
+        DATA_OP = {DATA_OP}
+      />
 
       <
       Button variant = "outlined"
