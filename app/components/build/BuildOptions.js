@@ -224,17 +224,17 @@ class BuildOptions extends React.Component {
                   let data = JSON.stringify(buildState);
                   writeFile(join('reference_contracts', fileName.replace(/\s+/g,"_") + '.json'), data, (err) => {  
                     if (err) throw err;
+                    this.handleClose();
                     console.log('Data written to file');
                     this.getFiles();
-                    this.handleClose();
                   });
                 }
                 else if (!isSave) {
                   readFile(join('reference_contracts', fileName), (err, data) => {  
                     if (err) throw err;
+                    this.handleClose();
                     loadState(JSON.parse(data));
                     console.log('Data loaded');
-                    this.handleClose();
                   });
                 }
               }
