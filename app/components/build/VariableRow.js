@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -17,65 +15,54 @@ const styles = theme => ({
     maxWidth: 150
   },
   textField: {
-      marginLeft: theme.spacing.unit,
-      marginRight: theme.spacing.unit
-  },
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit
+  }
 });
 
 class VariableRow extends React.Component {
-
   render() {
-    const {
-      classes,
-      theme,
-      updateVariables,
-      val
-    } = this.props;
-    return ( <
-      div >
+    const { classes, theme, updateVariables, val } = this.props;
+    return (
+      <div>
+        <FormControl className={classes.formControl}>
+          <TextField
+            label="Variable Name"
+            className={classes.textField}
+            value={val.displayName}
+            onChange={event =>
+              updateVariables({
+                ...val,
+                displayName: event.target.value,
+                name: event.target.value
+                  .toLowerCase()
+                  .trim()
+                  .replace(/\s/g, '_')
+              })
+            }
+            margin="normal"
+          />{' '}
+        </FormControl>
 
-      <
-      FormControl className = {
-        classes.formControl
-      } >
-      <TextField
-          label="Variable Name"
-          className={classes.textField}
-          value={val.displayName}
-          onChange={event => updateVariables({...val, displayName: event.target.value, name: event.target.value.toLowerCase().trim().replace(/\s/g, '_')})}
-          margin="normal"
-        /> < /
-      FormControl >
-
-      <
-      FormControl className = {
-        classes.formControl
-      } >
-      <
-      InputLabel htmlFor = "protocol" > Variable Type < /InputLabel> <
-      Select value = {
-        val.type
-      }
-      onChange = {
-        event => updateVariables({...val, type: event.target.value})
-      }
-      inputProps = {
-        {
-          name: 'Var Type',
-          id: 'type',
-        }
-      } >
-      <
-      MenuItem value = "uint" > Integer < /MenuItem> <
-      MenuItem value = "bool" > Boolean < /MenuItem> <
-      MenuItem value = "address payable" > Address < /MenuItem> <
-      MenuItem value = "string" > String < /MenuItem> < /
-      Select > <
-      /FormControl>
-
-      <
-      /div>
-
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="protocol"> Variable Type </InputLabel>{' '}
+          <Select
+            value={val.type}
+            onChange={event =>
+              updateVariables({ ...val, type: event.target.value })
+            }
+            inputProps={{
+              name: 'Var Type',
+              id: 'type'
+            }}
+          >
+            <MenuItem value="uint"> Integer </MenuItem>{' '}
+            <MenuItem value="bool"> Boolean </MenuItem>{' '}
+            <MenuItem value="address payable"> Address </MenuItem>{' '}
+            <MenuItem value="string"> String </MenuItem>{' '}
+          </Select>{' '}
+        </FormControl>
+      </div>
     );
   }
 }

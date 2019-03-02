@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -15,70 +13,65 @@ const styles = theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     maxHeight: '40vw',
-    overflow: 'auto',
+    overflow: 'auto'
   },
   button: {
-    margin: theme.spacing.unit,
-  },
+    margin: theme.spacing.unit
+  }
 });
 
 class VariableList extends React.Component {
+  render() {
+    const { classes, theme, header, updateVariables, vars } = this.props;
 
-      render() {
-        const {
-          classes,
-          theme,
-          header,
-          updateVariables,
-          vars
-        } = this.props;
-
-        if (vars.length === 0) {
-          vars.push({name: '', displayName: '', type: 'uint'});
-        }
-
-        return ( <
-            Paper className = {
-              classes.paper
-            } >
-            <
-            Typography variant = "title"
-            noWrap > {
-              header
-            } < /Typography> {
-            vars.map((element, index) => <VariableRow val = {element} key = {index} updateVariables={(val) => {
-                let variables = [...vars];
-                variables[index] = val;
-                updateVariables(variables);
-            }}/>)
-          }
-
-          <
-          Button variant = "contained"
-        color = "primary"
-        className = {
-          classes.button
-        }
-        onClick = {
-          () => updateVariables([...vars, {name: '', displayName: '', type: 'uint'}])} >
-          +
-          <
-          /Button> <
-          br / >
-          <
-          /Paper>
-        );
-      }
+    if (vars.length === 0) {
+      vars.push({ name: '', displayName: '', type: 'uint' });
     }
 
-    VariableList.propTypes = {
-      classes: PropTypes.object.isRequired,
-      theme: PropTypes.object.isRequired,
-      header: PropTypes.string.isRequired,
-      updateVariables: PropTypes.func.isRequired,
-      vars: PropTypes.array.isRequired
-    };
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="title" noWrap>
+          {' '}
+          {header}{' '}
+        </Typography>{' '}
+        {vars.map((element, index) => (
+          <VariableRow
+            val={element}
+            key={index}
+            updateVariables={val => {
+              let variables = [...vars];
+              variables[index] = val;
+              updateVariables(variables);
+            }}
+          />
+        ))}
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={() =>
+            updateVariables([
+              ...vars,
+              { name: '', displayName: '', type: 'uint' }
+            ])
+          }
+        >
+          +
+        </Button>{' '}
+        <br />
+      </Paper>
+    );
+  }
+}
 
-    export default withStyles(styles, {
-      withTheme: true
-    })(VariableList);
+VariableList.propTypes = {
+  classes: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
+  header: PropTypes.string.isRequired,
+  updateVariables: PropTypes.func.isRequired,
+  vars: PropTypes.array.isRequired
+};
+
+export default withStyles(styles, {
+  withTheme: true
+})(VariableList);

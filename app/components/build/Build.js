@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import BuildOptions from './BuildOptions';
@@ -16,92 +14,61 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: '0 8px',
-    ...theme.mixins.toolbar,
+    ...theme.mixins.toolbar
   },
   content: {
     flexGrow: 1,
     backgroundColor: 'white',
     padding: theme.spacing.unit * 3,
-    margin: theme.spacing.unit * 3,
+    margin: theme.spacing.unit * 3
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing.unit
   },
   button: {
-    margin: theme.spacing.unit,
-  },
+    margin: theme.spacing.unit
+  }
 });
 
 class Build extends React.Component {
   state = {
-      tabs: ['Global State', 'Initial State'],
-      tabsCode : [''],
-      variables: {},
-      tabsParams: [[]],
-      tabsReturn: [null],
-      tabsRequire: [[]],
-      constructorParams: [],
-      events: {},
-      entities: {},
-      diagrams: [{}]
+    tabs: ['Global State', 'Initial State'],
+    tabsCode: [''],
+    variables: {},
+    tabsParams: [[]],
+    tabsReturn: [null],
+    tabsRequire: [[]],
+    constructorParams: [],
+    events: {},
+    entities: {},
+    diagrams: [{}]
   };
 
   render() {
-    const {
-      classes,
-      theme,
-      onback,
-      connection
-    } = this.props;
+    const { classes, theme, onback, connection } = this.props;
 
-    const {
-      tabs,
-      tabsCode,
-      variables
-    } = this.state;
+    const { tabs, tabsCode, variables } = this.state;
 
-    return ( <
-      main align = "center"
-      className = {
-        classes.content
-      } >
-      <
-      div className = {
-        classes.toolbar
-      }
-      /> <
-      div >
-
-      <
-      div className = {
-        classes.root
-      } >
-      <
-      BuildTabs 
-        variables = {variables} 
-        onVariablesChange = {(value) => this.setState({variables: value})} 
-        onTabsChange = {(value) => this.setState(value)}
-        buildState = {this.state} / >
-      <
-      BuildOptions onback = {
-        onback
-      }
-      connection = {
-        connection
-      }
-      buildState = {
-        this.state
-      }
-      loadState = {
-        (state) => this.setState(state)
-      }
-      /> <
-      /div>
-
-
-      <
-      /div> <
-      /main>
+    return (
+      <main align="center" className={classes.content}>
+        <div className={classes.toolbar} />{' '}
+        <div>
+          <div className={classes.root}>
+            <BuildTabs
+              variables={variables}
+              onVariablesChange={value => this.setState({ variables: value })}
+              onTabsChange={value => this.setState(value)}
+              buildState={this.state}
+            />
+            <BuildOptions
+              onback={onback}
+              connection={connection}
+              buildState={this.state}
+              loadState={state => this.setState(state)}
+            />{' '}
+          </div>
+        </div>{' '}
+      </main>
     );
   }
 }

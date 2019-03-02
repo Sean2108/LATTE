@@ -8,7 +8,4 @@ import 'typeface-roboto';
 
 const store = configureStore();
 
-render(
-  <MenuAppBar/>,
-  document.getElementById('app-bar')
-);
+render(<MenuAppBar />, document.getElementById('app-bar'));

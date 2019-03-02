@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { ipcRenderer } from 'electron';
 import Popover from '@material-ui/core/Popover';
@@ -14,21 +12,20 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing.unit
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 200,
+    minWidth: 200
   },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    width: 200,
-  },
+    width: 200
+  }
 });
 
 class BuildOptionsPopover extends React.Component {
-
   render() {
     const {
       classes,
@@ -48,71 +45,71 @@ class BuildOptionsPopover extends React.Component {
 
     return (
       <Popover
-          id="simple-popper"
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? 
-            <TextField
-              id="standard-name"
-              label="File Name"
-              className={classes.textField}
+        id="simple-popper"
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+      >
+        {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? (
+          <TextField
+            id="standard-name"
+            label="File Name"
+            className={classes.textField}
+            value={fileName}
+            onChange={handleChange('fileName')}
+            margin="normal"
+          />
+        ) : (
+          <FormControl className={classes.formControl}>
+            <InputLabel htmlFor="filename-simple">File Name</InputLabel>
+            <Select
               value={fileName}
               onChange={handleChange('fileName')}
-              margin="normal"
-            />
-            : 
-            <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="filename-simple">File Name</InputLabel>
-              <Select
-                value={fileName}
-                onChange={handleChange('fileName')}
-                inputProps={{
-                  name: 'filename',
-                  id: 'filename-simple',
-                }}
-              >
-                <MenuItem value="">
-                  <em>None</em>
+              inputProps={{
+                name: 'filename',
+                id: 'filename-simple'
+              }}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {files.map(item => (
+                <MenuItem value={item} key={item}>
+                  {item}
                 </MenuItem>
-                {files.map(item => <MenuItem value={item} key={item}>{item}</MenuItem>)}
-              </Select>
-            </FormControl>
-          }
-            <
-            Button variant = "contained"
-            color = "primary"
-            className = {
-              classes.button
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={() => {
+            switch (dataOp) {
+              case DATA_OP.SAVE_DATA:
+                saveData();
+                break;
+              case DATA_OP.LOAD_DATA:
+                loadData();
+                break;
+              case DATA_OP.SAVE_CONTRACT:
+                saveContract();
+                break;
             }
-            onClick = {
-              () => {
-                switch (dataOp) {
-                  case DATA_OP.SAVE_DATA:
-                    saveData();
-                    break;
-                  case DATA_OP.LOAD_DATA:
-                    loadData();
-                    break;
-                  case DATA_OP.SAVE_CONTRACT:
-                    saveContract();
-                    break;
-                }
-              }
-            } >
-            Done <
-            /Button>
+          }}
+        >
+          Done{' '}
+        </Button>
       </Popover>
-
     );
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -10,105 +10,103 @@ import Grid from '@material-ui/core/Grid';
 import VariableList from './VariableList';
 
 const styles = theme => ({
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap'
-    },
-    textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit
-    },
-    paper: {
-        padding: theme.spacing.unit * 2,
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-        maxHeight: '40vw',
-        overflow: 'auto'
-    },
-    button: {
-        margin: 0
-    },
-    rightIcon: {
-        marginLeft: theme.spacing.unit
-    },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit
+  },
+  paper: {
+    padding: theme.spacing.unit * 2,
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    maxHeight: '40vw',
+    overflow: 'auto'
+  },
+  button: {
+    margin: 0
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit
+  }
 });
 
 class StructList extends React.Component {
-    state = {
-        contents: '',
-        propcontents: '',
-        modalAdd: '',
-        anchor: null
-    };
+  state = {
+    contents: '',
+    propcontents: '',
+    modalAdd: '',
+    anchor: null
+  };
 
-    handleChange = name => event => {
-        this.setState({[name]: event.target.value});
-    };
+  handleChange = name => event => {
+    this.setState({ [name]: event.target.value });
+  };
 
-    render() {
-        const {classes, theme, header, updateVariables, initialVars} = this.props;
-        return (< Paper className = {
-            classes.paper
-        } > < Typography variant = "title" noWrap > {
-            header
-        } < /Typography>
-        <br/>
+  render() {
+    const { classes, theme, header, updateVariables, initialVars } = this.props;
+    return (
+      <Paper className={classes.paper}>
+        {' '}
+        <Typography variant="title" noWrap>
+          {' '}
+          {header}{' '}
+        </Typography>
+        <br />
         <Grid container spacing={24}>
-        {
-            Object.keys(initialVars).map((key) => 
-                    <Grid item xs={6} key={key}>
-                    <
-                VariableList header = {
-                    key
+          {Object.keys(initialVars).map(key => (
+            <Grid item xs={6} key={key}>
+              <VariableList
+                header={key}
+                updateVariables={vars =>
+                  updateVariables({ ...initialVars, [key]: vars })
                 }
-                updateVariables = {
-                    (vars) => updateVariables({...initialVars, [key]: vars})
-                }
-                vars = {initialVars[key]} / >
-                </Grid>)
-    }
-        </Grid> 
-        < TextField id = "standard-name"
-    label = {header === "Entities" ? "Entity Name" : "Event Name"}
-    className = {
-        classes.textField
-    }
-    onChange = {
-        this.handleChange('contents')
-    }
-    value = {
-        this.state.contents
-    }
-    margin = "normal" / > < Button variant = "contained" color = "primary" className = {
-        classes.button
-    }
-    onClick = {
-        () => {
-            if (!this.state.contents || this.state.contents in initialVars) 
-                return;
+                vars={initialVars[key]}
+              />
+            </Grid>
+          ))}
+        </Grid>
+        <TextField
+          id="standard-name"
+          label={header === 'Entities' ? 'Entity Name' : 'Event Name'}
+          className={classes.textField}
+          onChange={this.handleChange('contents')}
+          value={this.state.contents}
+          margin="normal"
+        />{' '}
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={() => {
+            if (!this.state.contents || this.state.contents in initialVars)
+              return;
             updateVariables({
-                ...initialVars,
-                [this.state.contents]: []
+              ...initialVars,
+              [this.state.contents]: []
             });
-            this.setState({contents: ''});
-        }
-    } > Add < AddIcon className = {
-        classes.rightIcon
-    } /> < /Button> <
-          br / > < /Paper>
-            );
-          }
+            this.setState({ contents: '' });
+          }}
+        >
+          {' '}
+          Add <AddIcon className={classes.rightIcon} />{' '}
+        </Button>{' '}
+        <br />{' '}
+      </Paper>
+    );
+  }
+}
 
-        }
+StructList.propTypes = {
+  classes: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
+  header: PropTypes.string.isRequired,
+  updateVariables: PropTypes.func,
+  initialVars: PropTypes.object.isRequired
+};
 
-        StructList.propTypes = {
-          classes: PropTypes.object.isRequired,
-          theme: PropTypes.object.isRequired,
-          header: PropTypes.string.isRequired,
-          updateVariables: PropTypes.func,
-          initialVars: PropTypes.object.isRequired
-        };
-
-        export default withStyles(styles, {
-          withTheme: true
-        })(StructList);
+export default withStyles(styles, {
+  withTheme: true
+})(StructList);

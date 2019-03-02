@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { platform } from 'os';
 import MenuBuilder from './menu';
-import {compile} from 'solc';
+import { compile } from 'solc';
 
 let mainWindow = null;
 
@@ -98,21 +98,24 @@ if (platform() === 'linux') {
 
 ipcMain.on('request-compile', (event, arg) => {
   if (mainWindow) {
-      let input = {
-        language: 'Solidity',
-        sources: {
-            'code.sol': {
-                content: arg
-            }
-        },
-        settings: {
-            outputSelection: {
-                '*': {
-                    '*': [ '*' ]
-                }
-            }
+    let input = {
+      language: 'Solidity',
+      sources: {
+        'code.sol': {
+          content: arg
         }
-    }
-    mainWindow.webContents.send('request-compile-complete', compile(JSON.stringify(input)));
+      },
+      settings: {
+        outputSelection: {
+          '*': {
+            '*': ['*']
+          }
+        }
+      }
+    };
+    mainWindow.webContents.send(
+      'request-compile-complete',
+      compile(JSON.stringify(input))
+    );
   }
 });

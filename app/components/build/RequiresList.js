@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -16,79 +14,93 @@ const styles = theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     maxHeight: '40vw',
-    overflow: 'auto',
+    overflow: 'auto'
   },
   button: {
-    margin: theme.spacing.unit,
-  },
+    margin: theme.spacing.unit
+  }
 });
 
 class RequiresList extends React.Component {
+  buildParser = new BuildParser(null);
 
-      buildParser = new BuildParser(null);
+  render() {
+    const {
+      classes,
+      theme,
+      header,
+      vars,
+      onChangeRequire,
+      requires
+    } = this.props;
+    this.buildParser.reset(this.props.vars, {});
 
-      render() {
-        const {
-          classes,
-          theme,
-          header,
-          vars,
-          onChangeRequire,
-          requires
-        } = this.props;
-        this.buildParser.reset(this.props.vars, {});
+    if (requires.length === 0) {
+      requires.push({
+        var1: '',
+        displayVar1: '',
+        comp: '==',
+        var2: '',
+        displayVar2: '',
+        requireMessage: ''
+      });
+    }
 
-        if (requires.length === 0) {
-          requires.push({var1: '', displayVar1: '', comp: '==', var2: '', displayVar2: '', requireMessage: ''});
-        }
-
-        return ( <
-            Paper className = {
-              classes.paper
-            } >
-            <
-            Typography variant = "title"
-            noWrap > {
-              header
-            } < /Typography> {
-              
-            requires.map((element, index) => <RequireRow require = {element} key = {index} vars = {vars} showMessage = {true}
-            updateRequire = {(val) => {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="title" noWrap>
+          {' '}
+          {header}{' '}
+        </Typography>{' '}
+        {requires.map((element, index) => (
+          <RequireRow
+            require={element}
+            key={index}
+            vars={vars}
+            showMessage={true}
+            updateRequire={val => {
               let variables = [...requires];
               variables[index] = val;
               onChangeRequire(variables);
             }}
-            parseVariable = {this.buildParser.parseVariable}/>)
+            parseVariable={this.buildParser.parseVariable}
+          />
+        ))}
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={() =>
+            onChangeRequire([
+              ...requires,
+              {
+                var1: '',
+                displayVar1: '',
+                comp: '==',
+                var2: '',
+                displayVar2: '',
+                requireMessage: ''
+              }
+            ])
           }
-
-          <
-          Button variant = "contained"
-        color = "primary"
-        className = {
-          classes.button
-        }
-        onClick = {
-          () => onChangeRequire([...requires, {var1: '', displayVar1: '', comp: '==', var2: '', displayVar2: '', requireMessage: ''}])
-          } >
+        >
           +
-          <
-          /Button> <
-          br / >
-          <
-          /Paper>
-        );
-      }
-    }
+        </Button>{' '}
+        <br />
+      </Paper>
+    );
+  }
+}
 
-    RequiresList.propTypes = {
-      classes: PropTypes.object.isRequired,
-      theme: PropTypes.object.isRequired,
-      header: PropTypes.string.isRequired,
-      vars: PropTypes.object.isRequired,
-      onChangeRequire: PropTypes.func.isRequired,
-      requires: PropTypes.array.isRequired
-    };
+RequiresList.propTypes = {
+  classes: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
+  header: PropTypes.string.isRequired,
+  vars: PropTypes.object.isRequired,
+  onChangeRequire: PropTypes.func.isRequired,
+  requires: PropTypes.array.isRequired
+};
 
-    export default withStyles(styles, {
-      withTheme: true
-    })(RequiresList);
+export default withStyles(styles, {
+  withTheme: true
+})(RequiresList);

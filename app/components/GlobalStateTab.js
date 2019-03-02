@@ -17,18 +17,18 @@ const styles = theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     maxHeight: '20vw',
-    overflow: 'auto',
+    overflow: 'auto'
   },
   button: {
-    margin: theme.spacing.unit,
-  },
+    margin: theme.spacing.unit
+  }
 });
 
 class GlobalStateTab extends React.Component {
-    state = {
-        globalVars: [0],
-        constructorVars: [0]
-    }
+  state = {
+    globalVars: [0],
+    constructorVars: [0]
+  };
 
   render() {
     const { classes, theme } = this.props;
@@ -36,10 +36,10 @@ class GlobalStateTab extends React.Component {
     return (
       <Grid container spacing={24}>
         <Grid item xs={6}>
-        <VariableList header={"Global State Objects"} isInput={false}/>
+          <VariableList header={'Global State Objects'} isInput={false} />
         </Grid>
         <Grid item xs={6}>
-        <VariableList header={"Constructor Parameters"} isInput={true}/>
+          <VariableList header={'Constructor Parameters'} isInput={true} />
         </Grid>
       </Grid>
     );
