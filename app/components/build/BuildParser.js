@@ -20,7 +20,9 @@ export class BuildParser {
 
     parse(start) {
         this.findVariables(start);
-        return this.traverseNextNode(start);
+        let code = this.traverseNextNode(start);
+        this.onVariablesChange({...this.variables, ...this.varList});
+        return code;
     }
 
     findVariables(start) {
@@ -35,7 +37,6 @@ export class BuildParser {
                 }
             }
         } while (unparsedStatements.size > 0 && hasChanged);
-        this.onVariablesChange({...this.variables, ...this.varList});
     }
 
     traverseForVariables(node, unparsedStatements) {
@@ -159,11 +160,9 @@ export class BuildParser {
                 if ('mapName' in parsedLhs) {
                     let lhsType = parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
                     this.variables[parsedLhs.mapName] = {type: 'mapping', from: lhsType, to: parsedRhs.type};
-                    this.onVariablesChange({...this.variables, ...this.varList});
                 }
                 else if (parsedLhs.type === 'var' || !(parsedLhs.name in this.variables || parsedLhs.name in this.functionParams)) {
                     this.variables[parsedLhs.name] = parsedRhs.type;
-                    this.onVariablesChange({...this.variables, ...this.varList});
                 }
                 else if (parsedLhs.type !== parsedRhs.type) {
                     alert(`invalid assignment at node ${nodeCode}`);
@@ -180,7 +179,6 @@ export class BuildParser {
                 [entityName, params] = rhs.split('(');
                 parsedLhs = this.parseVariable(lhs);
                 this.variables[parsedLhs.name] = entityName;
-                this.onVariablesChange({...this.variables, ...this.varList});
                 params = params.replace(')', '').split(', ').map(param => this.parseVariable(param).name).join(', ');
                 return `${parsedLhs.name} = ${entityName}(${params});`;
             case "Transfer":
