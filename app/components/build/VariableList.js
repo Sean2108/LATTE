@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import VariableRow from './VariableRow';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   paper: {
@@ -17,12 +18,15 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
 class VariableList extends React.Component {
   render() {
-    const { classes, theme, header, updateVariables, vars } = this.props;
+    const { classes, theme, header, updateVariables, vars, tooltipText } = this.props;
 
     if (vars.length === 0) {
       vars.push({ name: '', displayName: '', type: 'uint' });
@@ -30,10 +34,11 @@ class VariableList extends React.Component {
 
     return (
       <Paper className={classes.paper}>
+      <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
         <Typography variant="title" noWrap>
-          {' '}
-          {header}{' '}
-        </Typography>{' '}
+          {header}
+        </Typography>
+      </Tooltip>
         {vars.map((element, index) => (
           <VariableRow
             val={element}
@@ -57,7 +62,7 @@ class VariableList extends React.Component {
           }
         >
           +
-        </Button>{' '}
+        </Button>
         <br />
       </Paper>
     );
@@ -69,7 +74,8 @@ VariableList.propTypes = {
   theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   updateVariables: PropTypes.func.isRequired,
-  vars: PropTypes.array.isRequired
+  vars: PropTypes.array.isRequired,
+  tooltipText: PropTypes.string.isRequired
 };
 
 export default withStyles(styles, {

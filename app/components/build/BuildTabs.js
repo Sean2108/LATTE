@@ -21,8 +21,8 @@ function TabContainer(props) {
         paddingBottom: 24
       }}
     >
-      {' '}
-      {props.children}{' '}
+      
+      {props.children}
     </Typography>
   );
 }
@@ -105,9 +105,9 @@ class BuildTabs extends React.Component {
                 this.setState({ addTabPopoverAnchor: event.currentTarget })
               }
               label="+"
-            />{' '}
-          </Tabs>{' '}
-        </AppBar>{' '}
+            />
+          </Tabs>
+        </AppBar>
         {value === 0 && (
           <TabContainer>
             <InitialStateTab
@@ -185,7 +185,7 @@ class BuildTabs extends React.Component {
             }
             value={this.state.popoverContent}
             margin="normal"
-          />{' '}
+          />
           <Button
             variant="contained"
             color="primary"
@@ -213,8 +213,8 @@ class BuildTabs extends React.Component {
               }
             }}
           >
-            {' '}
-            Add <AddIcon className={classes.rightIcon} />{' '}
+            
+            Add <AddIcon className={classes.rightIcon} />
           </Button>
         </Popover>
       </div>

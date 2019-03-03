@@ -84,8 +84,9 @@ class EntityNode extends React.Component {
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
               <ParamList
-                header={'Event Parameters'}
+                header={'Entity Information'}
                 params={varList[this.state.variableSelected]}
+                tooltipText={'The information that the entity will contain'}
                 updateParams={params =>
                   this.setState({
                     emitStatement: `${this.state.variableSelected}(${params

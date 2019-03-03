@@ -107,7 +107,7 @@ class BuildOptionsPopover extends React.Component {
             }
           }}
         >
-          Done{' '}
+          Done
         </Button>
       </Popover>
     );

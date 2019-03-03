@@ -369,6 +369,9 @@ export class BuildParser {
       .toLowerCase()
       .trim()
       .replace(/\s/g, '_');
+    if (varName.slice(0, 2) === '0x') {
+      return { name: varName, type: 'address payable' };
+    }
     const keywords = [
       {
         name: 'msg.sender',

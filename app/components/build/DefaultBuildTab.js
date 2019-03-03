@@ -41,20 +41,22 @@ class DefaultBuildTab extends React.Component {
     let variables = this.flattenParamsToObject(params);
     return (
       <div>
-        {' '}
+        
         <VariableList
           header={'Function Inputs'}
           updateVariables={vars => onChangeParams(vars)}
           vars={params}
-        />{' '}
-        <br />{' '}
+          tooltipText={'These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below.'}
+        />
+        <br />
         <RequiresList
           header={'Checking Phase'}
           vars={{ ...varList, ...variables }}
           onChangeRequire={onChangeRequire}
           requires={requires}
-        />{' '}
-        <br />{' '}
+          tooltipText={'Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user.'}
+        />
+        <br />
         <BuildDiagram
           varList={this.varList}
           functionParams={variables}
@@ -65,7 +67,7 @@ class DefaultBuildTab extends React.Component {
           onChangeReturn={onChangeReturn}
           diagram={diagram}
           updateDiagram={updateDiagram}
-        />{' '}
+        />
       </div>
     );
   }

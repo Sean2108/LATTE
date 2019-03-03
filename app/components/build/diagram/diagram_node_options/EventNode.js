@@ -73,8 +73,11 @@ class EventNode extends React.Component {
         {this.state.variableSelected !== '' &&
           varList[this.state.variableSelected].length > 0 && (
             <ParamList
-              header={'Event Parameters'}
+              header={'Event Information'}
               params={varList[this.state.variableSelected]}
+              tooltipText={
+                'The information that will be emitted together with the event'
+              }
               updateParams={params =>
                 this.setState({
                   emitStatement: `${this.state.variableSelected}(${params

@@ -6,10 +6,14 @@ import { ipcRenderer } from 'electron';
 import BuildOptionsPopover from './BuildOptionsPopover';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   button: {
     margin: theme.spacing.unit
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -240,52 +244,82 @@ class BuildOptions extends React.Component {
           }}
           DATA_OP={DATA_OP}
         />
-        <Button
-          variant="outlined"
-          color="primary"
-          className={classes.button}
-          onClick={onback}
+
+        <Tooltip
+          title="Return to connect page"
+          classes={{ tooltip: classes.tooltipFont }}
         >
-          Back{' '}
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          className={classes.button}
-          onClick={event => {
-            this.handleClick(event, DATA_OP.LOAD_DATA);
-          }}
+          <Button
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            onClick={onback}
+          >
+            Back
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          title="Load saved progress"
+          classes={{ tooltip: classes.tooltipFont }}
         >
-          Load{' '}
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          className={classes.button}
-          onClick={event => {
-            this.handleClick(event, DATA_OP.SAVE_DATA);
-          }}
+          <Button
+            variant="outlined"
+            color="secondary"
+            className={classes.button}
+            onClick={event => {
+              this.handleClick(event, DATA_OP.LOAD_DATA);
+            }}
+          >
+            Load
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          title="Save current progress"
+          classes={{ tooltip: classes.tooltipFont }}
         >
-          Save{' '}
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={event => {
-            this.handleClick(event, DATA_OP.SAVE_CONTRACT);
-          }}
+          <Button
+            variant="outlined"
+            color="secondary"
+            className={classes.button}
+            onClick={event => {
+              this.handleClick(event, DATA_OP.SAVE_DATA);
+            }}
+          >
+            Save
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          title="Generate and save smart contract code"
+          classes={{ tooltip: classes.tooltipFont }}
         >
-          Generate Code{' '}
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={this.deploySmartContract}
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={event => {
+              this.handleClick(event, DATA_OP.SAVE_CONTRACT);
+            }}
+          >
+            Generate Code
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          title={`Deploy smart contract to ${this.web3.currentProvider.host}`}
+          classes={{ tooltip: classes.tooltipFont }}
         >
-          Deploy{' '}
-        </Button>{' '}
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={this.deploySmartContract}
+          >
+            Deploy
+          </Button>
+        </Tooltip>
       </div>
     );
   }

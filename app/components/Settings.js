@@ -25,10 +25,10 @@ class Settings extends React.Component {
 
     return (
       <main align="center" className={classes.content}>
-        <div className={classes.toolbar} />{' '}
+        <div className={classes.toolbar} />
         <Typography variant="title" noWrap>
-          {' '}
-          Settings{' '}
+          
+          Settings
         </Typography>
       </main>
     );

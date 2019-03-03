@@ -7,6 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import RequireRow from './RequireRow';
 import { BuildParser } from './BuildParser';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   paper: {
@@ -18,6 +19,9 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -31,7 +35,8 @@ class RequiresList extends React.Component {
       header,
       vars,
       onChangeRequire,
-      requires
+      requires,
+      tooltipText
     } = this.props;
     this.buildParser.reset(this.props.vars, {});
 
@@ -48,10 +53,11 @@ class RequiresList extends React.Component {
 
     return (
       <Paper className={classes.paper}>
-        <Typography variant="title" noWrap>
-          {' '}
-          {header}{' '}
-        </Typography>{' '}
+        <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
+          <Typography variant="title" noWrap>
+            {header}
+          </Typography>
+        </Tooltip>
         {requires.map((element, index) => (
           <RequireRow
             require={element}
@@ -85,7 +91,7 @@ class RequiresList extends React.Component {
           }
         >
           +
-        </Button>{' '}
+        </Button>
         <br />
       </Paper>
     );
@@ -98,7 +104,8 @@ RequiresList.propTypes = {
   header: PropTypes.string.isRequired,
   vars: PropTypes.object.isRequired,
   onChangeRequire: PropTypes.func.isRequired,
-  requires: PropTypes.array.isRequired
+  requires: PropTypes.array.isRequired,
+  tooltipText: PropTypes.string.isRequired
 };
 
 export default withStyles(styles, {

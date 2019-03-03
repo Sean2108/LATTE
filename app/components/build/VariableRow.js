@@ -41,11 +41,11 @@ class VariableRow extends React.Component {
               })
             }
             margin="normal"
-          />{' '}
+          />
         </FormControl>
 
         <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="protocol"> Variable Type </InputLabel>{' '}
+          <InputLabel htmlFor="protocol"> Variable Type </InputLabel>
           <Select
             value={val.type}
             onChange={event =>
@@ -56,11 +56,11 @@ class VariableRow extends React.Component {
               id: 'type'
             }}
           >
-            <MenuItem value="uint"> Integer </MenuItem>{' '}
-            <MenuItem value="bool"> Boolean </MenuItem>{' '}
-            <MenuItem value="address payable"> Address </MenuItem>{' '}
-            <MenuItem value="string"> String </MenuItem>{' '}
-          </Select>{' '}
+            <MenuItem value="uint"> Number </MenuItem>
+            <MenuItem value="bool"> True/False </MenuItem>
+            <MenuItem value="address payable"> Address </MenuItem>
+            <MenuItem value="string"> Text </MenuItem>
+          </Select>
         </FormControl>
       </div>
     );

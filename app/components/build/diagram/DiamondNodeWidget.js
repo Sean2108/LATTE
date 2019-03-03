@@ -75,8 +75,8 @@ export class DiamonNodeWidget extends React.Component<
             left: -8
           }}
         >
-          <PortWidget name="left" node={this.props.node} />{' '}
-        </div>{' '}
+          <PortWidget name="left" node={this.props.node} />
+        </div>
         <div
           style={{
             position: 'absolute',
@@ -85,8 +85,8 @@ export class DiamonNodeWidget extends React.Component<
             top: -8
           }}
         >
-          <PortWidget name="top" node={this.props.node} />{' '}
-        </div>{' '}
+          <PortWidget name="top" node={this.props.node} />
+        </div>
         <div
           style={{
             position: 'absolute',
@@ -99,8 +99,8 @@ export class DiamonNodeWidget extends React.Component<
             name="right"
             node={this.props.node}
             model={this.props.node.outPortFalse}
-          />{' '}
-        </div>{' '}
+          />
+        </div>
         <div
           style={{
             position: 'absolute',
@@ -113,8 +113,8 @@ export class DiamonNodeWidget extends React.Component<
             name="bottom"
             node={this.props.node}
             model={this.props.node.outPortTrue}
-          />{' '}
-        </div>{' '}
+          />
+        </div>
       </div>
     );
   }

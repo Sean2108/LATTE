@@ -158,12 +158,12 @@ class MiniDrawer extends React.Component {
               )}
             >
               <MenuIcon />
-            </IconButton>{' '}
+            </IconButton>
             <Typography variant="title" color="inherit" noWrap>
-              Smart Contract Builder{' '}
-            </Typography>{' '}
-          </Toolbar>{' '}
-        </AppBar>{' '}
+              Smart Contract Builder
+            </Typography>
+          </Toolbar>
+        </AppBar>
         <Drawer
           variant="permanent"
           classes={{
@@ -176,14 +176,14 @@ class MiniDrawer extends React.Component {
         >
           <div className={classes.toolbar}>
             <IconButton onClick={this.handleDrawerClose}>
-              {' '}
+              
               {theme.direction === 'rtl' ? (
                 <ChevronRightIcon />
               ) : (
                 <ChevronLeftIcon />
-              )}{' '}
-            </IconButton>{' '}
-          </div>{' '}
+              )}
+            </IconButton>
+          </div>
           <Divider />
           <List>
             <div>
@@ -197,11 +197,11 @@ class MiniDrawer extends React.Component {
               >
                 <ListItemIcon>
                   <WifiIcon />
-                </ListItemIcon>{' '}
+                </ListItemIcon>
                 <ListItemText primary="Connect" />
-              </ListItem>{' '}
-            </div>{' '}
-          </List>{' '}
+              </ListItem>
+            </div>
+          </List>
           <Divider />
           <List>
             <div>
@@ -215,13 +215,13 @@ class MiniDrawer extends React.Component {
               >
                 <ListItemIcon>
                   <SettingsIcon />
-                </ListItemIcon>{' '}
+                </ListItemIcon>
                 <ListItemText primary="Settings" />
-              </ListItem>{' '}
-            </div>{' '}
-          </List>{' '}
-        </Drawer>{' '}
-        {this.selectShown(this.state.selected)}{' '}
+              </ListItem>
+            </div>
+          </List>
+        </Drawer>
+        {this.selectShown(this.state.selected)}
       </div>
     );
   }

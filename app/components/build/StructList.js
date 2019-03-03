@@ -8,6 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import VariableList from './VariableList';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   container: {
@@ -30,6 +31,9 @@ const styles = theme => ({
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -46,14 +50,22 @@ class StructList extends React.Component {
   };
 
   render() {
-    const { classes, theme, header, updateVariables, initialVars } = this.props;
+    const {
+      classes,
+      theme,
+      header,
+      updateVariables,
+      initialVars,
+      tooltipText,
+      varListTooltipText
+    } = this.props;
     return (
       <Paper className={classes.paper}>
-        {' '}
-        <Typography variant="title" noWrap>
-          {' '}
-          {header}{' '}
-        </Typography>
+        <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
+          <Typography variant="title" noWrap>
+            {header}
+          </Typography>
+        </Tooltip>
         <br />
         <Grid container spacing={24}>
           {Object.keys(initialVars).map(key => (
@@ -64,6 +76,7 @@ class StructList extends React.Component {
                   updateVariables({ ...initialVars, [key]: vars })
                 }
                 vars={initialVars[key]}
+                tooltipText={varListTooltipText}
               />
             </Grid>
           ))}
@@ -75,7 +88,7 @@ class StructList extends React.Component {
           onChange={this.handleChange('contents')}
           value={this.state.contents}
           margin="normal"
-        />{' '}
+        />
         <Button
           variant="contained"
           color="primary"
@@ -90,10 +103,9 @@ class StructList extends React.Component {
             this.setState({ contents: '' });
           }}
         >
-          {' '}
-          Add <AddIcon className={classes.rightIcon} />{' '}
-        </Button>{' '}
-        <br />{' '}
+          Add <AddIcon className={classes.rightIcon} />
+        </Button>
+        <br />
       </Paper>
     );
   }
@@ -104,7 +116,9 @@ StructList.propTypes = {
   theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   updateVariables: PropTypes.func,
-  initialVars: PropTypes.object.isRequired
+  initialVars: PropTypes.object.isRequired,
+  tooltipText: PropTypes.string.isRequired,
+  varListTooltipText: PropTypes.string.isRequired
 };
 
 export default withStyles(styles, {

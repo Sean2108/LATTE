@@ -18,12 +18,16 @@ import {
 } from 'storm-react-diagrams';
 import DiagramModal from './diagram/DiagramModal';
 import { BuildParser } from './BuildParser';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     textAlign: 'center',
     color: 'theme.palette.text.secondary'
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -143,13 +147,30 @@ class BuildDiagram extends React.Component {
   render() {
     const { classes, theme, varList, events, entities } = this.props;
 
+    const tooltips = {
+      assignment:
+        'The Assignment Node assigns and stores values to a new variable that you can later in the diagram.',
+      event:
+        'The Event Node announces an event that has previously been defined in the Global State Tab.',
+      entity:
+        'The Entity Node creates a new entity based on the entity templates defined in the Global State Tab.',
+      transfer: 'The Transfer Node transfer Ether to an address.',
+      return:
+        'The Return Node returns a value to the external user and ends the function.',
+      conditional:
+        'The Conditional Node provides branching logic. Based on whether the defined condition is true or false, the execution of the function can take different paths.'
+    };
+
     return (
       <Paper className={classes.paper}>
-        {' '}
-        <Typography variant="title" noWrap>
-          {' '}
-          Action Phase{' '}
-        </Typography>
+        <Tooltip
+          title="This is the main logic of the function, which will be executed when the checking phase has been successfully passed. Drag nodes from the left panel onto the diagram and connect them to create your logic for the function."
+          classes={{ tooltip: classes.tooltipFont }}
+        >
+          <Typography variant="title" noWrap>
+            Action Phase
+          </Typography>
+        </Tooltip>
         <DiagramModal
           open={this.state.open}
           close={() => {
@@ -161,59 +182,87 @@ class BuildDiagram extends React.Component {
           events={events}
           entities={entities}
           addNode={this.addNode}
+          tooltipText={tooltips[this.state.type]}
         />
         <div className="body">
-          {' '}
           <div className="header">
-            {' '}
-            <div className="title"> Nodes </div>{' '}
-          </div>{' '}
+            <div className="title"> Nodes </div>
+          </div>
           <div className="content">
-            {' '}
             <TrayWidget>
-              <TrayItemWidget
-                model={{
-                  type: 'assignment'
-                }}
-                name="Assignment Node"
-                color="rgb(192,0,0)"
-              />{' '}
-              <TrayItemWidget
-                model={{
-                  type: 'event'
-                }}
-                name="Event Node"
-                color="rgb(0,192,0)"
-              />{' '}
-              <TrayItemWidget
-                model={{
-                  type: 'entity'
-                }}
-                name="New Entity Node"
-                color="rgb(100,100,0)"
-              />
-              <TrayItemWidget
-                model={{
-                  type: 'transfer'
-                }}
-                name="Transfer Node"
-                color="rgb(255,0,192)"
-              />{' '}
-              <TrayItemWidget
-                model={{
-                  type: 'return'
-                }}
-                name="Return Node"
-                color="rgb(255,100,0)"
-              />{' '}
-              <TrayItemWidget
-                model={{
-                  type: 'conditional'
-                }}
-                name="Conditional Node"
-                color="rgb(192,0,255)"
-              />{' '}
-            </TrayWidget>{' '}
+              <Tooltip
+                title={tooltips.assignment}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'assignment'
+                  }}
+                  name="Assignment Node"
+                  color="rgb(192,0,0)"
+                />
+              </Tooltip>
+              <Tooltip
+                title={tooltips.event}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'event'
+                  }}
+                  name="Event Node"
+                  color="rgb(0,192,0)"
+                />
+              </Tooltip>
+              <Tooltip
+                title={tooltips.entity}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'entity'
+                  }}
+                  name="New Entity Node"
+                  color="rgb(100,100,0)"
+                />
+              </Tooltip>
+              <Tooltip
+                title={tooltips.transfer}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'transfer'
+                  }}
+                  name="Transfer Node"
+                  color="rgb(255,0,192)"
+                />
+              </Tooltip>
+              <Tooltip
+                title={tooltips.return}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'return'
+                  }}
+                  name="Return Node"
+                  color="rgb(255,100,0)"
+                />
+              </Tooltip>
+              <Tooltip
+                title={tooltips.conditional}
+                classes={{ tooltip: classes.tooltipFont }}
+              >
+                <TrayItemWidget
+                  model={{
+                    type: 'conditional'
+                  }}
+                  name="Conditional Node"
+                  color="rgb(192,0,255)"
+                />
+              </Tooltip>
+            </TrayWidget>
             <div
               className="diagram-layer"
               onDrop={event => {
@@ -235,9 +284,9 @@ class BuildDiagram extends React.Component {
                 diagramEngine={this.engine}
                 className="srd-canvas"
                 allowLooseLinks={false}
-              />{' '}
-            </div>{' '}
-          </div>{' '}
+              />
+            </div>
+          </div>
         </div>
       </Paper>
     );

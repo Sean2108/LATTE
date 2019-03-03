@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   textField: {
@@ -18,6 +19,9 @@ const styles = theme => ({
     color: theme.palette.text.secondary,
     maxHeight: '20vw',
     overflow: 'auto'
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -39,16 +43,17 @@ class ParamList extends React.Component {
       header,
       updateVariables,
       params,
-      updateParams
+      updateParams,
+      tooltipText
     } = this.props;
 
     return (
       <Paper className={classes.paper}>
-        {' '}
-        <Typography variant="title" noWrap>
-          {' '}
-          {header}{' '}
-        </Typography>
+        <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
+          <Typography variant="title" noWrap>
+            {header}
+          </Typography>
+        </Tooltip>
         <br />
         {params.filter(param => param.name).map((param, index) => (
           <div key={index}>
@@ -62,7 +67,7 @@ class ParamList extends React.Component {
             />
           </div>
         ))}
-        <br />{' '}
+        <br />
       </Paper>
     );
   }
@@ -73,7 +78,8 @@ ParamList.propTypes = {
   theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   params: PropTypes.array.isRequired,
-  updateParams: PropTypes.func.isRequired
+  updateParams: PropTypes.func.isRequired,
+  tooltipText: PropTypes.string.isRequired
 };
 
 export default withStyles(styles, {

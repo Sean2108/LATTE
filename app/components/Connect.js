@@ -10,6 +10,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import { configureRequestOptions } from 'builder-util-runtime';
+import Tooltip from '@material-ui/core/Tooltip';
 
 var Web3 = require('web3');
 
@@ -35,6 +36,9 @@ const styles = theme => ({
   },
   text: {
     color: 'black'
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -99,18 +103,22 @@ class Connect extends React.Component {
 
     return (
       <main align="center" className={classes.content}>
-        <div className={classes.toolbar} />{' '}
-        <Typography variant="title" noWrap>
-          {' '}
-          Connect to blockchain{' '}
-        </Typography>
+        <div className={classes.toolbar} />
+        <Tooltip
+          title="Enter a valid blockchain address to connect to it."
+          classes={{ tooltip: classes.tooltipFont }}
+        >
+          <Typography variant="title" noWrap>
+            Connect to blockchain
+          </Typography>
+        </Tooltip>
         <br />
         <div>
           <FormControl
             error={this.state.connectionFailed}
             className={classes.formControl}
           >
-            <InputLabel htmlFor="protocol"> Protocol </InputLabel>{' '}
+            <InputLabel htmlFor="protocol"> Protocol </InputLabel>
             <Select
               value={this.state.protocol}
               onChange={this.changeProtocol}
@@ -119,35 +127,35 @@ class Connect extends React.Component {
                 id: 'protocol'
               }}
             >
-              <MenuItem value="http"> HTTP </MenuItem>{' '}
-              <MenuItem value="https"> HTTPS </MenuItem>{' '}
-            </Select>{' '}
+              <MenuItem value="http"> HTTP </MenuItem>
+              <MenuItem value="https"> HTTPS </MenuItem>
+            </Select>
             {this.state.connectionFailed ? (
               <FormHelperText> URL not found! </FormHelperText>
-            ) : null}{' '}
-          </FormControl>{' '}
+            ) : null}
+          </FormControl>
           <span className={classes.text}> : //</span>
           <FormControl
             className={classes.formControl}
             error={this.state.addressEmpty || this.state.connectionFailed}
           >
-            <InputLabel htmlFor="name-simple"> Blockchain Address </InputLabel>{' '}
-            <Input id="address" />{' '}
+            <InputLabel htmlFor="name-simple"> Blockchain Address </InputLabel>
+            <Input id="address" />
             {this.state.addressEmpty ? (
               <FormHelperText> Address cannot be empty! </FormHelperText>
-            ) : null}{' '}
-          </FormControl>{' '}
-          <span className={classes.text}> : </span>{' '}
+            ) : null}
+          </FormControl>
+          <span className={classes.text}> : </span>
           <FormControl
             className={classes.formControl}
             error={this.state.portEmpty || this.state.connectionFailed}
           >
-            <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>{' '}
-            <Input id="port" />{' '}
+            <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>
+            <Input id="port" />
             {this.state.portEmpty ? (
               <FormHelperText> Port cannot be empty! </FormHelperText>
-            ) : null}{' '}
-          </FormControl>{' '}
+            ) : null}
+          </FormControl>
           <br />
           <br />
           <Button
@@ -156,9 +164,9 @@ class Connect extends React.Component {
             className={classes.button}
             onClick={this.login}
           >
-            Connect{' '}
-          </Button>{' '}
-        </div>{' '}
+            Connect
+          </Button>
+        </div>
       </main>
     );
   }

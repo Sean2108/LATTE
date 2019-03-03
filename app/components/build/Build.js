@@ -51,7 +51,7 @@ class Build extends React.Component {
 
     return (
       <main align="center" className={classes.content}>
-        <div className={classes.toolbar} />{' '}
+        <div className={classes.toolbar} />
         <div>
           <div className={classes.root}>
             <BuildTabs
@@ -65,9 +65,9 @@ class Build extends React.Component {
               connection={connection}
               buildState={this.state}
               loadState={state => this.setState(state)}
-            />{' '}
+            />
           </div>
-        </div>{' '}
+        </div>
       </main>
     );
   }

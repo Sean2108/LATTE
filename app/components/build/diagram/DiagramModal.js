@@ -9,6 +9,7 @@ import TransferNode from './diagram_node_options/TransferNode';
 import ConditionalNode from './diagram_node_options/ConditionalNode';
 import EventNode from './diagram_node_options/EventNode';
 import EntityNode from './diagram_node_options/EntityNode';
+import Tooltip from '@material-ui/core/Tooltip';
 
 function getModalStyle() {
   return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
@@ -21,6 +22,9 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing.unit * 4
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 
@@ -38,7 +42,8 @@ class DiagramModal extends React.Component {
       type,
       varList,
       events,
-      entities
+      entities,
+      tooltipText
     } = this.props;
 
     return (
@@ -49,10 +54,15 @@ class DiagramModal extends React.Component {
           open={open}
         >
           <div style={getModalStyle()} className={classes.paper}>
-            <Typography variant="title" id="modal-title">
-              New {type.charAt(0).toUpperCase() + type.substr(1)}
-              &nbsp; Node
-            </Typography>
+            <Tooltip
+              title={tooltipText}
+              classes={{ tooltip: classes.tooltipFont }}
+            >
+              <Typography variant="title" id="modal-title">
+                New {type.charAt(0).toUpperCase() + type.substr(1)}
+                &nbsp;Node
+              </Typography>
+            </Tooltip>
             <Typography variant="caption" id="modal-title">
               {this.getTypeFields(
                 type,
@@ -100,7 +110,8 @@ DiagramModal.propTypes = {
   type: PropTypes.string.isRequired,
   varList: PropTypes.object,
   events: PropTypes.object,
-  entities: PropTypes.object
+  entities: PropTypes.object,
+  tooltipText: PropTypes.string.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(DiagramModal);
