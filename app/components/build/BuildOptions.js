@@ -107,7 +107,7 @@ class BuildOptions extends React.Component {
     for (const [name, type] of Object.entries(buildState.variables)) {
       if (typeof type === 'object' && type.type === 'mapping') {
         code += `mapping(${type.from} => ${type.to}) ${name};\n`;
-      } else {
+      } else if (type) {
         code += `${type} public ${name};\n`;
       }
     }
@@ -123,7 +123,7 @@ class BuildOptions extends React.Component {
           ? 'constructor'
           : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i]
-        ? `returns (${buildState.tabsReturn[i]})`
+        ? `returns (${buildState.tabsReturn[i]} memory)`
         : '';
       let requires = buildState.tabsRequire[i]
         .filter(req => req.var1 && req.var2 && req.comp)

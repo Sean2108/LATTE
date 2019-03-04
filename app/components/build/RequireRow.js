@@ -13,7 +13,7 @@ const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit,
     minWidth: 120,
-    maxWidth: 150
+    maxWidth: 250
   },
   textField: {
     marginLeft: theme.spacing.unit,
@@ -23,8 +23,8 @@ const styles = theme => ({
 
 class RequireRow extends React.Component {
   validate() {
-    let lhs = this.props.parseVariable(this.props.var1);
-    let rhs = this.props.parseVariable(this.props.var2);
+    let lhs = this.props.buildParser.parseVariable(this.props.var1);
+    let rhs = this.props.buildParser.parseVariable(this.props.var2);
     if (lhs.type === 'var') {
       alert('left variable type is unknown');
     }
@@ -38,9 +38,9 @@ class RequireRow extends React.Component {
 
   handleChange = name => event => {
     let state = { ...this.props.require, [name]: event.target.value };
-    if (this.props.parseVariable) {
-      state.var1 = this.props.parseVariable(state.displayVar1).name;
-      state.var2 = this.props.parseVariable(state.displayVar2).name;
+    if (this.props.buildParser) {
+      state.var1 = this.props.buildParser.parseVariable(state.displayVar1).name;
+      state.var2 = this.props.buildParser.parseVariable(state.displayVar2).name;
     }
     this.props.updateRequire(state);
   };
@@ -122,7 +122,7 @@ RequireRow.propTypes = {
   vars: PropTypes.object.isRequired,
   showMessage: PropTypes.bool,
   updateRequire: PropTypes.func.isRequired,
-  parseVariable: PropTypes.func,
+  buildParser: PropTypes.object,
   require: PropTypes.object.isRequired
 };
 

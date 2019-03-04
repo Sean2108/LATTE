@@ -152,21 +152,23 @@ export class BuildParser {
         [lhs, rhs] = code.split(' = ');
         parsedLhs = this.parseVariable(lhs);
         parsedRhs = this.parseVariable(rhs);
-        if (
-          'mapName' in parsedLhs &&
-          parsedLhs.keyType !== 'var' &&
-          parsedRhs.type !== 'var'
-        ) {
-          let lhsType =
-            parsedLhs.keyType === 'address payable'
-              ? 'address'
-              : parsedLhs.keyType;
-          this.variables[parsedLhs.mapName] = {
-            type: 'mapping',
-            from: lhsType,
-            to: parsedRhs.type
-          };
+        if (!parsedLhs.type || !parsedRhs.type) {
           return true;
+        }
+        if ('mapName' in parsedLhs) {
+          if (parsedLhs.keyType !== 'var' && parsedRhs.type !== 'var') {
+            let lhsType =
+              parsedLhs.keyType === 'address payable'
+                ? 'address'
+                : parsedLhs.keyType;
+            this.variables[parsedLhs.mapName] = {
+              type: 'mapping',
+              from: lhsType,
+              to: parsedRhs.type
+            };
+            return true;
+          }
+          return false;
         }
         if (
           parsedLhs.type === 'var' ||
@@ -228,6 +230,9 @@ export class BuildParser {
     [lhs, rhs] = code.split(' = ');
     parsedLhs = this.parseVariable(lhs);
     parsedRhs = this.parseVariable(rhs);
+    if (!parsedLhs.type || !parsedRhs.type) {
+      return `${parsedLhs.name} = ${parsedRhs.name};`;
+    }
     if ('mapName' in parsedLhs) {
       let lhsType =
         parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
@@ -245,7 +250,7 @@ export class BuildParser {
     ) {
       this.variables[parsedLhs.name] = parsedRhs.type;
     } else if (parsedLhs.type !== parsedRhs.type) {
-      console.log(`invalid assignment at node ${nodeCode}`);
+      console.log(`invalid assignment at node ${code}`);
     }
     return `${parsedLhs.name} = ${parsedRhs.name};`;
   }
@@ -281,11 +286,11 @@ export class BuildParser {
     parsedLhs = this.parseVariable(lhs);
     parsedRhs = this.parseVariable(rhs);
     if (parsedLhs.type !== 'uint') {
-      console.log(`value should be an integer at node ${nodeCode}`);
+      console.log(`value should be an integer at node ${code}`);
     }
     if (parsedRhs.type !== 'address payable') {
       console.log(
-        `transfer target should be a payable address at node ${nodeCode}`
+        `transfer target should be a payable address at node ${code}`
       );
     }
     return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
@@ -335,24 +340,17 @@ export class BuildParser {
       }
       return { name: variable.trim(), type: 'uint' };
     }
-    for (let check of [this.parseOperator, this.parseMap]) {
-      let checkResult = check(variable);
-      if (checkResult) {
-        return checkResult;
-      }
-    }
     let varName = variable
       .toLowerCase()
       .trim()
       .replace(/\s/g, '_');
-    let keywordCheck = this.parseKeyword(varName);
-    if (keywordCheck) {
-      return keywordCheck;
-    }
-    if (!(varName in variables)) {
-      return { name: varName, type: 'var' };
-    }
-    return { name: varName, type: variables[varName] };
+    return (
+      this.parseOperator(variable) ||
+      this.parseStruct(variable) ||
+      this.parseMap(variable, variables) ||
+      this.parseKeyword(varName) ||
+      this.lookupVariableName(varName, variables)
+    );
   }
 
   parseOperator(variable) {
@@ -407,11 +405,25 @@ export class BuildParser {
     return null;
   }
 
-  parseMap(variable) {
-    if (/('s | for )/.test(variable)) {
+  parseStruct(variable) {
+    if (/('s )/.test(variable)) {
+      let struct, attr;
+      [struct, attr] = variable.split("'s ");
+      let parsedStruct = this.parseVariable(struct);
+      let parsedAttr = this.parseVariable(attr);
+      return {
+        name: `${parsedStruct.name}.${parsedAttr.name}`,
+        type: null
+      };
+    }
+    return null;
+  }
+
+  parseMap(variable, variables) {
+    if (/( for | of )/.test(variable)) {
       let map, key;
-      if (variable.indexOf("'s ") > 0) {
-        [key, map] = variable.split("'s ");
+      if (variable.indexOf(' of ') > 0) {
+        [map, key] = variable.split(' of ');
       } else {
         [map, key] = variable.split(' for ');
       }
@@ -467,8 +479,17 @@ export class BuildParser {
     return null;
   }
 
+  lookupVariableName(varName, variables) {
+    if (!(varName in variables)) {
+      return { name: varName, type: 'var' };
+    }
+    return { name: varName, type: variables[varName] };
+  }
+
   checkIntUintMismatch(parsedLhs, parsedRhs, leftIntReturn, rightIntReturn) {
     if (
+      parsedLhs.type &&
+      parsedRhs.type &&
       parsedLhs.type.slice(-3) === 'int' &&
       parsedRhs.type.slice(-3) === 'int'
     ) {

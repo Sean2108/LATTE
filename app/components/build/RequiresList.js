@@ -69,7 +69,7 @@ class RequiresList extends React.Component {
               variables[index] = val;
               onChangeRequire(variables);
             }}
-            parseVariable={this.buildParser.parseVariable}
+            buildParser={this.buildParser}
           />
         ))}
         <Button
