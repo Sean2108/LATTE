@@ -335,6 +335,27 @@ export class BuildParser {
       }
       return { name: variable.trim(), type: 'uint' };
     }
+    for (let check of [this.parseOperator, this.parseMap]) {
+      let checkResult = check(variable);
+      if (checkResult) {
+        return checkResult;
+      }
+    }
+    let varName = variable
+      .toLowerCase()
+      .trim()
+      .replace(/\s/g, '_');
+    let keywordCheck = this.parseKeyword(varName);
+    if (keywordCheck) {
+      return keywordCheck;
+    }
+    if (!(varName in variables)) {
+      return { name: varName, type: 'var' };
+    }
+    return { name: varName, type: variables[varName] };
+  }
+
+  parseOperator(variable) {
     for (let operator of ['*', '/', '+', '-']) {
       if (variable.indexOf(operator) > 0) {
         let lhs, rhs;
@@ -383,6 +404,10 @@ export class BuildParser {
         };
       }
     }
+    return null;
+  }
+
+  parseMap(variable) {
     if (/('s | for )/.test(variable)) {
       let map, key;
       if (variable.indexOf("'s ") > 0) {
@@ -402,10 +427,10 @@ export class BuildParser {
         type: type
       };
     }
-    let varName = variable
-      .toLowerCase()
-      .trim()
-      .replace(/\s/g, '_');
+    return null;
+  }
+
+  parseKeyword(varName) {
     if (varName.slice(0, 2) === '0x') {
       return { name: varName, type: 'address payable' };
     }
@@ -439,10 +464,7 @@ export class BuildParser {
         return { name: keyword.name, type: keyword.type };
       }
     }
-    if (!(varName in variables)) {
-      return { name: varName, type: 'var' };
-    }
-    return { name: varName, type: variables[varName] };
+    return null;
   }
 
   checkIntUintMismatch(parsedLhs, parsedRhs, leftIntReturn, rightIntReturn) {
