@@ -182,7 +182,7 @@ class BuildDiagram extends React.Component {
           events={events}
           entities={entities}
           addNode={this.addNode}
-          tooltipText={tooltips[this.state.type]}
+          tooltipText={tooltips[this.state.type] || ''}
         />
         <div className="body">
           <div className="header">
