@@ -26,7 +26,7 @@ export class BuildParser {
 
   findVariables(start) {
     let unparsedStatements = new Set();
-    this.traverseForVariables(start, unparsedStatements);
+    this.traverseForVariables(start, unparsedStatements, new Set());
     let hasChanged = false;
     do {
       for (let statement of unparsedStatements) {
@@ -38,22 +38,27 @@ export class BuildParser {
     } while (unparsedStatements.size > 0 && hasChanged);
   }
 
-  traverseForVariables(node, unparsedStatements) {
-    if (!node) {
+  traverseForVariables(node, unparsedStatements, visitedNodes) {
+    if (!node || visitedNodes.has(node)) {
       return;
     }
+    visitedNodes.add(node);
     if (node instanceof DiamondNodeModel) {
       this.parseNode('Compare: ' + node.name);
       let falseNextNode = this.getNextNode(node.outPortFalse);
       let trueNextNode = this.getNextNode(node.outPortTrue);
-      this.traverseForVariables(falseNextNode, unparsedStatements);
-      this.traverseForVariables(trueNextNode, unparsedStatements);
+      this.traverseForVariables(
+        falseNextNode,
+        unparsedStatements,
+        visitedNodes
+      );
+      this.traverseForVariables(trueNextNode, unparsedStatements, visitedNodes);
     }
     if (!this.parseNodeForVariables(node.name)) {
       unparsedStatements.add(node.name);
     }
     let nextNode = this.getNextNodeForDefaultNode(node);
-    this.traverseForVariables(nextNode, unparsedStatements);
+    this.traverseForVariables(nextNode, unparsedStatements, visitedNodes);
   }
 
   traverseNextNode(node, stopNode = null) {
@@ -106,6 +111,23 @@ export class BuildParser {
     return curNodeCode + this.traverseNextNode(nextNode, stopNode);
   }
 
+  generateCodeForCycle(start, isTrue) {
+    let outPort = isTrue ? start.outPortTrue : start.outPortFalse;
+    let node = this.getNextNode(outPort);
+    let code = '';
+    while (node) {
+      if (node === start) {
+        return code;
+      }
+      if (node instanceof DiamondNodeModel) {
+        return null;
+      }
+      code += this.parseNode(node.name) + '\n';
+      node = this.getNextNodeForDefaultNode(node);
+    }
+    return null;
+  }
+
   getNextNode(outPort) {
     let links = Object.values(outPort.getLinks());
     if (links.length === 0 || !links[0].targetPort) {
@@ -116,11 +138,7 @@ export class BuildParser {
   }
 
   getNextNodeForDefaultNode(node) {
-    // TODO: find better way to get next node for diamond
-    if (node instanceof DiamondNodeModel) {
-      return this.getNextNode(node.outPortTrue);
-    }
-    if (node.getOutPorts().length === 0) {
+    if (node instanceof DiamondNodeModel || node.getOutPorts().length === 0) {
       return null;
     }
     return this.getNextNode(node.getOutPorts()[0]);
@@ -184,100 +202,119 @@ export class BuildParser {
   }
 
   parseNode(nodeCode) {
-    let type, code, lhs, rhs, parsedLhs, parsedRhs, params;
+    let type, code;
     [type, code] = nodeCode.split(': ');
     switch (type) {
       case 'Assignment':
-        [lhs, rhs] = code.split(' = ');
-        parsedLhs = this.parseVariable(lhs);
-        parsedRhs = this.parseVariable(rhs);
-        if ('mapName' in parsedLhs) {
-          let lhsType =
-            parsedLhs.keyType === 'address payable'
-              ? 'address'
-              : parsedLhs.keyType;
-          this.variables[parsedLhs.mapName] = {
-            type: 'mapping',
-            from: lhsType,
-            to: parsedRhs.type
-          };
-        } else if (
-          parsedLhs.type === 'var' ||
-          !(
-            parsedLhs.name in this.variables ||
-            parsedLhs.name in this.functionParams
-          )
-        ) {
-          this.variables[parsedLhs.name] = parsedRhs.type;
-        } else if (parsedLhs.type !== parsedRhs.type) {
-          alert(`invalid assignment at node ${nodeCode}`);
-        }
-        return `${parsedLhs.name} = ${parsedRhs.name};`;
+        return this.parseAssignmentNode(code);
       case 'Emit Event':
-        let eventName;
-        [eventName, params] = code.split('(');
-        params = params
-          .replace(')', '')
-          .split(', ')
-          .map(param => this.parseVariable(param).name)
-          .join(', ');
-        return `emit ${eventName}(${params});`;
+        return this.parseEventNode(code);
       case 'New Entity':
-        let entityName;
-        [lhs, rhs] = code.split(' = ');
-        [entityName, params] = rhs.split('(');
-        parsedLhs = this.parseVariable(lhs);
-        this.variables[parsedLhs.name] = entityName;
-        params = params
-          .replace(')', '')
-          .split(', ')
-          .map(param => this.parseVariable(param).name)
-          .join(', ');
-        return `${parsedLhs.name} = ${entityName}(${params});`;
+        return this.parseEntityNode(code);
       case 'Transfer':
-        [lhs, rhs] = code.split(' to ');
-        parsedLhs = this.parseVariable(lhs);
-        parsedRhs = this.parseVariable(rhs);
-        if (parsedLhs.type !== 'uint') {
-          alert(`value should be an integer at node ${nodeCode}`);
-        }
-        if (parsedRhs.type !== 'address payable') {
-          alert(
-            `transfer target should be a payable address at node ${nodeCode}`
-          );
-        }
-        return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
+        return this.parseTransferNode(code);
       case 'Return':
         let returnVar = this.parseVariable(code);
         this.returnVar = returnVar.type;
         return `return ${returnVar.name};`;
       case 'Compare':
-        let comp;
-        [lhs, comp, rhs] = code.split(/ ([!><=]=|>|<) /);
-        parsedLhs = this.parseVariable(lhs);
-        parsedRhs = this.parseVariable(rhs);
-        if (parsedLhs.type !== parsedRhs.type) {
-          let mismatch = this.checkIntUintMismatch(
-            parsedLhs,
-            parsedRhs,
-            `uint(${parsedLhs.name}) ${comp} ${parsedRhs.name}`,
-            `${parsedLhs.name} ${comp} uint(${parsedRhs.name})`
-          );
-          if (mismatch) {
-            return mismatch;
-          }
-          alert(`comparing different types at node ${nodeCode}`);
-        }
-        if (
-          parsedLhs.type === 'string' &&
-          parsedRhs.type === 'string' &&
-          comp === '=='
-        ) {
-          return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
-        }
-        return `${parsedLhs.name} ${comp} ${parsedRhs.name}`;
+        return this.parseCompareNode(code);
     }
     return '';
+  }
+
+  parseAssignmentNode(code) {
+    let lhs, rhs, parsedLhs, parsedRhs;
+    [lhs, rhs] = code.split(' = ');
+    parsedLhs = this.parseVariable(lhs);
+    parsedRhs = this.parseVariable(rhs);
+    if ('mapName' in parsedLhs) {
+      let lhsType =
+        parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
+      this.variables[parsedLhs.mapName] = {
+        type: 'mapping',
+        from: lhsType,
+        to: parsedRhs.type
+      };
+    } else if (
+      parsedLhs.type === 'var' ||
+      !(
+        parsedLhs.name in this.variables ||
+        parsedLhs.name in this.functionParams
+      )
+    ) {
+      this.variables[parsedLhs.name] = parsedRhs.type;
+    } else if (parsedLhs.type !== parsedRhs.type) {
+      console.log(`invalid assignment at node ${nodeCode}`);
+    }
+    return `${parsedLhs.name} = ${parsedRhs.name};`;
+  }
+
+  parseEventNode(code) {
+    let eventName, params;
+    [eventName, params] = code.split('(');
+    params = params
+      .replace(')', '')
+      .split(', ')
+      .map(param => this.parseVariable(param).name)
+      .join(', ');
+    return `emit ${eventName}(${params});`;
+  }
+
+  parseEntityNode(code) {
+    let entityName, lhs, rhs, parsedLhs, params;
+    [lhs, rhs] = code.split(' = ');
+    [entityName, params] = rhs.split('(');
+    parsedLhs = this.parseVariable(lhs);
+    this.variables[parsedLhs.name] = entityName;
+    params = params
+      .replace(')', '')
+      .split(', ')
+      .map(param => this.parseVariable(param).name)
+      .join(', ');
+    return `${parsedLhs.name} = ${entityName}(${params});`;
+  }
+
+  parseTransferNode(code) {
+    let lhs, rhs, parsedLhs, parsedRhs;
+    [lhs, rhs] = code.split(' to ');
+    parsedLhs = this.parseVariable(lhs);
+    parsedRhs = this.parseVariable(rhs);
+    if (parsedLhs.type !== 'uint') {
+      console.log(`value should be an integer at node ${nodeCode}`);
+    }
+    if (parsedRhs.type !== 'address payable') {
+      console.log(
+        `transfer target should be a payable address at node ${nodeCode}`
+      );
+    }
+    return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
+  }
+
+  parseCompareNode(code) {
+    let comp, lhs, rhs, parsedLhs, parsedRhs;
+    [lhs, comp, rhs] = code.split(/ ([!><=]=|>|<) /);
+    parsedLhs = this.parseVariable(lhs);
+    parsedRhs = this.parseVariable(rhs);
+    if (parsedLhs.type !== parsedRhs.type) {
+      let mismatch = this.checkIntUintMismatch(
+        parsedLhs,
+        parsedRhs,
+        `uint(${parsedLhs.name}) ${comp} ${parsedRhs.name}`,
+        `${parsedLhs.name} ${comp} uint(${parsedRhs.name})`
+      );
+      if (mismatch) {
+        return mismatch;
+      }
+    }
+    if (
+      parsedLhs.type === 'string' &&
+      parsedRhs.type === 'string' &&
+      comp === '=='
+    ) {
+      return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
+    }
+    return `${parsedLhs.name} ${comp} ${parsedRhs.name}`;
   }
 
   parseVariable(variable) {
@@ -327,7 +364,7 @@ export class BuildParser {
               type: parsedLhs.type === 'map' ? parsedRhs.type : parsedLhs.type
             };
           }
-          alert(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
+          console.log(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
           return {
             name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`,
             type: 'var'
@@ -406,20 +443,6 @@ export class BuildParser {
       return { name: varName, type: 'var' };
     }
     return { name: varName, type: variables[varName] };
-  }
-
-  generateCodeForCycle(start, isTrue) {
-    let outPort = isTrue ? start.outPortTrue : start.outPortFalse;
-    let node = this.getNextNode(outPort);
-    let code = '';
-    while (node) {
-      if (node === start) {
-        return code;
-      }
-      code += this.parseNode(node.name) + '\n';
-      node = this.getNextNodeForDefaultNode(node);
-    }
-    return null;
   }
 
   checkIntUintMismatch(parsedLhs, parsedRhs, leftIntReturn, rightIntReturn) {
