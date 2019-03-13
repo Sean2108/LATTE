@@ -98,7 +98,10 @@ class StructList extends React.Component {
               return;
             updateVariables({
               ...initialVars,
-              [this.state.contents]: []
+              [this.state.contents
+                .toLowerCase()
+                .trim()
+                .replace(/\s/g, '_')]: []
             });
             this.setState({ contents: '' });
           }}

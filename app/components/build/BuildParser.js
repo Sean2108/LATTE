@@ -383,7 +383,6 @@ export class BuildParser {
               type: parsedLhs.type === 'map' ? parsedRhs.type : parsedLhs.type
             };
           }
-          console.log(`invalid types ${parsedLhs.type} and ${parsedRhs.type}`);
           return {
             name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`,
             type: 'var'

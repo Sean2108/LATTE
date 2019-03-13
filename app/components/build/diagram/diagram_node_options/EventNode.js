@@ -71,7 +71,8 @@ class EventNode extends React.Component {
         <br />
 
         {this.state.variableSelected !== '' &&
-          varList[this.state.variableSelected].length > 0 && (
+          varList[this.state.variableSelected].filter(param => param.name)
+            .length > 0 && (
             <ParamList
               header={'Event Information'}
               params={varList[this.state.variableSelected]}

@@ -112,7 +112,7 @@ class BuildOptions extends React.Component {
       }
     }
     for (const [name, params] of Object.entries(buildState.events)) {
-      code += `event ${name} (${params
+      code += `event ${name}(${params
         .filter(param => param.name)
         .map(param => `${param.type} ${param.name}`)
         .join(', ')});\n`;
