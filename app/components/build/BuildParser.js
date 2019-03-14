@@ -166,6 +166,9 @@ export class BuildParser {
               from: lhsType,
               to: parsedRhs.type
             };
+            if ('innerKeyType' in parsedLhs) {
+              this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
+            }
             return true;
           }
           return false;
@@ -241,6 +244,9 @@ export class BuildParser {
         from: lhsType,
         to: parsedRhs.type
       };
+      if ('innerKeyType' in parsedLhs) {
+        this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
+      }
     } else if (
       parsedLhs.type === 'var' ||
       !(
@@ -420,11 +426,26 @@ export class BuildParser {
 
   parseMap(variable, variables) {
     if (/( for | of )/.test(variable)) {
-      let map, key;
+      let map, key, innerKey;
       if (variable.indexOf(' of ') > 0) {
-        [map, key] = variable.split(' of ');
+        [map, key, innerKey] = variable.split(' of ');
       } else {
-        [map, key] = variable.split(' for ');
+        [map, key, innerKey] = variable.split(' for ');
+      }
+      if (innerKey) {
+        let parsedMap = this.parseVariable(map);
+        let parsedKey = this.parseVariable(key);
+        let parsedInnerKey = this.parseVariable(innerKey);
+        let type = variables[parsedMap.name]
+          ? variables[parsedMap.name]['to']
+          : 'map';
+        return {
+          name: `${parsedMap.name}[${parsedKey.name}][${parsedInnerKey.name}]`,
+          mapName: parsedMap.name,
+          keyType: parsedKey.type,
+          innerKeyType: parsedInnerKey.type,
+          type: type
+        };
       }
       let parsedMap = this.parseVariable(map);
       let parsedKey = this.parseVariable(key);
