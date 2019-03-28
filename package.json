@@ -88,7 +88,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sean2108/LATTE-Visual-Smart-Contract-Builder.git"
+    "url": "git+https://github.com/Sean2108/LATTE.git"
   },
   "author": {
     "name": "Sean Tan",
@@ -99,7 +99,7 @@
   "keywords": [
     "smart contract"
   ],
-  "homepage": "https://github.com/Sean2108/LATTE-Visual-Smart-Contract-Builder",
+  "homepage": "https://github.com/Sean2108/LATTE",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
