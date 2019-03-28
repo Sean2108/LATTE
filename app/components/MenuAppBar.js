@@ -160,7 +160,7 @@ class MiniDrawer extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="title" color="inherit" noWrap>
-              Smart Contract Builder
+              LATTE
             </Typography>
           </Toolbar>
         </AppBar>

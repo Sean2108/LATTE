@@ -1,8 +1,8 @@
 {
-  "name": "smart-contract-builder",
-  "productName": "Smart Contract Builder",
+  "name": "latte",
+  "productName": "LATTE",
   "version": "1.0.0",
-  "description": "GUI for building smart contracts",
+  "description": "Visual Smart Contract Builder: GUI for building smart contracts",
   "main": "./main.prod.js",
   "author": {
     "name": "Sean Tan",
