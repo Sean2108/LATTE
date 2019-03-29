@@ -3,7 +3,7 @@ LATTE is a graphical user interface tool that makes it easy for both developers 
 
 Uses electron, react, solc and web3. Material-UI is used to style the application.
 
-[More on LATTE](poster.jpg)
+![More on LATTE](poster.jpg)
 
 View thesis.pdf for more details.
 
