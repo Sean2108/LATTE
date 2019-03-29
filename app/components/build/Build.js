@@ -56,7 +56,6 @@ class Build extends React.Component {
           <div className={classes.root}>
             <BuildTabs
               variables={variables}
-              onVariablesChange={value => this.setState({ variables: value })}
               onTabsChange={value => this.setState(value)}
               buildState={this.state}
             />

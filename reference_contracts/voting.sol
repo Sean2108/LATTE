@@ -89,4 +89,34 @@ contract Ballot {
     {
         return winningProposalName;
     }
+
+    /// Delegate your vote to the voter `to`.
+    function delegate(address to) public {
+        // assigns reference
+        Voter storage sender = voters[msg.sender];
+        require(!sender.voted, "You already voted.");
+
+        require(to != msg.sender, "Self-delegation is disallowed.");
+
+        // Forward the delegation as long as
+        // `to` also delegated.
+        while (voters[to].delegate != address(0)) {
+            to = voters[to].delegate;
+        }
+
+        // Since `sender` is a reference, this
+        // modifies `voters[msg.sender].voted`
+        sender.voted = true;
+        sender.delegate = to;
+        Voter storage delegate_ = voters[to];
+        if (delegate_.voted) {
+            // If the delegate already voted,
+            // directly add to the number of votes
+            proposals[delegate_.vote] += sender.weight;
+        } else {
+            // If the delegate did not vote yet,
+            // add to her weight.
+            delegate_.weight += sender.weight;
+        }
+    }
 }

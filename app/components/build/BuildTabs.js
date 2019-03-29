@@ -205,7 +205,6 @@ class BuildTabs extends React.Component {
                   diagrams: [...buildState.diagrams, {}]
                 };
                 this.setState({
-                  ...this.state,
                   popoverContent: '',
                   addTabPopoverAnchor: null
                 });

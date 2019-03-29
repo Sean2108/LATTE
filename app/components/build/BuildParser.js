@@ -6,11 +6,12 @@ export class BuildParser {
     this.onVariablesChange = onVariablesChange;
   }
 
-  reset(varList, functionParams) {
+  reset(varList, functionParams, structList = null) {
     this.variables = {};
     this.returnVar = null;
     this.varList = varList;
     this.functionParams = functionParams;
+    this.structList = structList;
   }
 
   getReturnVar() {
@@ -167,18 +168,20 @@ export class BuildParser {
               to: parsedRhs.type
             };
             if ('innerKeyType' in parsedLhs) {
-              this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
+              this.variables[parsedLhs.mapName]['inner'] =
+                parsedLhs.innerKeyType;
             }
             return true;
           }
           return false;
         }
         if (
-          parsedLhs.type === 'var' ||
-          !(
-            parsedLhs.name in this.variables ||
-            parsedLhs.name in this.functionParams
-          )
+          !parsedLhs.name.includes('.') &&
+          (parsedLhs.type === 'var' ||
+            !(
+              parsedLhs.name in this.variables ||
+              parsedLhs.name in this.functionParams
+            ))
         ) {
           this.variables[parsedLhs.name] = parsedRhs.type;
           return true;
@@ -248,11 +251,12 @@ export class BuildParser {
         this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
       }
     } else if (
-      parsedLhs.type === 'var' ||
-      !(
-        parsedLhs.name in this.variables ||
-        parsedLhs.name in this.functionParams
-      )
+      !parsedLhs.name.includes('.') &&
+      (parsedLhs.type === 'var' ||
+        !(
+          parsedLhs.name in this.variables ||
+          parsedLhs.name in this.functionParams
+        ))
     ) {
       this.variables[parsedLhs.name] = parsedRhs.type;
     } else if (parsedLhs.type !== parsedRhs.type) {
@@ -416,6 +420,17 @@ export class BuildParser {
       [struct, attr] = variable.split("'s ");
       let parsedStruct = this.parseVariable(struct);
       let parsedAttr = this.parseVariable(attr);
+      for (let attribute of this.structList[parsedStruct.type]) {
+        if (
+          attribute.name === parsedAttr.name ||
+          attribute.displayName === parsedAttr.name
+        ) {
+          return {
+            name: `${parsedStruct.name}.${parsedAttr.name}`,
+            type: attribute.type
+          };
+        }
+      }
       return {
         name: `${parsedStruct.name}.${parsedAttr.name}`,
         type: null
@@ -486,7 +501,13 @@ export class BuildParser {
       {
         name: 'address(uint160(0))',
         type: 'address payable',
-        strings: ['address', 'type_address', 'address_type', 'an_address']
+        strings: [
+          'address',
+          'type_address',
+          'address_type',
+          'an_address',
+          'invalid_address'
+        ]
       },
       { name: 'true', type: 'bool', strings: ['true'] },
       { name: 'false', type: 'bool', strings: ['false'] }

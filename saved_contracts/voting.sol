@@ -6,6 +6,10 @@ bool voted;
 address payable delegate;
 string vote;
 }
+Voter public sender_details;
+address payable public delegated_to;
+Voter public delegate_details;
+string public delegate_vote;
 mapping(string => uint) vote_count;
 address payable public chairperson;
 Voter public chairperson_voter;
@@ -42,5 +46,23 @@ winning_proposal_name = proposal;
 }
 function winningProposal() public payable returns (string memory) {
       return winning_proposal_name;
+}
+function delegate(address payable to) public payable  {
+      require(voter_details[msg.sender].voted == false, "You already voted.");
+require(to != msg.sender, "Self-delegation is disallowed.");
+sender_details = voter_details[msg.sender];
+delegated_to = to;
+while (voter_details[delegated_to].delegate != address(uint160(0))) {
+delegated_to = voter_details[delegated_to].delegate;
+}
+sender_details.voted = true;
+sender_details.delegate = delegated_to;
+delegate_details = voter_details[delegated_to];
+if (delegate_details.voted == true) {
+delegate_vote = delegate_details.vote;
+vote_count[delegate_vote] = vote_count[delegate_vote] + sender_details.weight;
+} else {
+delegate_details.weight = delegate_details.weight + sender_details.weight;
+}
 }
 }

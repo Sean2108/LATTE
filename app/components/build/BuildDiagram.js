@@ -67,7 +67,7 @@ class BuildDiagram extends React.Component {
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
-          this.buildParser.reset(this.props.varList, this.props.functionParams);
+          this.buildParser.reset(this.props.varList, this.props.functionParams, this.props.entities);
           let code = this.buildParser.parse(this.start);
           this.props.onChangeLogic(code);
           this.props.onChangeReturn(this.buildParser.getReturnVar());
