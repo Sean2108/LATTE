@@ -39,7 +39,7 @@ const styles = theme => ({
     'text-align': 'center'
   },
   equals: {
-    margin: 'auto'
+    margin: '5% auto'
   },
   varSelect: {
     margin: theme.spacing.unit,
@@ -73,7 +73,7 @@ class ReturnNode extends React.Component {
             }
             margin="none"
           />
-          <Typography className={classes.equals}> = </Typography>
+          <Typography className={classes.equals}> &nbsp;=&nbsp; </Typography>
           <TextField
             id="standard-name"
             label="Assigned Value"
