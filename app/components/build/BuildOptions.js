@@ -68,7 +68,7 @@ class BuildOptions extends React.Component {
           .deploy(deploymentJson)
           .send({
             from: account,
-            gas: 1500000,
+            gas: 15000000000,
             gasPrice: '30000000000000'
           })
           .on('error', error => {
