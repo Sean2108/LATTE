@@ -55,6 +55,7 @@ class DefaultBuildTab extends React.Component {
           onChangeRequire={onChangeRequire}
           requires={requires}
           tooltipText={'Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user.'}
+          entities={entities}
         />
         <br />
         <BuildDiagram
