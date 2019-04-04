@@ -90,7 +90,7 @@ class EntityNode extends React.Component {
                 updateParams={params =>
                   this.setState({
                     emitStatement: `${this.state.variableSelected}(${params
-                      .map(param => `${param.value}`)
+                      .map(param => param.value ? `${param.value}` : 'an address')
                       .join(', ')})`
                   })
                 }

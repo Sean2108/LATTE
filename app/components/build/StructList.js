@@ -99,9 +99,8 @@ class StructList extends React.Component {
             updateVariables({
               ...initialVars,
               [this.state.contents
-                .toLowerCase()
-                .trim()
-                .replace(/\s/g, '_')]: []
+                .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
+                .replace(/\s+/g, '')]: []
             });
             this.setState({ contents: '' });
           }}

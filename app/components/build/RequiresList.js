@@ -38,7 +38,7 @@ class RequiresList extends React.Component {
       requires,
       tooltipText
     } = this.props;
-    this.buildParser.reset(this.props.vars, {});
+    this.buildParser.reset(this.props.vars, {}, this.props.entities);
 
     if (requires.length === 0) {
       requires.push({
@@ -105,7 +105,8 @@ RequiresList.propTypes = {
   vars: PropTypes.object.isRequired,
   onChangeRequire: PropTypes.func.isRequired,
   requires: PropTypes.array.isRequired,
-  tooltipText: PropTypes.string.isRequired
+  tooltipText: PropTypes.string.isRequired,
+  entities: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, {

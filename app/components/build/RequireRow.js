@@ -39,8 +39,17 @@ class RequireRow extends React.Component {
   handleChange = name => event => {
     let state = { ...this.props.require, [name]: event.target.value };
     if (this.props.buildParser) {
-      state.var1 = this.props.buildParser.parseVariable(state.displayVar1).name;
-      state.var2 = this.props.buildParser.parseVariable(state.displayVar2).name;
+      try {
+        state.var1 = this.props.buildParser.parseVariable(
+          state.displayVar1
+        ).name;
+        state.var2 = this.props.buildParser.parseVariable(
+          state.displayVar2
+        ).name;
+        console.log(state);
+      } catch (err) {
+        console.log(err);
+      }
     }
     this.props.updateRequire(state);
   };
