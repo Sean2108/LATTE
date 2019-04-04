@@ -5,8 +5,6 @@ Uses electron, react, solc and web3. Material-UI is used to style the applicatio
 
 ![More on LATTE](poster.jpg)
 
-View thesis.pdf for more details.
-
 ## To run:
 - yarn - installs all packages and dependencies
 - yarn dev - runs the application in development mode (with the console available)
