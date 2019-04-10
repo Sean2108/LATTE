@@ -146,11 +146,11 @@ export class BuildParser {
   }
 
   parseNodeForVariables(nodeCode) {
-    let type, code, lhs, rhs, parsedLhs, parsedRhs, params;
+    let type, code, lhs, rhs, parsedLhs, parsedRhs, params, comp;
     [type, code] = nodeCode.split(': ');
     switch (type) {
       case 'Assignment':
-        [lhs, rhs] = code.split(' = ');
+        [lhs, comp, rhs] = code.split(/ ([\*\/+=]?=) /);
         parsedLhs = this.parseVariable(lhs);
         parsedRhs = this.parseVariable(rhs);
         if (!parsedLhs.type || !parsedRhs.type) {
@@ -232,12 +232,12 @@ export class BuildParser {
   }
 
   parseAssignmentNode(code) {
-    let lhs, rhs, parsedLhs, parsedRhs;
-    [lhs, rhs] = code.split(' = ');
+    let lhs, rhs, comp, parsedLhs, parsedRhs;
+    [lhs, comp, rhs] = code.split(/ ([\*\/+=]?=) /);
     parsedLhs = this.parseVariable(lhs);
     parsedRhs = this.parseVariable(rhs);
     if (!parsedLhs.type || !parsedRhs.type) {
-      return `${parsedLhs.name} = ${parsedRhs.name};`;
+      return `${parsedLhs.name} ${comp} ${parsedRhs.name};`;
     }
     if ('mapName' in parsedLhs) {
       let lhsType =
@@ -262,7 +262,7 @@ export class BuildParser {
     } else if (parsedLhs.type !== parsedRhs.type) {
       console.log(`invalid assignment at node ${code}`);
     }
-    return `${parsedLhs.name} = ${parsedRhs.name};`;
+    return `${parsedLhs.name} ${comp} ${parsedRhs.name};`;
   }
 
   parseEventNode(code) {

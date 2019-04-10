@@ -30,13 +30,12 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     minWidth: 400
   },
+  innerFormControl: {
+    margin: theme.spacing.unit,
+    minWidth: 130
+  },
   button: {
     margin: theme.spacing.unit
-  },
-  inline: {
-    display: 'flex',
-    'justify-content': 'space-evenly',
-    'text-align': 'center'
   },
   equals: {
     margin: '5% auto'
@@ -54,6 +53,7 @@ const styles = theme => ({
 class ReturnNode extends React.Component {
   state = {
     variableSelected: '',
+    assignment: '=',
     assignedVal: ''
   };
 
@@ -62,7 +62,7 @@ class ReturnNode extends React.Component {
 
     return (
       <FormControl className={classes.formControl}>
-        <div className={classes.inline}>
+        <div>
           <TextField
             id="standard-name"
             label="Variable Name"
@@ -73,7 +73,25 @@ class ReturnNode extends React.Component {
             }
             margin="none"
           />
-          <Typography className={classes.equals}> &nbsp;=&nbsp; </Typography>
+          <FormControl className={classes.innerFormControl}>
+            <InputLabel htmlFor="assign">Assignment Type</InputLabel>
+            <Select
+              value={this.state.assignment}
+              onChange={event =>
+                this.setState({ assignment: event.target.value })
+              }
+              inputProps={{
+                name: 'assign',
+                id: 'assign'
+              }}
+            >
+              <MenuItem value="=">Is</MenuItem>
+              <MenuItem value="+=">Increase by</MenuItem>
+              <MenuItem value="-=">Decrease by</MenuItem>
+              <MenuItem value="*=">Multiply by</MenuItem>
+              <MenuItem value="/=">Divided by</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             id="standard-name"
             label="Assigned Value"
@@ -105,7 +123,9 @@ class ReturnNode extends React.Component {
             onClick={() => {
               close();
               submit(
-                `${this.state.variableSelected} = ${this.state.assignedVal}`
+                `${this.state.variableSelected} ${this.state.assignment} ${
+                  this.state.assignedVal
+                }`
               );
             }}
           >
