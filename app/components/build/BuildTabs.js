@@ -32,7 +32,7 @@ TabContainer.propTypes = {
 };
 
 const styles = theme => ({
-  tabs: {
+  buildtabs: {
     flexGrow: 1,
     width: '97%',
     backgroundColor: theme.palette.background.paper
@@ -46,6 +46,10 @@ const styles = theme => ({
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
+  },
+  tabs: {
+    width: '100%',
+    maxWidth: '80vw'
   }
 });
 
@@ -83,9 +87,10 @@ class BuildTabs extends React.Component {
     const { value } = this.state;
 
     return (
-      <div className={classes.tabs}>
+      <div className={classes.buildtabs}>
         <AppBar position="static" color="default">
           <Tabs
+            className={classes.tabs}
             value={value}
             onChange={(event, value) => {
               if (value !== buildState.tabs.length) {
