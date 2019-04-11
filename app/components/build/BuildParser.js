@@ -485,7 +485,7 @@ export class BuildParser {
       {
         name: 'msg.sender',
         type: 'address payable',
-        strings: ['message_sender', 'msg_sender', 'sender']
+        strings: ['message_sender', 'msg_sender', 'sender', 'function_caller']
       },
       {
         name: 'msg.value',
@@ -506,7 +506,8 @@ export class BuildParser {
           'type_address',
           'address_type',
           'an_address',
-          'invalid_address'
+          'invalid_address',
+          'null_address'
         ]
       },
       { name: 'true', type: 'bool', strings: ['true'] },
