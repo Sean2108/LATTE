@@ -46,7 +46,6 @@ class RequireRow extends React.Component {
         state.var2 = this.props.buildParser.parseVariable(
           state.displayVar2
         ).name;
-        console.log(state);
       } catch (err) {
         console.log(err);
       }

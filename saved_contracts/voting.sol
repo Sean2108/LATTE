@@ -11,12 +11,13 @@ address payable public delegated_to;
 Voter public delegate_details;
 string public delegate_vote;
 mapping(string => uint) vote_count;
+Voter public voter;
+mapping(string => uint) voute_count;
+uint public winning_vote_count;
+string public winning_proposal_name;
 address payable public chairperson;
 Voter public chairperson_voter;
 mapping(address => Voter) voter_details;
-Voter public voter;
-uint public winning_vote_count;
-string public winning_proposal_name;
 constructor() public payable  {
       chairperson = msg.sender;
 chairperson_voter = Voter(1, false, address(uint160(0)), "");
@@ -38,7 +39,7 @@ require(voter_details[msg.sender].voted == false, "Already voted.");
 voter = voter_details[msg.sender];
 voter.voted = true;
 voter.vote = proposal;
-vote_count[proposal] = vote_count[proposal] + voter.weight;
+voute_count[proposal] += voter.weight;
 if (vote_count[proposal] > winning_vote_count) {
 winning_vote_count = vote_count[proposal];
 winning_proposal_name = proposal;
@@ -60,9 +61,9 @@ sender_details.delegate = delegated_to;
 delegate_details = voter_details[delegated_to];
 if (delegate_details.voted == true) {
 delegate_vote = delegate_details.vote;
-vote_count[delegate_vote] = vote_count[delegate_vote] + sender_details.weight;
+vote_count[delegate_vote] += sender_details.weight;
 } else {
-delegate_details.weight = delegate_details.weight + sender_details.weight;
+delegate_details.weight += sender_details.weight;
 }
 }
 }

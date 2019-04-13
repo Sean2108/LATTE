@@ -1,14 +1,14 @@
 pragma solidity ^0.5.4;
 contract Code {
+address payable public highest_bidder;
+uint public highest_bid;
 bool public ended;
 uint public amount;
 mapping(address => uint) pending_returns;
-address payable public highest_bidder;
-uint public highest_bid;
 address payable public beneficiary;
 uint public auction_end;
-event HighestBidIncreased (address payable bidder, uint amount);
-event AuctionEnded (address payable winner, uint amount);
+event HighestBidIncreased(address payable bidder, uint amount);
+event AuctionEnded(address payable winner, uint amount);
 constructor(address payable _beneficiary, uint bidding_time) public payable  {
       beneficiary = _beneficiary;
 auction_end = now + bidding_time;
@@ -17,11 +17,11 @@ function bid() public payable  {
       require(now <= auction_end, "Auction already ended.");
 require(msg.value > highest_bid, "There already is a higher bid.");
 if (highest_bid != 0) {
-pending_returns[highest_bidder] = pending_returns[highest_bidder] + highest_bid;
-} 
+} else {
 highest_bidder = msg.sender;
 highest_bid = msg.value;
 emit HighestBidIncreased(msg.sender, msg.value);
+}
 }
 function withdraw() public payable  {
       amount = pending_returns[msg.sender];
