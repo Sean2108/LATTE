@@ -6,6 +6,9 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
 import Tooltip from '@material-ui/core/Tooltip';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
   textField: {
@@ -22,6 +25,10 @@ const styles = theme => ({
   },
   tooltipFont: {
     fontSize: 14
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    width: 300
   }
 });
 
@@ -57,14 +64,33 @@ class ParamList extends React.Component {
         <br />
         {params.filter(param => param.name).map((param, index) => (
           <div key={index}>
-            <TextField
-              id="value"
-              label={`Value of ${param.displayName || ''}`}
-              className={classes.textField}
-              value={param.value || ''}
-              onChange={this.handleChange(index)}
-              margin="normal"
-            />
+            {param.type === 'bool' ? (
+              <FormControl className={classes.formControl}>
+                <InputLabel htmlFor="protocol">
+                  {`Value of ${param.displayName || ''}`}
+                </InputLabel>
+                <Select
+                  value={param.value || 'true'}
+                  onChange={this.handleChange(index)}
+                  inputProps={{
+                    name: 'truefalse',
+                    id: 'tf'
+                  }}
+                >
+                  <MenuItem value="true"> True </MenuItem>
+                  <MenuItem value="false"> False </MenuItem>
+                </Select>
+              </FormControl>
+            ) : (
+              <TextField
+                id="value"
+                label={`Value of ${param.displayName || ''}`}
+                className={classes.textField}
+                value={param.value || ''}
+                onChange={this.handleChange(index)}
+                margin="normal"
+              />
+            )}
           </div>
         ))}
         <br />
