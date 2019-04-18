@@ -1,9 +1,9 @@
 pragma solidity ^0.5.4;
 contract Code {
-uint public state;
-address payable public buyer;
-address payable public seller;
-uint public sell_value;
+uint private state;
+address payable private buyer;
+address payable private seller;
+uint private sell_value;
 event aborted();
 event purchase_confirmed();
 event item_received();

@@ -108,7 +108,7 @@ class BuildOptions extends React.Component {
       if (typeof type === 'object' && type.type === 'mapping') {
         code += 'inner' in type ? `mapping(${type.from} => mapping(${type.inner === 'address payable' ? 'address' : type.inner} => ${type.to})) ${name};\n` : `mapping(${type.from} => ${type.to}) ${name};\n`;
       } else if (type) {
-        code += `${type} public ${name};\n`;
+        code += `${type} private ${name};\n`;
       }
     }
     for (const [name, params] of Object.entries(buildState.events)) {

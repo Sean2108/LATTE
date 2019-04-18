@@ -1,13 +1,17 @@
 pragma solidity ^0.5.4;
 contract Code {
-mapping(address => mapping(address => uint)) _allowed;
 mapping(address => uint) _balances;
+mapping(address => mapping(address => uint)) _allowed;
 event Transferred(address payable from, address payable to, uint amount);
 event Approval(address payable owner, address payable spender, uint amount);
 constructor() public payable  {
       }
-function transfer(address payable to, uint amount) public payable  {
+function transfer(address payable to, uint amount) public payable returns (bool) {
       require(to != address(uint160(0)), "");
+_balances[msg.sender] -= amount;
+_balances[to] += amount;
+emit Transferred(msg.sender, to, amount);
+return true;
 }
 function approve(address payable spender, uint amount) public payable returns (bool) {
       require(spender != address(uint160(0)), "");

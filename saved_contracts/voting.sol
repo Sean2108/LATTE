@@ -6,17 +6,17 @@ bool voted;
 address payable delegate;
 string vote;
 }
-Voter public sender_details;
-address payable public delegated_to;
-Voter public delegate_details;
-string public delegate_vote;
+Voter private sender_details;
+address payable private delegated_to;
+Voter private delegate_details;
+string private delegate_vote;
 mapping(string => uint) vote_count;
-Voter public voter;
+Voter private voter;
 mapping(string => uint) voute_count;
-uint public winning_vote_count;
-string public winning_proposal_name;
-address payable public chairperson;
-Voter public chairperson_voter;
+uint private winning_vote_count;
+string private winning_proposal_name;
+address payable private chairperson;
+Voter private chairperson_voter;
 mapping(address => Voter) voter_details;
 constructor() public payable  {
       chairperson = msg.sender;
