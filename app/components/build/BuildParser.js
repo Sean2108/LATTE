@@ -277,13 +277,13 @@ export class BuildParser {
   }
 
   parseEntityNode(code) {
-    let entityName, lhs, rhs, parsedLhs, params;
+    let entityName, lhs, rhs, parsedLhs, paramsStorage, params, memory;
     [lhs, rhs] = code.split(' = ');
-    [entityName, params] = rhs.split('(');
+    [entityName, paramsStorage] = rhs.split('(');
+    [params, memory] = paramsStorage.split(') -> in ');
     parsedLhs = this.parseVariable(lhs);
     this.variables[parsedLhs.name] = entityName;
     params = params
-      .replace(')', '')
       .split(', ')
       .map(param => this.parseVariable(param).name)
       .join(', ');

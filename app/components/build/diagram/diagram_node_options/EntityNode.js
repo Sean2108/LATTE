@@ -10,6 +10,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import ParamList from '../../ParamList';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const styles = theme => ({
   paper: {
@@ -39,7 +41,8 @@ class EntityNode extends React.Component {
   state = {
     variableSelected: '',
     assignVar: '',
-    emitStatement: ''
+    emitStatement: '',
+    isMemory: true
   };
 
   render() {
@@ -62,7 +65,7 @@ class EntityNode extends React.Component {
             onChange={event =>
               this.setState({
                 variableSelected: event.target.value,
-                emitStatement: `${event.target.value}()`
+                emitStatement: `${event.target.value}() -> in ${this.state.isMemory ? 'memory' : 'storage'}`
               })
             }
             inputProps={{
@@ -80,6 +83,24 @@ class EntityNode extends React.Component {
             ))}
           </Select>
           <br />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.isMemory}
+                onChange={event =>
+                  this.setState({
+                    isMemory: event.target.checked,
+                    emitStatement: `${event.target.value}() -> in ${event.target.checked ? 'memory' : 'storage'}`
+                  })
+                }
+                value="isMemory"
+                color="primary"
+              />
+            }
+            label="Store in Memory?"
+          />
+          {this.state.isMemory ? '' : 'Using storage will cost significantly more gas!'}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
@@ -102,7 +123,7 @@ class EntityNode extends React.Component {
                                   ? 'false'
                                   : 'an address'
                       )
-                      .join(', ')})`
+                      .join(', ')}) -> in ${this.state.isMemory ? 'memory' : 'storage'}`
                   })
                 }
               />
