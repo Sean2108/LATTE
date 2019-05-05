@@ -287,7 +287,7 @@ export class BuildParser {
       .split(', ')
       .map(param => this.parseVariable(param).name)
       .join(', ');
-    return `${parsedLhs.name} = ${entityName}(${params});`;
+    return `${memory === 'memory' ? `${entityName} memory ` : ''}${parsedLhs.name} = ${entityName}(${params});`;
   }
 
   parseTransferNode(code) {

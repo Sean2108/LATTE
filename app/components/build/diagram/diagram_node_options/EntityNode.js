@@ -100,7 +100,7 @@ class EntityNode extends React.Component {
             }
             label="Store in Memory?"
           />
-          {this.state.isMemory ? '' : 'Using storage will cost significantly more gas!'}
+          {this.state.isMemory ? '' : 'Warning: Using the storage option costs significantly more gas!'}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
