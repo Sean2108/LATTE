@@ -36,6 +36,7 @@ class DefaultBuildTab extends React.Component {
       params,
       requires,
       diagram,
+      onChangeView,
       updateDiagram
     } = this.props;
     let variables = this.flattenParamsToObject(params);
@@ -67,6 +68,7 @@ class DefaultBuildTab extends React.Component {
           onVariablesChange={onVariablesChange}
           onChangeReturn={onChangeReturn}
           diagram={diagram}
+          onChangeView={onChangeView}
           updateDiagram={updateDiagram}
         />
       </div>
@@ -86,6 +88,7 @@ DefaultBuildTab.propTypes = {
   params: PropTypes.array.isRequired,
   requires: PropTypes.array.isRequired,
   diagram: PropTypes.object.isRequired,
+  onChangeView: PropTypes.func.isRequired,
   updateDiagram: PropTypes.func.isRequired
 };
 

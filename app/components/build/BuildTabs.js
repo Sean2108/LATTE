@@ -160,6 +160,9 @@ class BuildTabs extends React.Component {
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
                   diagram={buildState.diagrams[i]}
+                  onChangeView={newView =>
+                    this.handleOnChange(newView, i, 'isView')
+                  }
                   updateDiagram={diagram =>
                     this.handleOnChange(diagram, i, 'diagrams')
                   }
@@ -207,6 +210,7 @@ class BuildTabs extends React.Component {
                   tabsCode: [...buildState.tabsCode, ''],
                   tabsParams: [...buildState.tabsParams, []],
                   tabsRequire: [...buildState.tabsRequire, []],
+                  isView: [...buildState.isView, false],
                   diagrams: [...buildState.diagrams, {}]
                 };
                 this.setState({

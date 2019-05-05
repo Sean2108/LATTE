@@ -41,6 +41,7 @@ class Build extends React.Component {
     constructorParams: [],
     events: {},
     entities: {},
+    isView: [false],
     diagrams: [{}]
   };
 

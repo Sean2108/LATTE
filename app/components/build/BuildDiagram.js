@@ -71,6 +71,7 @@ class BuildDiagram extends React.Component {
           let code = this.buildParser.parse(this.start);
           this.props.onChangeLogic(code);
           this.props.onChangeReturn(this.buildParser.getReturnVar());
+          this.props.onChangeView(this.buildParser.getView());
           this.props.updateDiagram(this.model.serializeDiagram());
         }, 5000);
       }
@@ -304,6 +305,7 @@ BuildDiagram.propTypes = {
   onVariablesChange: PropTypes.func.isRequired,
   onChangeReturn: PropTypes.func.isRequired,
   diagram: PropTypes.object.isRequired,
+  onChangeView: PropTypes.func,
   updateDiagram: PropTypes.func.isRequired
 };
 

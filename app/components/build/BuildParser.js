@@ -12,10 +12,15 @@ export class BuildParser {
     this.varList = varList;
     this.functionParams = functionParams;
     this.structList = structList;
+    this.isView = true;
   }
 
   getReturnVar() {
     return this.returnVar;
+  }
+
+  getView() {
+    return this.isView;
   }
 
   parse(start) {
@@ -214,12 +219,16 @@ export class BuildParser {
     [type, code] = nodeCode.split(': ');
     switch (type) {
       case 'Assignment':
+        this.isView = false;
         return this.parseAssignmentNode(code);
       case 'Emit Event':
+        this.isView = false;
         return this.parseEventNode(code);
       case 'New Entity':
+        this.isView = false;
         return this.parseEntityNode(code);
       case 'Transfer':
+        this.isView = false;
         return this.parseTransferNode(code);
       case 'Return':
         let returnVar = this.parseVariable(code);

@@ -152,10 +152,12 @@ class BuildOptions extends React.Component {
               ? `${element.type} memory ${element.name}`
               : `${element.type} ${element.name}`
         )
-        .join(', ')}) public payable ${returnCode} {
+        .join(', ')}) public ${buildState.isView[i] && buildState.tabs[i+1] !== 'Initial State' ? 'view' : 'payable'} ${returnCode} {
       ${requires}${buildState.tabsCode[i]}}\n`;
     }
-    return code + '}';
+    code += '}';
+    console.log(code);
+    return code;
   }
 
   isString(variable) {
@@ -235,7 +237,6 @@ class BuildOptions extends React.Component {
           }
           saveContract={() => {
             let code = this.formCode();
-            console.log(code);
             let filename = fileName.replace(/\s+/g, '_') + '.sol';
             writeFile(join('saved_contracts', filename), code, err => {
               if (err) throw err;
