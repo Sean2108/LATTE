@@ -6,15 +6,15 @@ bool voted;
 address payable delegate;
 string vote;
 }
+Voter private voter;
+mapping(string => uint) vote_count;
+uint private winning_vote_count;
+string private winning_proposal_name;
 Voter private sender_details;
 address payable private delegated_to;
 Voter private delegate_details;
 string private delegate_vote;
-mapping(string => uint) vote_count;
-Voter private voter;
 mapping(string => uint) voute_count;
-uint private winning_vote_count;
-string private winning_proposal_name;
 address payable private chairperson;
 Voter private chairperson_voter;
 mapping(address => Voter) voter_details;
@@ -39,13 +39,13 @@ require(voter_details[msg.sender].voted == false, "Already voted.");
 voter = voter_details[msg.sender];
 voter.voted = true;
 voter.vote = proposal;
-voute_count[proposal] += voter.weight;
+vote_count[proposal] += voter.weight;
 if (vote_count[proposal] > winning_vote_count) {
 winning_vote_count = vote_count[proposal];
 winning_proposal_name = proposal;
 } 
 }
-function winningProposal() public payable returns (string memory) {
+function winningProposal() public view returns (string memory) {
       return winning_proposal_name;
 }
 function delegate(address payable to) public payable  {

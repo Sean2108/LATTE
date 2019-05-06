@@ -24,7 +24,9 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     textAlign: 'center',
-    color: 'theme.palette.text.secondary'
+    color: 'theme.palette.text.secondary',
+    resize: 'vertical',
+    overflow: 'hidden'
   },
   tooltipFont: {
     fontSize: 14
