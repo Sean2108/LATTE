@@ -92,6 +92,12 @@ class Connect extends React.Component {
     );
   };
 
+  _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      this.login();
+    }
+  }
+
   changeProtocol = event => {
     this.setState({
       protocol: event.target.value
@@ -140,7 +146,7 @@ class Connect extends React.Component {
             error={this.state.addressEmpty || this.state.connectionFailed}
           >
             <InputLabel htmlFor="name-simple"> Blockchain Address </InputLabel>
-            <Input id="address" />
+            <Input id="address" onKeyDown={this._handleKeyDown} />
             {this.state.addressEmpty ? (
               <FormHelperText> Address cannot be empty! </FormHelperText>
             ) : null}
@@ -151,7 +157,7 @@ class Connect extends React.Component {
             error={this.state.portEmpty || this.state.connectionFailed}
           >
             <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>
-            <Input id="port" />
+            <Input id="port" onKeyDown={this._handleKeyDown}/>
             {this.state.portEmpty ? (
               <FormHelperText> Port cannot be empty! </FormHelperText>
             ) : null}
