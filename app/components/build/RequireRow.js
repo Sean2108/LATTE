@@ -69,6 +69,8 @@ class RequireRow extends React.Component {
           <TextField
             id="standard-name"
             label="Variable 1"
+            multiline
+            rowsMax="3"
             className={classes.textField}
             value={require.displayVar1}
             onChange={this.handleChange('displayVar1')}
@@ -99,6 +101,8 @@ class RequireRow extends React.Component {
           <TextField
             id="standard-name"
             label="Variable 2"
+            multiline
+            rowsMax="3"
             className={classes.textField}
             value={require.displayVar2}
             onChange={this.handleChange('displayVar2')}
@@ -111,6 +115,8 @@ class RequireRow extends React.Component {
             <TextField
               id="standard-name"
               label="Failure Message"
+              multiline
+              rowsMax="3"
               className={classes.textField}
               value={require.requireMessage}
               onChange={this.handleChange('requireMessage')}

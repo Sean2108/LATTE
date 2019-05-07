@@ -67,6 +67,8 @@ class ReturnNode extends React.Component {
             id="standard-name"
             label="Variable Name"
             className={classes.textField}
+            multiline
+            rowsMax="3"
             value={this.state.variableSelected}
             onChange={event =>
               this.setState({ variableSelected: event.target.value })
@@ -95,6 +97,8 @@ class ReturnNode extends React.Component {
           <TextField
             id="standard-name"
             label="Assigned Value"
+            multiline
+            rowsMax="3"
             className={classes.textField}
             onChange={event =>
               this.setState({ assignedVal: event.target.value })
