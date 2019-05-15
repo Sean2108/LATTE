@@ -21,7 +21,6 @@ function TabContainer(props) {
         paddingBottom: 24
       }}
     >
-      
       {props.children}
     </Typography>
   );
@@ -83,7 +82,13 @@ class BuildTabs extends React.Component {
   };
 
   render() {
-    const { classes, variables, onTabsChange, buildState } = this.props;
+    const {
+      classes,
+      variables,
+      onTabsChange,
+      buildState,
+      bitsMode
+    } = this.props;
     const { value } = this.state;
 
     return (
@@ -131,6 +136,7 @@ class BuildTabs extends React.Component {
                   constructorParams: params
                 });
               }}
+              bitsMode={bitsMode}
             />
           </TabContainer>
         )}
@@ -166,6 +172,7 @@ class BuildTabs extends React.Component {
                   updateDiagram={diagram =>
                     this.handleOnChange(diagram, i, 'diagrams')
                   }
+                  bitsMode={bitsMode}
                 />
               </TabContainer>
             )
@@ -221,7 +228,6 @@ class BuildTabs extends React.Component {
               }
             }}
           >
-            
             Add <AddIcon className={classes.rightIcon} />
           </Button>
         </Popover>
@@ -234,7 +240,8 @@ BuildTabs.propTypes = {
   classes: PropTypes.object.isRequired,
   variables: PropTypes.object.isRequired,
   onTabsChange: PropTypes.func.isRequired,
-  buildState: PropTypes.object.isRequired
+  buildState: PropTypes.object.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles)(BuildTabs);

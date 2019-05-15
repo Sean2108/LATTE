@@ -46,7 +46,7 @@ class Build extends React.Component {
   };
 
   render() {
-    const { classes, theme, onback, connection } = this.props;
+    const { classes, theme, onback, connection, bitsMode } = this.props;
 
     const { tabs, tabsCode, variables } = this.state;
 
@@ -59,12 +59,14 @@ class Build extends React.Component {
               variables={variables}
               onTabsChange={value => this.setState(value)}
               buildState={this.state}
+              bitsMode={bitsMode}
             />
             <BuildOptions
               onback={onback}
               connection={connection}
               buildState={this.state}
               loadState={state => this.setState(state)}
+              bitsMode={bitsMode}
             />
           </div>
         </div>
@@ -77,7 +79,8 @@ Build.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
   onback: PropTypes.func.isRequired,
-  connection: PropTypes.object.isRequired
+  connection: PropTypes.object.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

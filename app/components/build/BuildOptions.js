@@ -97,35 +97,22 @@ class BuildOptions extends React.Component {
 
   formCode() {
     let buildState = this.props.buildState;
+    let bitsMode = this.props.bitsMode;
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
-    for (const [name, params] of Object.entries(buildState.entities)) {
-      code += `struct ${name} {\n${params
-        .filter(param => param.name)
-        .map(param => `${param.type} ${param.name};\n`)
-        .join('')}}\n`;
-    }
-    for (const [name, type] of Object.entries(buildState.variables)) {
-      if (typeof type === 'object' && type.type === 'mapping') {
-        code += 'inner' in type ? `mapping(${type.from} => mapping(${type.inner === 'address payable' ? 'address' : type.inner} => ${type.to})) ${name};\n` : `mapping(${type.from} => ${type.to}) ${name};\n`;
-      } else if (type) {
-        code += `${type} private ${name};\n`;
-      }
-    }
-    for (const [name, params] of Object.entries(buildState.events)) {
-      code += `event ${name}(${params
-        .filter(param => param.name)
-        .map(param => `${param.type} ${param.name}`)
-        .join(', ')});\n`;
-    }
+    code += this.formStructsEvents(buildState.entities, bitsMode, false);
+    code += this.formVars(buildState.variables);
+    code += this.formStructsEvents(buildState.events, bitsMode, true);
     for (let i = 0; i < buildState.tabsCode.length; i++) {
       let functionName =
         buildState.tabs[i + 1] === 'Initial State'
           ? 'constructor'
           : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i]
-        ? ['bool', 'address', 'address payable', 'uint', 'int'].includes(buildState.tabsReturn[i]) 
-        ? `returns (${buildState.tabsReturn[i]})`
-        : `returns (${buildState.tabsReturn[i]} memory)`
+        ? ['bool', 'address', 'address payable', 'uint', 'int'].includes(
+            buildState.tabsReturn[i]
+          )
+          ? `returns (${buildState.tabsReturn[i]})`
+          : `returns (${buildState.tabsReturn[i]} memory)`
         : '';
       let requires = buildState.tabsRequire[i]
         .filter(req => req.var1 && req.var2 && req.comp)
@@ -149,14 +136,63 @@ class BuildOptions extends React.Component {
         .map(
           element =>
             element.type === 'string'
-              ? `${element.type} memory ${element.name}`
-              : `${element.type} ${element.name}`
+              ? bitsMode && element.bits !== ''
+                ? `bytes${element.bits} memory ${element.name}`
+                : `${element.type} memory ${element.name}`
+              : bitsMode
+                ? `${element.type}${element.bits} ${element.name}`
+                : `${element.type} ${element.name}`
         )
-        .join(', ')}) public ${buildState.isView[i] && buildState.tabs[i+1] !== 'Initial State' ? 'view' : 'payable'} ${returnCode} {
+        .join(', ')}) public ${
+        buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
+          ? 'view'
+          : 'payable'
+      } ${returnCode} {
       ${requires}${buildState.tabsCode[i]}}\n`;
     }
     code += '}';
     console.log(code);
+    return code;
+  }
+
+  formStructsEvents(entities, bitsMode, isEvent) {
+    let code = '';
+    for (const [name, params] of Object.entries(entities)) {
+      code += `${isEvent ? 'event' : 'struct'} ${name} ${
+        isEvent ? '(' : '{\n'
+      }${params
+        .filter(param => param.name)
+        .map(param => {
+          let suffix = isEvent ? '' : ';\n';
+          if (bitsMode) {
+            if (param.type === 'string' && param.bits !== '') {
+              return `bytes${param.bits} ${param.name}${suffix}`;
+            }
+            return `${param.type}${param.bits} ${param.name}${suffix}`;
+          }
+          return `${param.type} ${param.name}${suffix}`;
+        })
+        .join(isEvent ? ', ' : '')}${isEvent ? ')' : '}'}${
+        isEvent ? ';' : ''
+      }\n`;
+    }
+    return code;
+  }
+
+  formVars(variables) {
+    let code = '';
+    for (const [name, type] of Object.entries(variables)) {
+      if (typeof type === 'object' && type.type === 'mapping') {
+        code +=
+          'inner' in type
+            ? `mapping(${type.from} => mapping(${
+                type.inner === 'address payable' ? 'address' : type.inner
+              } => ${type.to})) ${name};\n`
+            : `mapping(${type.from} => ${type.to}) ${name};\n`;
+      } else if (type) {
+        code += `${type} private ${name};\n`;
+      }
+    }
     return code;
   }
 
@@ -198,7 +234,14 @@ class BuildOptions extends React.Component {
   }
 
   render() {
-    const { classes, theme, onback, buildState, loadState } = this.props;
+    const {
+      classes,
+      theme,
+      onback,
+      buildState,
+      loadState,
+      bitsMode
+    } = this.props;
     const { anchorEl, dataOp, fileName, files } = this.state;
     const open = Boolean(anchorEl);
 
@@ -334,7 +377,8 @@ BuildOptions.propTypes = {
   onback: PropTypes.func.isRequired,
   connection: PropTypes.object.isRequired,
   buildState: PropTypes.object.isRequired,
-  loadState: PropTypes.func.isRequired
+  loadState: PropTypes.func.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

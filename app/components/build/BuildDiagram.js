@@ -71,7 +71,7 @@ class BuildDiagram extends React.Component {
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
-          this.buildParser.reset(this.props.varList, this.props.functionParams, this.props.entities);
+          this.buildParser.reset(this.props.varList, this.props.functionParams, this.props.events, this.props.entities, this.props.bitsMode);
           let code = this.buildParser.parse(this.start);
           this.props.onChangeLogic(code);
           this.props.onChangeReturn(this.buildParser.getReturnVar());
@@ -315,7 +315,8 @@ BuildDiagram.propTypes = {
   onChangeReturn: PropTypes.func.isRequired,
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func,
-  updateDiagram: PropTypes.func.isRequired
+  updateDiagram: PropTypes.func.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);

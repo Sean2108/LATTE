@@ -14,7 +14,8 @@ class InitialStateTab extends React.Component {
       updateEntities,
       updateEvents,
       params,
-      updateParams
+      updateParams,
+      bitsMode
     } = this.props;
     return (
       <div>
@@ -24,6 +25,7 @@ class InitialStateTab extends React.Component {
           updateVariables={updateEvents}
           initialVars={events}
           varListTooltipText={`The names and types of information that will be announced with the event.`}
+          bitsMode={bitsMode}
         />
         <br />
         <StructList
@@ -32,6 +34,7 @@ class InitialStateTab extends React.Component {
           updateVariables={updateEntities}
           initialVars={entities}
           varListTooltipText={'The names and types of information that the entity will contain.'}
+          bitsMode={bitsMode}
         />
         <br />
         {params &&

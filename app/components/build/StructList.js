@@ -57,7 +57,8 @@ class StructList extends React.Component {
       updateVariables,
       initialVars,
       tooltipText,
-      varListTooltipText
+      varListTooltipText,
+      bitsMode
     } = this.props;
     return (
       <Paper className={classes.paper}>
@@ -77,6 +78,7 @@ class StructList extends React.Component {
                 }
                 vars={initialVars[key]}
                 tooltipText={varListTooltipText}
+                bitsMode={bitsMode}
               />
             </Grid>
           ))}
@@ -120,7 +122,8 @@ StructList.propTypes = {
   updateVariables: PropTypes.func,
   initialVars: PropTypes.object.isRequired,
   tooltipText: PropTypes.string.isRequired,
-  varListTooltipText: PropTypes.string.isRequired
+  varListTooltipText: PropTypes.string.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

@@ -22,7 +22,7 @@ const styles = theme => ({
 
 class VariableRow extends React.Component {
   render() {
-    const { classes, theme, updateVariables, val } = this.props;
+    const { classes, theme, updateVariables, val, bitsMode } = this.props;
     return (
       <div>
         <FormControl className={classes.formControl}>
@@ -49,7 +49,7 @@ class VariableRow extends React.Component {
           <Select
             value={val.type}
             onChange={event =>
-              updateVariables({ ...val, type: event.target.value })
+              updateVariables({ ...val, type: event.target.value, bits: '' })
             }
             inputProps={{
               name: 'Var Type',
@@ -62,6 +62,53 @@ class VariableRow extends React.Component {
             <MenuItem value="string"> Text </MenuItem>
           </Select>
         </FormControl>
+
+        {bitsMode &&
+          val.type === 'uint' && (
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="protocol"> Number of Bits </InputLabel>
+              <Select
+                value={val.bits}
+                onChange={event =>
+                  updateVariables({ ...val, bits: event.target.value })
+                }
+                inputProps={{
+                  name: 'Number of Bits',
+                  id: 'type'
+                }}
+              >
+                <MenuItem value=""> None </MenuItem>
+                <MenuItem value="8"> 8 </MenuItem>
+                <MenuItem value="32"> 32 </MenuItem>
+                <MenuItem value="64"> 64 </MenuItem>
+                <MenuItem value="128"> 128 </MenuItem>
+                <MenuItem value="256"> 256 </MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
+        {bitsMode &&
+          val.type === 'string' && (
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="protocol"> Number of Bytes </InputLabel>
+              <Select
+                value={val.bits}
+                onChange={event =>
+                  updateVariables({ ...val, bits: event.target.value })
+                }
+                inputProps={{
+                  name: 'Number of Bytes',
+                  id: 'type'
+                }}
+              >
+                <MenuItem value=""> None </MenuItem>
+                <MenuItem value="4"> 4 </MenuItem>
+                <MenuItem value="8"> 8 </MenuItem>
+                <MenuItem value="16"> 16 </MenuItem>
+                <MenuItem value="32"> 32 </MenuItem>
+              </Select>
+            </FormControl>
+          )}
       </div>
     );
   }
@@ -71,7 +118,8 @@ VariableRow.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
   updateVariables: PropTypes.func.isRequired,
-  val: PropTypes.object.isRequired
+  val: PropTypes.object.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

@@ -26,10 +26,10 @@ const styles = theme => ({
 
 class VariableList extends React.Component {
   render() {
-    const { classes, theme, header, updateVariables, vars, tooltipText } = this.props;
+    const { classes, theme, header, updateVariables, vars, tooltipText, bitsMode } = this.props;
 
     if (vars.length === 0) {
-      vars.push({ name: '', displayName: '', type: 'uint' });
+      vars.push({ name: '', displayName: '', type: 'uint', bits: '' });
     }
 
     return (
@@ -48,6 +48,7 @@ class VariableList extends React.Component {
               variables[index] = val;
               updateVariables(variables);
             }}
+            bitsMode={bitsMode}
           />
         ))}
         <Button
@@ -57,7 +58,7 @@ class VariableList extends React.Component {
           onClick={() =>
             updateVariables([
               ...vars,
-              { name: '', displayName: '', type: 'uint' }
+              { name: '', displayName: '', type: 'uint', bits: '' }
             ])
           }
         >
@@ -75,7 +76,8 @@ VariableList.propTypes = {
   header: PropTypes.string.isRequired,
   updateVariables: PropTypes.func.isRequired,
   vars: PropTypes.array.isRequired,
-  tooltipText: PropTypes.string.isRequired
+  tooltipText: PropTypes.string.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

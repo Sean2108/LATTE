@@ -6,13 +6,21 @@ export class BuildParser {
     this.onVariablesChange = onVariablesChange;
   }
 
-  reset(varList, functionParams, structList = null) {
+  reset(
+    varList,
+    functionParams,
+    eventList = null,
+    structList = null,
+    bitsMode = false
+  ) {
     this.variables = {};
     this.returnVar = null;
     this.varList = varList;
     this.functionParams = functionParams;
+    this.eventList = eventList;
     this.structList = structList;
     this.isView = true;
+    this.bitsMode = bitsMode;
   }
 
   getReturnVar() {
@@ -92,14 +100,18 @@ export class BuildParser {
       let intersection = this.getIntersection(trueNextNode, falseNextNode);
       if (intersection) {
         let elseCode = this.traverseNextNode(falseNextNode, intersection);
-        return `if (${conditionCode}) {\n${this.traverseNextNode(trueNextNode, intersection)}} ${
+        return `if (${conditionCode}) {\n${this.traverseNextNode(
+          trueNextNode,
+          intersection
+        )}} ${
           elseCode !== '' ? `else {\n${elseCode}}` : ''
         }\n${this.traverseNextNode(intersection, stopNode)}`;
       }
       let elseCode = this.traverseNextNode(falseNextNode, stopNode);
-      return `if (${conditionCode}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} ${
-        elseCode !== '' ? `else {\n${elseCode}}` : ''
-      }\n`;
+      return `if (${conditionCode}) {\n${this.traverseNextNode(
+        trueNextNode,
+        stopNode
+      )}} ${elseCode !== '' ? `else {\n${elseCode}}` : ''}\n`;
     }
     let curNodeCode =
       node.name === 'Start' ? '' : this.parseNode(node.data) + '\n';
@@ -183,14 +195,30 @@ export class BuildParser {
           return true;
         }
         return false;
+      case 'event':
+        if (this.bitsMode) {
+          this.bitsModeParseParams(
+            nodeData.params,
+            this.eventList,
+            nodeData.variableSelected
+          );
+        }
+        return true;
       case 'entity':
         parsedLhs = this.parseVariable(nodeData.variableSelected);
+        if (this.bitsMode) {
+          this.bitsModeParseParams(
+            nodeData.params,
+            this.structList,
+            nodeData.variableSelected
+          );
+        }
         this.variables[parsedLhs.name] = nodeData.assignVar;
         return true;
       case 'transfer':
         parsedLhs = this.parseVariable(nodeData.variableSelected);
         parsedRhs = this.parseVariable(nodeData.value);
-        if (parsedLhs.type === 'var') {
+        if (!this.bitsMode && parsedLhs.type === 'var') {
           this.variables[parsedLhs.name] = 'uint';
         }
         if (parsedRhs.type === 'var') {
@@ -199,6 +227,15 @@ export class BuildParser {
         return true;
     }
     return true;
+  }
+
+  bitsModeParseParams(params, infoList, varSelected) {
+    for (let i = 0; i < params.length; i++) {
+      let param = params[i];
+      let info = infoList[varSelected][i];
+      this.variables[this.parseVariable(param).name] =
+        `${info.type === 'string' && info.bits ? 'bytes' : info.type}${info['bits']}`;
+    }
   }
 
   parseNode(nodeData) {
@@ -252,18 +289,23 @@ export class BuildParser {
     ) {
       this.variables[parsedLhs.name] = parsedRhs.type;
     } else if (parsedLhs.type !== parsedRhs.type) {
-      console.log(`invalid assignment at node ${data.variableSelected} ${data.assignment} ${data.assignedVal}`);
+      console.log(
+        `invalid assignment at node ${data.variableSelected} ${
+          data.assignment
+        } ${data.assignedVal}`
+      );
     }
     return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
   }
 
   parseEventNode(data) {
-    let params = data.params.map(param => this.parseVariable(param).name).join(', ');
+    let params = data.params
+      .map(param => this.parseVariable(param).name)
+      .join(', ');
     return `emit ${data.variableSelected}(${params});`;
   }
 
   parseEntityNode(data) {
-    console.log(data);
     let parsedLhs = this.parseVariable(data.assignVar);
     this.variables[parsedLhs.name] = data.variableSelected;
     let params = data.params

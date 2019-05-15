@@ -12,11 +12,21 @@ class DefaultBuildTab extends React.Component {
     this.varList = this.props.varList;
   }
 
-  flattenParamsToObject(params) {
+  flattenParamsToObject(params, bitsMode) {
     return params
       .filter(element => element.name)
       .reduce((result, currentObject) => {
-        result[currentObject.name] = currentObject.type;
+        if (bitsMode) {
+          if (currentObject.type === 'string' && currentObject.bits !== '') {
+            result[currentObject.name] = `bytes${currentObject.bits}`;
+          }
+          else {
+            result[currentObject.name] = `${currentObject.type}${currentObject.bits}`;
+          }
+        }
+        else {
+          result[currentObject.name] = currentObject.type;
+        }
         return result;
       }, {});
   }
@@ -37,9 +47,10 @@ class DefaultBuildTab extends React.Component {
       requires,
       diagram,
       onChangeView,
-      updateDiagram
+      updateDiagram,
+      bitsMode
     } = this.props;
-    let variables = this.flattenParamsToObject(params);
+    let variables = this.flattenParamsToObject(params, bitsMode);
     return (
       <div>
         
@@ -48,6 +59,7 @@ class DefaultBuildTab extends React.Component {
           updateVariables={vars => onChangeParams(vars)}
           vars={params}
           tooltipText={'These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below.'}
+          bitsMode={bitsMode}
         />
         <br />
         <RequiresList
@@ -70,6 +82,7 @@ class DefaultBuildTab extends React.Component {
           diagram={diagram}
           onChangeView={onChangeView}
           updateDiagram={updateDiagram}
+          bitsMode={bitsMode}
         />
       </div>
     );
@@ -89,7 +102,8 @@ DefaultBuildTab.propTypes = {
   requires: PropTypes.array.isRequired,
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func.isRequired,
-  updateDiagram: PropTypes.func.isRequired
+  updateDiagram: PropTypes.func.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default DefaultBuildTab;
