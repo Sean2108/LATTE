@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const styles = theme => ({
   toolbar: {
@@ -21,15 +23,27 @@ const styles = theme => ({
 
 class Settings extends React.Component {
   render() {
-    const { classes, theme } = this.props;
+    const { classes, theme, bitsMode, changeBitsMode } = this.props;
 
     return (
       <main align="center" className={classes.content}>
         <div className={classes.toolbar} />
         <Typography variant="title" noWrap>
-          
           Settings
         </Typography>
+        <FormControlLabel
+            control={
+              <Switch
+                checked={bitsMode}
+                onChange={event =>
+                  changeBitsMode(event.target.checked)
+                }
+                value="bitsMode"
+                color="primary"
+              />
+            }
+            label="Advanced Feature: Set Variable Bit Size to Reduce Gas"
+          />
       </main>
     );
   }
@@ -37,7 +51,9 @@ class Settings extends React.Component {
 
 Settings.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  theme: PropTypes.object.isRequired,
+  bitsMode: PropTypes.bool.isRequired,
+  changeBitsMode: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {

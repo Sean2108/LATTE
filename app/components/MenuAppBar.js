@@ -20,6 +20,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Connect from './Connect';
 import Settings from './Settings';
 import Build from './build/Build';
+import { existsSync, readFile, writeFile } from 'fs';
 
 const drawerWidth = 240;
 
@@ -90,11 +91,14 @@ const selection = {
   BUILD: 'build'
 };
 
+const settingsFile = './settings.json';
+
 class MiniDrawer extends React.Component {
   state = {
     open: false,
     selected: selection.CONNECT,
-    connection: null
+    connection: null,
+    bitsMode: false
   };
 
   handleDrawerOpen = () => {
@@ -125,15 +129,46 @@ class MiniDrawer extends React.Component {
       case selection.CONNECT:
         return <Connect onclick={this.goToBuild} />;
       case selection.SETTINGS:
-        return <Settings />;
+        return (
+          <Settings
+            bitsMode={this.state.bitsMode}
+            changeBitsMode={newVal => {
+              let newData = {bitsMode: newVal};
+              this.setState(newData);
+              writeFile(
+                settingsFile,
+                JSON.stringify(newData),
+                err => {
+                  if (err) throw err;
+                }
+              );
+            }}
+          />
+        );
       case selection.BUILD:
         return (
-          <Build onback={this.goToConnect} connection={this.state.connection} />
+          <Build
+            onback={this.goToConnect}
+            connection={this.state.connection}
+            bitsMode={this.state.bitsMode}
+          />
         );
       default:
         return null;
     }
   };
+
+  componentWillMount() {
+    if (existsSync(settingsFile)) {
+      readFile(settingsFile, (err, data) => {
+        if (err) throw err;
+        let parsedData = JSON.parse(data);
+        if ('bitsMode' in parsedData) {
+          this.setState({ bitsMode: parsedData.bitsMode });
+        }
+      });
+    }
+  }
 
   render() {
     const { classes, theme } = this.props;
@@ -176,7 +211,6 @@ class MiniDrawer extends React.Component {
         >
           <div className={classes.toolbar}>
             <IconButton onClick={this.handleDrawerClose}>
-              
               {theme.direction === 'rtl' ? (
                 <ChevronRightIcon />
               ) : (
