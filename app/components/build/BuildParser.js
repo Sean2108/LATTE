@@ -71,7 +71,6 @@ export class BuildParser {
     if (!node || (stopNode && node === stopNode)) {
       return '';
     }
-    console.log(node.data);
     if (node instanceof DiamondNodeModel) {
       let falseNextNode = this.getNextNode(node.outPortFalse);
       let trueNextNode = this.getNextNode(node.outPortTrue);
@@ -264,14 +263,15 @@ export class BuildParser {
   }
 
   parseEntityNode(data) {
-    let parsedLhs = this.parseVariable(data.variableSelected);
-    this.variables[parsedLhs.name] = data.assignVar;
+    console.log(data);
+    let parsedLhs = this.parseVariable(data.assignVar);
+    this.variables[parsedLhs.name] = data.variableSelected;
     let params = data.params
       .map(param => this.parseVariable(param).name)
       .join(', ');
-    return `${data.isMemory ? `${entityName} memory ` : ''}${
+    return `${data.isMemory ? `${data.variableSelected} memory ` : ''}${
       parsedLhs.name
-    } = ${data.assignVar}(${params});`;
+    } = ${data.variableSelected}(${params});`;
   }
 
   parseTransferNode(data) {
