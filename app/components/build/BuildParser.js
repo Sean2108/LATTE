@@ -1,4 +1,4 @@
-import { DiamondNodeModel } from './diagram/DiamondNodeModel';
+import { DiamondNodeModel } from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 
 export class BuildParser {
   constructor(onVariablesChange) {
@@ -50,7 +50,7 @@ export class BuildParser {
     }
     visitedNodes.add(node);
     if (node instanceof DiamondNodeModel) {
-      this.parseNode('Compare: ' + node.name);
+      this.parseNode(node.data);
       let falseNextNode = this.getNextNode(node.outPortFalse);
       let trueNextNode = this.getNextNode(node.outPortTrue);
       this.traverseForVariables(
@@ -60,8 +60,8 @@ export class BuildParser {
       );
       this.traverseForVariables(trueNextNode, unparsedStatements, visitedNodes);
     }
-    if (!this.parseNodeForVariables(node.name)) {
-      unparsedStatements.add(node.name);
+    if (node.name !== 'Start' && !this.parseNodeForVariables(node.data)) {
+      unparsedStatements.add(node.data);
     }
     let nextNode = this.getNextNodeForDefaultNode(node);
     this.traverseForVariables(nextNode, unparsedStatements, visitedNodes);
@@ -71,23 +71,21 @@ export class BuildParser {
     if (!node || (stopNode && node === stopNode)) {
       return '';
     }
+    console.log(node.data);
     if (node instanceof DiamondNodeModel) {
       let falseNextNode = this.getNextNode(node.outPortFalse);
       let trueNextNode = this.getNextNode(node.outPortTrue);
       let trueWhileCode = this.generateCodeForCycle(node, true);
+      let conditionCode = this.parseNode(node.data);
       if (trueWhileCode) {
-        return `while (${this.parseNode(
-          'Compare: ' + node.name
-        )}) {\n${trueWhileCode}}\n${this.traverseNextNode(
+        return `while (${conditionCode}) {\n${trueWhileCode}}\n${this.traverseNextNode(
           falseNextNode,
           stopNode
         )}`;
       }
       let falseWhileCode = this.generateCodeForCycle(node, false);
       if (falseWhileCode) {
-        return `while (!(${this.parseNode(
-          'Compare: ' + node.name
-        )})) {\n${falseWhileCode}}\n${this.traverseNextNode(
+        return `while (!(${conditionCode})) {\n${falseWhileCode}}\n${this.traverseNextNode(
           trueNextNode,
           stopNode
         )}`;
@@ -95,21 +93,17 @@ export class BuildParser {
       let intersection = this.getIntersection(trueNextNode, falseNextNode);
       if (intersection) {
         let elseCode = this.traverseNextNode(falseNextNode, intersection);
-        return `if (${this.parseNode(
-          'Compare: ' + node.name
-        )}) {\n${this.traverseNextNode(trueNextNode, intersection)}} ${
+        return `if (${conditionCode}) {\n${this.traverseNextNode(trueNextNode, intersection)}} ${
           elseCode !== '' ? `else {\n${elseCode}}` : ''
         }\n${this.traverseNextNode(intersection, stopNode)}`;
       }
       let elseCode = this.traverseNextNode(falseNextNode, stopNode);
-      return `if (${this.parseNode(
-        'Compare: ' + node.name
-      )}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} ${
+      return `if (${conditionCode}) {\n${this.traverseNextNode(trueNextNode, stopNode)}} ${
         elseCode !== '' ? `else {\n${elseCode}}` : ''
       }\n`;
     }
     let curNodeCode =
-      node.name === 'Start' ? '' : this.parseNode(node.name) + '\n';
+      node.name === 'Start' ? '' : this.parseNode(node.data) + '\n';
     let nextNode = this.getNextNodeForDefaultNode(node);
     if (!nextNode) {
       return curNodeCode;
@@ -128,7 +122,7 @@ export class BuildParser {
       if (node instanceof DiamondNodeModel) {
         return null;
       }
-      code += this.parseNode(node.name) + '\n';
+      code += this.parseNode(node.data) + '\n';
       node = this.getNextNodeForDefaultNode(node);
     }
     return null;
@@ -150,14 +144,12 @@ export class BuildParser {
     return this.getNextNode(node.getOutPorts()[0]);
   }
 
-  parseNodeForVariables(nodeCode) {
-    let type, code, lhs, rhs, parsedLhs, parsedRhs, params, comp;
-    [type, code] = nodeCode.split(': ');
-    switch (type) {
-      case 'Assignment':
-        [lhs, comp, rhs] = code.split(/ ([\*\/+-]?=) /);
-        parsedLhs = this.parseVariable(lhs);
-        parsedRhs = this.parseVariable(rhs);
+  parseNodeForVariables(nodeData) {
+    let parsedLhs, parsedRhs;
+    switch (nodeData.type) {
+      case 'assignment':
+        parsedLhs = this.parseVariable(nodeData.variableSelected);
+        parsedRhs = this.parseVariable(nodeData.assignedVal);
         if (!parsedLhs.type || !parsedRhs.type) {
           return true;
         }
@@ -192,17 +184,13 @@ export class BuildParser {
           return true;
         }
         return false;
-      case 'New Entity':
-        let entityName;
-        [lhs, rhs] = code.split(' = ');
-        [entityName, params] = rhs.split('(');
-        parsedLhs = this.parseVariable(lhs);
-        this.variables[parsedLhs.name] = entityName;
+      case 'entity':
+        parsedLhs = this.parseVariable(nodeData.variableSelected);
+        this.variables[parsedLhs.name] = nodeData.assignVar;
         return true;
-      case 'Transfer':
-        [lhs, rhs] = code.split(' to ');
-        parsedLhs = this.parseVariable(lhs);
-        parsedRhs = this.parseVariable(rhs);
+      case 'transfer':
+        parsedLhs = this.parseVariable(nodeData.variableSelected);
+        parsedRhs = this.parseVariable(nodeData.value);
         if (parsedLhs.type === 'var') {
           this.variables[parsedLhs.name] = 'uint';
         }
@@ -214,39 +202,35 @@ export class BuildParser {
     return true;
   }
 
-  parseNode(nodeCode) {
-    let type, code;
-    [type, code] = nodeCode.split(': ');
-    switch (type) {
-      case 'Assignment':
+  parseNode(nodeData) {
+    switch (nodeData.type) {
+      case 'assignment':
         this.isView = false;
-        return this.parseAssignmentNode(code);
-      case 'Emit Event':
+        return this.parseAssignmentNode(nodeData);
+      case 'event':
         this.isView = false;
-        return this.parseEventNode(code);
-      case 'New Entity':
+        return this.parseEventNode(nodeData);
+      case 'entity':
         this.isView = false;
-        return this.parseEntityNode(code);
-      case 'Transfer':
+        return this.parseEntityNode(nodeData);
+      case 'transfer':
         this.isView = false;
-        return this.parseTransferNode(code);
-      case 'Return':
-        let returnVar = this.parseVariable(code);
+        return this.parseTransferNode(nodeData);
+      case 'return':
+        let returnVar = this.parseVariable(nodeData.variableSelected);
         this.returnVar = returnVar.type;
         return `return ${returnVar.name};`;
-      case 'Compare':
-        return this.parseCompareNode(code);
+      case 'conditional':
+        return this.parseCompareNode(nodeData);
     }
     return '';
   }
 
-  parseAssignmentNode(code) {
-    let lhs, rhs, comp, parsedLhs, parsedRhs;
-    [lhs, comp, rhs] = code.split(/ ([\*\/+-]?=) /);
-    parsedLhs = this.parseVariable(lhs);
-    parsedRhs = this.parseVariable(rhs);
+  parseAssignmentNode(data) {
+    let parsedLhs = this.parseVariable(data.variableSelected);
+    let parsedRhs = this.parseVariable(data.assignedVal);
     if (!parsedLhs.type || !parsedRhs.type) {
-      return `${parsedLhs.name} ${comp} ${parsedRhs.name};`;
+      return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
     }
     if ('mapName' in parsedLhs) {
       let lhsType =
@@ -269,63 +253,50 @@ export class BuildParser {
     ) {
       this.variables[parsedLhs.name] = parsedRhs.type;
     } else if (parsedLhs.type !== parsedRhs.type) {
-      console.log(`invalid assignment at node ${code}`);
+      console.log(`invalid assignment at node ${data.variableSelected} ${data.assignment} ${data.assignedVal}`);
     }
-    return `${parsedLhs.name} ${comp} ${parsedRhs.name};`;
+    return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
   }
 
-  parseEventNode(code) {
-    let eventName, params;
-    [eventName, params] = code.split('(');
-    params = params
-      .replace(')', '')
-      .split(', ')
+  parseEventNode(data) {
+    let params = data.params.map(param => this.parseVariable(param).name).join(', ');
+    return `emit ${data.variableSelected}(${params});`;
+  }
+
+  parseEntityNode(data) {
+    let parsedLhs = this.parseVariable(data.variableSelected);
+    this.variables[parsedLhs.name] = data.assignVar;
+    let params = data.params
       .map(param => this.parseVariable(param).name)
       .join(', ');
-    return `emit ${eventName}(${params});`;
+    return `${data.isMemory ? `${entityName} memory ` : ''}${
+      parsedLhs.name
+    } = ${data.assignVar}(${params});`;
   }
 
-  parseEntityNode(code) {
-    let entityName, lhs, rhs, parsedLhs, paramsStorage, params, memory;
-    [lhs, rhs] = code.split(' = ');
-    [entityName, paramsStorage] = rhs.split('(');
-    [params, memory] = paramsStorage.split(') -> in ');
-    parsedLhs = this.parseVariable(lhs);
-    this.variables[parsedLhs.name] = entityName;
-    params = params
-      .split(', ')
-      .map(param => this.parseVariable(param).name)
-      .join(', ');
-    return `${memory === 'memory' ? `${entityName} memory ` : ''}${parsedLhs.name} = ${entityName}(${params});`;
-  }
-
-  parseTransferNode(code) {
-    let lhs, rhs, parsedLhs, parsedRhs;
-    [lhs, rhs] = code.split(' to ');
-    parsedLhs = this.parseVariable(lhs);
-    parsedRhs = this.parseVariable(rhs);
+  parseTransferNode(data) {
+    let parsedLhs = this.parseVariable(data.value);
+    let parsedRhs = this.parseVariable(data.variableSelected);
     if (parsedLhs.type !== 'uint') {
-      console.log(`value should be an integer at node ${code}`);
+      console.log(`value should be an integer at transfer node`);
     }
     if (parsedRhs.type !== 'address payable') {
       console.log(
-        `transfer target should be a payable address at node ${code}`
+        `transfer target should be a payable address at transfer node`
       );
     }
     return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
   }
 
-  parseCompareNode(code) {
-    let comp, lhs, rhs, parsedLhs, parsedRhs;
-    [lhs, comp, rhs] = code.split(/ ([!><=]=|>|<) /);
-    parsedLhs = this.parseVariable(lhs);
-    parsedRhs = this.parseVariable(rhs);
+  parseCompareNode(data) {
+    let parsedLhs = this.parseVariable(data.var1);
+    let parsedRhs = this.parseVariable(data.var2);
     if (parsedLhs.type !== parsedRhs.type) {
       let mismatch = this.checkIntUintMismatch(
         parsedLhs,
         parsedRhs,
-        `uint(${parsedLhs.name}) ${comp} ${parsedRhs.name}`,
-        `${parsedLhs.name} ${comp} uint(${parsedRhs.name})`
+        `uint(${parsedLhs.name}) ${data.comp} ${parsedRhs.name}`,
+        `${parsedLhs.name} ${data.comp} uint(${parsedRhs.name})`
       );
       if (mismatch) {
         return mismatch;
@@ -338,7 +309,7 @@ export class BuildParser {
     ) {
       return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
     }
-    return `${parsedLhs.name} ${comp} ${parsedRhs.name}`;
+    return `${parsedLhs.name} ${data.comp} ${parsedRhs.name}`;
   }
 
   parseVariable(variable) {

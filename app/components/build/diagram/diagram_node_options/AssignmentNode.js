@@ -129,7 +129,7 @@ class ReturnNode extends React.Component {
               submit(
                 `${this.state.variableSelected} ${this.state.assignment} ${
                   this.state.assignedVal
-                }`
+                }`, {...this.state, type: 'assignment'}
               );
             }}
           >

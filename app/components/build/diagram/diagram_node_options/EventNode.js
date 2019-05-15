@@ -37,7 +37,7 @@ const styles = theme => ({
 class EventNode extends React.Component {
   state = {
     variableSelected: '',
-    emitStatement: ''
+    params: []
   };
 
   render() {
@@ -51,7 +51,7 @@ class EventNode extends React.Component {
           onChange={event =>
             this.setState({
               variableSelected: event.target.value,
-              emitStatement: `${event.target.value}()`
+              params: []
             })
           }
           inputProps={{
@@ -81,20 +81,18 @@ class EventNode extends React.Component {
               }
               updateParams={params =>
                 this.setState({
-                  emitStatement: `${this.state.variableSelected}(${params
-                    .map(
-                      param =>
-                        param.value
-                          ? `${param.value}`
-                          : param.type === 'uint'
-                            ? '0'
-                            : param.type === 'string'
-                              ? '""'
-                              : param.type === 'bool'
-                                ? 'false'
-                                : 'an address'
-                    )
-                    .join(', ')})`
+                  params: params.map(
+                    param =>
+                      param.value
+                        ? `${param.value}`
+                        : param.type === 'uint'
+                          ? '0'
+                          : param.type === 'string'
+                            ? '""'
+                            : param.type === 'bool'
+                              ? 'false'
+                              : 'an address'
+                  )
                 })
               }
             />
@@ -120,7 +118,12 @@ class EventNode extends React.Component {
                 return;
               }
               close();
-              submit(this.state.emitStatement);
+              submit(
+                `${this.state.variableSelected}(${this.state.params.join(
+                  ', '
+                )})`,
+                { ...this.state, type: 'event' }
+              );
             }}
           >
             Done

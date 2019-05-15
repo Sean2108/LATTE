@@ -5,14 +5,15 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import { TrayWidget } from './diagram/TrayWidget';
 import { TrayItemWidget } from './diagram/TrayItemWidget';
-import { DiamondNodeModel } from './diagram/DiamondNodeModel';
-import { DiamondNodeFactory } from './diagram/DiamondNodeFactory';
+import { DiamondNodeModel } from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
+import { DiamondNodeFactory } from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
 import { SimplePortFactory } from './diagram/SimplePortFactory';
-import { DiamondPortModel } from './diagram/DiamondPortModel';
+import { DiamondPortModel } from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
+import { DefaultDataNodeModel } from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
+import { DefaultDataNodeFactory } from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
 import {
   DiagramEngine,
   DiagramModel,
-  DefaultNodeModel,
   LinkModel,
   DiagramWidget
 } from 'storm-react-diagrams';
@@ -52,6 +53,7 @@ class BuildDiagram extends React.Component {
       new SimplePortFactory('diamond', config => new DiamondPortModel())
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());
+    this.engine.registerNodeFactory(new DefaultDataNodeFactory());
 
     this.model = new DiagramModel();
     if (Object.entries(this.props.diagram).length > 0) {
@@ -59,7 +61,7 @@ class BuildDiagram extends React.Component {
       this.start = this.findStart();
     }
     if (!this.start) {
-      this.start = new DefaultNodeModel('Start', 'rgb(0,192,255)');
+      this.start = new DefaultDataNodeModel('Start', 'rgb(0,192,255)');
       var startOut = this.start.addOutPort(' ');
       startOut.setMaximumLinks(1);
       this.start.setPosition(100, 100);
@@ -91,8 +93,8 @@ class BuildDiagram extends React.Component {
     return null;
   }
 
-  createDefaultNode(label, color, isReturn) {
-    var node = new DefaultNodeModel(label, color);
+  createDefaultNode(label, color, data, isReturn) {
+    var node = new DefaultDataNodeModel(label, color, data);
     node.addInPort(' ');
     if (!isReturn) {
       let outPort = node.addOutPort(' ');
@@ -101,46 +103,51 @@ class BuildDiagram extends React.Component {
     return node;
   }
 
-  selectNode(type, desc) {
+  selectNode(type, desc, data) {
     switch (type) {
       case 'assignment':
         return this.createDefaultNode(
           `Assignment: ${desc}`,
           'rgb(192,0,0)',
+          data,
           false
         );
       case 'event':
         return this.createDefaultNode(
           `Emit Event: ${desc}`,
           'rgb(0,192,0)',
+          data,
           false
         );
       case 'entity':
         return this.createDefaultNode(
           `New Entity: ${desc}`,
           'rgb(100,100,0)',
+          data,
           false
         );
       case 'transfer':
         return this.createDefaultNode(
           `Transfer: ${desc}`,
           'rgb(255,100,0)',
+          data,
           false
         );
       case 'return':
         return this.createDefaultNode(
           `Return: ${desc}`,
           'rgb(192,255,0)',
+          data,
           true
         );
       case 'conditional':
-        return new DiamondNodeModel(`${desc}`);
+        return new DiamondNodeModel(`${desc}`, data);
     }
     return null;
   }
 
-  addNode(info) {
-    let node = this.selectNode(this.state.type, info);
+  addNode(info, data) {
+    let node = this.selectNode(this.state.type, info, data);
     node.x = this.state.points.x;
     node.y = this.state.points.y;
     this.engine.getDiagramModel().addNode(node);
@@ -179,7 +186,7 @@ class BuildDiagram extends React.Component {
           close={() => {
             this.setState({ open: false });
           }}
-          submit={info => this.addNode(info)}
+          submit={(info, data) => this.addNode(info, data)}
           type={this.state.type}
           varList={varList}
           events={events}
@@ -238,7 +245,7 @@ class BuildDiagram extends React.Component {
                     type: 'transfer'
                   }}
                   name="Transfer Node"
-                  color="rgb(255,0,192)"
+                  color="rgb(255,100,0)"
                 />
               </Tooltip>
               <Tooltip
@@ -250,7 +257,7 @@ class BuildDiagram extends React.Component {
                     type: 'return'
                   }}
                   name="Return Node"
-                  color="rgb(255,100,0)"
+                  color="rgb(192,255,0)"
                 />
               </Tooltip>
               <Tooltip

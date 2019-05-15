@@ -41,7 +41,7 @@ class EntityNode extends React.Component {
   state = {
     variableSelected: '',
     assignVar: '',
-    emitStatement: '',
+    params: [],
     isMemory: true
   };
 
@@ -65,7 +65,7 @@ class EntityNode extends React.Component {
             onChange={event =>
               this.setState({
                 variableSelected: event.target.value,
-                emitStatement: `${event.target.value}() -> in ${this.state.isMemory ? 'memory' : 'storage'}`
+                params: []
               })
             }
             inputProps={{
@@ -90,8 +90,7 @@ class EntityNode extends React.Component {
                 checked={this.state.isMemory}
                 onChange={event =>
                   this.setState({
-                    isMemory: event.target.checked,
-                    emitStatement: `${event.target.value}() -> in ${event.target.checked ? 'memory' : 'storage'}`
+                    isMemory: event.target.checked
                   })
                 }
                 value="isMemory"
@@ -100,7 +99,9 @@ class EntityNode extends React.Component {
             }
             label="Store in Memory?"
           />
-          {this.state.isMemory ? '' : 'Warning: Using the storage option costs significantly more gas!'}
+          {this.state.isMemory
+            ? ''
+            : 'Warning: Using the storage option costs significantly more gas!'}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
@@ -110,20 +111,18 @@ class EntityNode extends React.Component {
                 tooltipText={'The information that the entity will contain'}
                 updateParams={params =>
                   this.setState({
-                    emitStatement: `${this.state.variableSelected}(${params
-                      .map(
-                        param =>
-                          param.value
-                            ? `${param.value}`
-                            : param.type === 'uint'
-                              ? '0'
-                              : param.type === 'string'
-                                ? '""'
-                                : param.type === 'bool'
-                                  ? 'false'
-                                  : 'an address'
-                      )
-                      .join(', ')}) -> in ${this.state.isMemory ? 'memory' : 'storage'}`
+                    params: params.map(
+                      param =>
+                        param.value
+                          ? `${param.value}`
+                          : param.type === 'uint'
+                            ? '0'
+                            : param.type === 'string'
+                              ? '""'
+                              : param.type === 'bool'
+                                ? 'false'
+                                : 'an address'
+                    )
                   })
                 }
               />
@@ -149,7 +148,14 @@ class EntityNode extends React.Component {
                   return;
                 }
                 close();
-                submit(`${this.state.assignVar} = ${this.state.emitStatement}`);
+                submit(
+                  `${this.state.assignVar} = ${
+                    this.state.variableSelected
+                  }(${this.state.params.join(', ')}) -> in ${
+                    this.state.isMemory ? 'memory' : 'storage'
+                  }`,
+                  { ...this.state, type: 'entity' }
+                );
               }}
             >
               Done

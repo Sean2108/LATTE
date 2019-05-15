@@ -70,7 +70,10 @@ class ReturnNode extends React.Component {
             className={classes.button}
             onClick={() => {
               close();
-              submit(this.state.variableSelected);
+              submit(this.state.variableSelected, {
+                ...this.state,
+                type: 'return'
+              });
             }}
           >
             Done

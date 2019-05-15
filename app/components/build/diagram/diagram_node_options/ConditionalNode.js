@@ -74,7 +74,13 @@ class ConditionalNode extends React.Component {
               submit(
                 `${this.state.displayVar1} ${this.state.comp} ${
                   this.state.displayVar2
-                }`
+                }`,
+                {
+                  var1: this.state.displayVar1,
+                  var2: this.state.displayVar2,
+                  comp: this.state.comp,
+                  type: 'conditional'
+                }
               );
             }}
           >
