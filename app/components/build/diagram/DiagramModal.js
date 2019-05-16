@@ -43,7 +43,8 @@ class DiagramModal extends React.Component {
       varList,
       events,
       entities,
-      tooltipText
+      tooltipText,
+      bitsMode
     } = this.props;
 
     return (
@@ -71,7 +72,8 @@ class DiagramModal extends React.Component {
                 events,
                 entities,
                 close,
-                submit
+                submit,
+                bitsMode
               )}
             </Typography>
           </div>
@@ -80,16 +82,16 @@ class DiagramModal extends React.Component {
     );
   }
 
-  getTypeFields(type, classes, varList, events, entities, close, submit) {
+  getTypeFields(type, classes, varList, events, entities, close, submit, bitsMode) {
     switch (type) {
       case 'assignment':
         return (
-          <AssignmentNode close={close} submit={submit} varList={varList} />
+          <AssignmentNode close={close} submit={submit} varList={varList} bitsMode={bitsMode} />
         );
       case 'event':
         return <EventNode close={close} submit={submit} varList={events} />;
       case 'entity':
-        return <EntityNode close={close} submit={submit} varList={entities} />;
+        return <EntityNode close={close} submit={submit} varList={entities} bitsMode={bitsMode} />;
       case 'transfer':
         return <TransferNode close={close} submit={submit} varList={varList} />;
       case 'return':
@@ -111,7 +113,8 @@ DiagramModal.propTypes = {
   varList: PropTypes.object,
   events: PropTypes.object,
   entities: PropTypes.object,
-  tooltipText: PropTypes.string.isRequired
+  tooltipText: PropTypes.string.isRequired,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(DiagramModal);

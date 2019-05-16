@@ -10,6 +10,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const styles = theme => ({
   paper: {
@@ -54,11 +56,12 @@ class ReturnNode extends React.Component {
   state = {
     variableSelected: '',
     assignment: '=',
-    assignedVal: ''
+    assignedVal: '',
+    isMemory: this.props.bitsMode
   };
 
   render() {
-    const { classes, close, submit, varList } = this.props;
+    const { classes, close, submit, varList, bitsMode } = this.props;
 
     return (
       <FormControl className={classes.formControl}>
@@ -108,6 +111,26 @@ class ReturnNode extends React.Component {
           />
         </div>
         <br />
+        {bitsMode && (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.isMemory}
+                onChange={event =>
+                  this.setState({
+                    isMemory: event.target.checked
+                  })
+                }
+                value="isMemory"
+                color="primary"
+              />
+            }
+            label="Store Locally"
+          />
+        )}
+        {bitsMode &&
+          !this.state.isMemory &&
+          'Warning: Storing the variable globally costs significantly more gas! Store globally only if the variable is shared between functions.'}
 
         <div className={classes.rightIcon}>
           <Button
@@ -129,7 +152,8 @@ class ReturnNode extends React.Component {
               submit(
                 `${this.state.variableSelected} ${this.state.assignment} ${
                   this.state.assignedVal
-                }`, {...this.state, type: 'assignment'}
+                }`,
+                { ...this.state, type: 'assignment' }
               );
             }}
           >
@@ -146,7 +170,8 @@ ReturnNode.propTypes = {
   classes: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
   submit: PropTypes.func.isRequired,
-  varList: PropTypes.object
+  varList: PropTypes.object,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(ReturnNode);

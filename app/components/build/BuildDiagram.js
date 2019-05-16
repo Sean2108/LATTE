@@ -155,7 +155,7 @@ class BuildDiagram extends React.Component {
   }
 
   render() {
-    const { classes, theme, varList, events, entities } = this.props;
+    const { classes, theme, varList, events, entities, bitsMode } = this.props;
 
     const tooltips = {
       assignment:
@@ -193,6 +193,7 @@ class BuildDiagram extends React.Component {
           entities={entities}
           addNode={this.addNode}
           tooltipText={tooltips[this.state.type] || ''}
+          bitsMode={bitsMode}
         />
         <div className="body">
           <div className="header">

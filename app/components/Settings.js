@@ -42,7 +42,7 @@ class Settings extends React.Component {
                 color="primary"
               />
             }
-            label="Advanced Feature: Set Variable Bit Size to Reduce Gas"
+            label="Advanced Feature: Gas Reduction Mode"
           />
       </main>
     );

@@ -15,6 +15,7 @@ export class BuildParser {
   ) {
     this.variables = {};
     this.memoryVars = {};
+    this.memoryVarsDeclared = {};
     this.returnVar = null;
     this.varList = varList;
     this.functionParams = functionParams;
@@ -134,7 +135,7 @@ export class BuildParser {
       if (node instanceof DiamondNodeModel) {
         return null;
       }
-      code += this.parseNode(node.data) + '\n';
+      code += this.parseNode(node.data, {...this.memoryVarsDeclared}) + '\n';
       node = this.getNextNodeForDefaultNode(node);
     }
     return null;
@@ -162,8 +163,6 @@ export class BuildParser {
       case 'assignment':
         parsedLhs = this.parseVariable(nodeData.variableSelected);
         parsedRhs = this.parseVariable(nodeData.assignedVal);
-        console.log(nodeData)
-        console.log(parsedRhs)
         if (!parsedLhs.type || !parsedRhs.type) {
           return true;
         }
@@ -194,7 +193,12 @@ export class BuildParser {
               parsedLhs.name in this.functionParams
             ))
         ) {
-          this.variables[parsedLhs.name] = parsedRhs.type;
+          if (nodeData.isMemory) {
+            this.memoryVars[parsedLhs.name] = parsedRhs.type;
+            this.memoryVarsDeclared[parsedLhs.name] = false;
+          } else {
+            this.variables[parsedLhs.name] = parsedRhs.type;
+          }
           return true;
         }
         return false;
@@ -259,11 +263,11 @@ export class BuildParser {
     }`;
   }
 
-  parseNode(nodeData) {
+  parseNode(nodeData, memoryVarsDeclared = this.memoryVarsDeclared) {
     switch (nodeData.type) {
       case 'assignment':
         this.isView = false;
-        return this.parseAssignmentNode(nodeData);
+        return this.parseAssignmentNode(nodeData, memoryVarsDeclared);
       case 'event':
         this.isView = false;
         return this.parseEventNode(nodeData);
@@ -283,7 +287,7 @@ export class BuildParser {
     return '';
   }
 
-  parseAssignmentNode(data) {
+  parseAssignmentNode(data, memoryVarsDeclared) {
     let parsedLhs = this.parseVariable(data.variableSelected);
     let parsedRhs = this.parseVariable(data.assignedVal);
     if (!parsedLhs.type || !parsedRhs.type) {
@@ -308,7 +312,11 @@ export class BuildParser {
           parsedLhs.name in this.functionParams
         ))
     ) {
-      this.variables[parsedLhs.name] = parsedRhs.type;
+      if (data.isMemory) {
+        this.memoryVars[parsedLhs.name] = parsedRhs.type;
+      } else {
+        this.variables[parsedLhs.name] = parsedRhs.type;
+      }
     } else if (parsedLhs.type !== parsedRhs.type) {
       console.log(
         `invalid assignment at node ${data.variableSelected} ${
@@ -316,7 +324,26 @@ export class BuildParser {
         } ${data.assignedVal}`
       );
     }
+    if (
+      data.isMemory &&
+      !parsedLhs.name.includes('.') &&
+      !('mapName' in parsedLhs) &&
+      !memoryVarsDeclared[parsedLhs.name]
+    ) {
+      memoryVarsDeclared[parsedLhs.name] = true;
+      return `${parsedRhs.type}${
+        this.typeCheckUseMemoryKeyword(parsedRhs.type) ? ' ' : ' storage '
+      }${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
+    }
     return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
+  }
+
+  typeCheckUseMemoryKeyword(type) {
+    return (
+      ['bool', 'address', 'address payable'].includes(type) ||
+      type.includes('bytes') ||
+      type.includes('int')
+    );
   }
 
   parseEventNode(data) {
@@ -336,7 +363,7 @@ export class BuildParser {
     } else {
       this.variables[parsedLhs.name] = data.variableSelected;
     }
-    return `${data.isMemory ? `${data.variableSelected} memory ` : ''}${
+    return `${data.isMemory ? `${data.variableSelected} storage ` : ''}${
       parsedLhs.name
     } = ${data.variableSelected}(${params});`;
   }

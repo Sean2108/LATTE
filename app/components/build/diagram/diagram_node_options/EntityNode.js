@@ -42,11 +42,11 @@ class EntityNode extends React.Component {
     variableSelected: '',
     assignVar: '',
     params: [],
-    isMemory: true
+    isMemory: this.props.bitsMode
   };
 
   render() {
-    const { classes, close, submit, varList } = this.props;
+    const { classes, close, submit, varList, bitsMode } = this.props;
 
     return (
       <div>
@@ -84,24 +84,26 @@ class EntityNode extends React.Component {
           </Select>
           <br />
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={this.state.isMemory}
-                onChange={event =>
-                  this.setState({
-                    isMemory: event.target.checked
-                  })
-                }
-                value="isMemory"
-                color="primary"
-              />
-            }
-            label="Store in Memory?"
-          />
-          {this.state.isMemory
-            ? ''
-            : 'Warning: Using the storage option costs significantly more gas!'}
+          {bitsMode && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={this.state.isMemory}
+                  onChange={event =>
+                    this.setState({
+                      isMemory: event.target.checked
+                    })
+                  }
+                  value="isMemory"
+                  color="primary"
+                />
+              }
+              label="Store Locally"
+            />
+          )}
+          {bitsMode &&
+            !this.state.isMemory &&
+            'Warning: Storing the variable globally costs significantly more gas! Store globally only if the variable is shared between functions.'}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
@@ -151,9 +153,7 @@ class EntityNode extends React.Component {
                 submit(
                   `${this.state.assignVar} = ${
                     this.state.variableSelected
-                  }(${this.state.params.join(', ')}) -> in ${
-                    this.state.isMemory ? 'memory' : 'storage'
-                  }`,
+                  }(${this.state.params.join(', ')})`,
                   { ...this.state, type: 'entity' }
                 );
               }}
@@ -172,7 +172,8 @@ EntityNode.propTypes = {
   classes: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
   submit: PropTypes.func.isRequired,
-  varList: PropTypes.object
+  varList: PropTypes.object,
+  bitsMode: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(EntityNode);
