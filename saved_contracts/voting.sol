@@ -1,29 +1,27 @@
 pragma solidity ^0.5.4;
 contract Code {
 struct Voter {
-uint weight;
+uint8 weight;
 bool voted;
 address payable delegate;
-string vote;
+bytes8 vote;
 }
-Voter private voter;
-mapping(string => uint) vote_count;
-uint private winning_vote_count;
-string private winning_proposal_name;
 Voter private sender_details;
 address payable private delegated_to;
 Voter private delegate_details;
-string private delegate_vote;
-mapping(string => uint) voute_count;
+bytes8 private delegate_vote;
+mapping(bytes8 => uint) vote_count;
+Voter private voter;
+uint private winning_vote_count;
+bytes8 private winning_proposal_name;
 address payable private chairperson;
-Voter private chairperson_voter;
 mapping(address => Voter) voter_details;
 constructor() public payable  {
       chairperson = msg.sender;
-chairperson_voter = Voter(1, false, address(uint160(0)), "");
+Voter memory chairperson_voter = Voter(1, false, address(uint160(0)), "");
 voter_details[chairperson] = chairperson_voter;
 }
-function addProposal(string memory proposal) public payable  {
+function addProposal(bytes8 proposal) public payable  {
       require(msg.sender == chairperson, "Only chairperson can add a new proposal.");
 vote_count[proposal] = 0;
 }
@@ -33,7 +31,7 @@ require(voter_details[target_voter].voted == false, "The voter already voted.");
 require(voter_details[target_voter].weight == 0, "The voter already has a right to vote.");
 voter_details[target_voter].weight = 1;
 }
-function vote(string memory proposal) public payable  {
+function vote(bytes8 proposal) public payable  {
       require(voter_details[msg.sender].weight != 0, "Has no right to vote.");
 require(voter_details[msg.sender].voted == false, "Already voted.");
 voter = voter_details[msg.sender];
@@ -45,7 +43,7 @@ winning_vote_count = vote_count[proposal];
 winning_proposal_name = proposal;
 } 
 }
-function winningProposal() public view returns (string memory) {
+function winningProposal() public view returns (bytes8) {
       return winning_proposal_name;
 }
 function delegate(address payable to) public payable  {

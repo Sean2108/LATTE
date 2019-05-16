@@ -38,7 +38,7 @@ class RequiresList extends React.Component {
       requires,
       tooltipText
     } = this.props;
-    this.buildParser.reset(this.props.vars, {}, this.props.entities);
+    this.buildParser.reset(this.props.vars, {}, {}, this.props.entities);
 
     if (requires.length === 0) {
       requires.push({

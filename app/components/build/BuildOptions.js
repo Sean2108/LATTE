@@ -108,9 +108,11 @@ class BuildOptions extends React.Component {
           ? 'constructor'
           : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
       let returnCode = buildState.tabsReturn[i]
-        ? ['bool', 'address', 'address payable', 'uint', 'int'].includes(
+        ? ['bool', 'address', 'address payable'].includes(
             buildState.tabsReturn[i]
-          )
+          ) ||
+          buildState.tabsReturn[i].includes('bytes') ||
+          buildState.tabsReturn[i].includes('int')
           ? `returns (${buildState.tabsReturn[i]})`
           : `returns (${buildState.tabsReturn[i]} memory)`
         : '';
@@ -137,7 +139,7 @@ class BuildOptions extends React.Component {
           element =>
             element.type === 'string'
               ? bitsMode && element.bits !== ''
-                ? `bytes${element.bits} memory ${element.name}`
+                ? `bytes${element.bits} ${element.name}`
                 : `${element.type} memory ${element.name}`
               : bitsMode
                 ? `${element.type}${element.bits} ${element.name}`
@@ -168,7 +170,9 @@ class BuildOptions extends React.Component {
             if (param.type === 'string' && param.bits !== '') {
               return `bytes${param.bits} ${param.name}${suffix}`;
             }
-            return `${param.type}${param.bits} ${param.name}${suffix}`;
+            if (param.bits) {
+              return `${param.type}${param.bits} ${param.name}${suffix}`;
+            }
           }
           return `${param.type} ${param.name}${suffix}`;
         })

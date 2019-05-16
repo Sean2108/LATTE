@@ -14,6 +14,7 @@ export class BuildParser {
     bitsMode = false
   ) {
     this.variables = {};
+    this.memoryVars = {};
     this.returnVar = null;
     this.varList = varList;
     this.functionParams = functionParams;
@@ -161,6 +162,8 @@ export class BuildParser {
       case 'assignment':
         parsedLhs = this.parseVariable(nodeData.variableSelected);
         parsedRhs = this.parseVariable(nodeData.assignedVal);
+        console.log(nodeData)
+        console.log(parsedRhs)
         if (!parsedLhs.type || !parsedRhs.type) {
           return true;
         }
@@ -205,7 +208,7 @@ export class BuildParser {
         }
         return true;
       case 'entity':
-        parsedLhs = this.parseVariable(nodeData.variableSelected);
+        parsedLhs = this.parseVariable(nodeData.assignVar);
         if (this.bitsMode) {
           this.bitsModeParseParams(
             nodeData.params,
@@ -213,7 +216,11 @@ export class BuildParser {
             nodeData.variableSelected
           );
         }
-        this.variables[parsedLhs.name] = nodeData.assignVar;
+        if (nodeData.isMemory) {
+          this.memoryVars[parsedLhs.name] = nodeData.variableSelected;
+        } else {
+          this.variables[parsedLhs.name] = nodeData.variableSelected;
+        }
         return true;
       case 'transfer':
         parsedLhs = this.parseVariable(nodeData.variableSelected);
@@ -233,9 +240,23 @@ export class BuildParser {
     for (let i = 0; i < params.length; i++) {
       let param = params[i];
       let info = infoList[varSelected][i];
-      this.variables[this.parseVariable(param).name] =
-        `${info.type === 'string' && info.bits ? 'bytes' : info.type}${info['bits']}`;
+      let parsedParam = this.parseVariable(param);
+      if (
+        parsedParam.type !== 'string' &&
+        parsedParam.type !== 'uint' &&
+        parsedParam.type !== 'int' &&
+        parsedParam.type !== 'bool' &&
+        !parsedParam.type.includes('address')
+      ) {
+        this.variables[parsedParam.name] = bitsModeGetType(info);
+      }
     }
+  }
+
+  bitsModeGetType(info) {
+    return `${info.type === 'string' && info.bits ? 'bytes' : info.type}${
+      info['bits']
+    }`;
   }
 
   parseNode(nodeData) {
@@ -307,10 +328,14 @@ export class BuildParser {
 
   parseEntityNode(data) {
     let parsedLhs = this.parseVariable(data.assignVar);
-    this.variables[parsedLhs.name] = data.variableSelected;
     let params = data.params
       .map(param => this.parseVariable(param).name)
       .join(', ');
+    if (data.isMemory) {
+      this.memoryVars[parsedLhs.name] = data.variableSelected;
+    } else {
+      this.variables[parsedLhs.name] = data.variableSelected;
+    }
     return `${data.isMemory ? `${data.variableSelected} memory ` : ''}${
       parsedLhs.name
     } = ${data.variableSelected}(${params});`;
@@ -358,7 +383,8 @@ export class BuildParser {
     let variables = {
       ...this.varList,
       ...this.variables,
-      ...this.functionParams
+      ...this.functionParams,
+      ...this.memoryVars
     };
     if (
       (variable[0] === '"' && variable[variable.length - 1] === '"') ||
@@ -449,7 +475,9 @@ export class BuildParser {
         ) {
           return {
             name: `${parsedStruct.name}.${parsedAttr.name}`,
-            type: attribute.type
+            type: this.bitsMode
+              ? this.bitsModeGetType(attribute)
+              : attribute.type
           };
         }
       }
