@@ -20,6 +20,8 @@ import {
 import DiagramModal from './diagram/DiagramModal';
 import { BuildParser } from './BuildParser';
 import Tooltip from '@material-ui/core/Tooltip';
+import { Button } from '@material-ui/core';
+import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 
 const styles = theme => ({
   paper: {
@@ -31,6 +33,17 @@ const styles = theme => ({
   },
   tooltipFont: {
     fontSize: 14
+  },
+  titleDiv: {
+    display: 'flex',
+    'justify-content': 'space-between',
+    'align-items': 'center'
+  },
+  leftInvis: {
+    visibility: 'hidden'
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit
   }
 });
 
@@ -71,7 +84,13 @@ class BuildDiagram extends React.Component {
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
-          this.buildParser.reset(this.props.varList, this.props.functionParams, this.props.events, this.props.entities, this.props.bitsMode);
+          this.buildParser.reset(
+            this.props.varList,
+            this.props.functionParams,
+            this.props.events,
+            this.props.entities,
+            this.props.bitsMode
+          );
           let code = this.buildParser.parse(this.start);
           this.props.onChangeLogic(code);
           this.props.onChangeReturn(this.buildParser.getReturnVar());
@@ -155,7 +174,15 @@ class BuildDiagram extends React.Component {
   }
 
   render() {
-    const { classes, theme, varList, events, entities, bitsMode } = this.props;
+    const {
+      classes,
+      theme,
+      varList,
+      events,
+      entities,
+      bitsMode,
+      openDrawer
+    } = this.props;
 
     const tooltips = {
       assignment:
@@ -177,9 +204,24 @@ class BuildDiagram extends React.Component {
           title="This is the main logic of the function, which will be executed when the checking phase has been successfully passed. Drag nodes from the left panel onto the diagram and connect them to create your logic for the function."
           classes={{ tooltip: classes.tooltipFont }}
         >
-          <Typography variant="title" noWrap>
-            Action Phase
-          </Typography>
+          <div className={classes.titleDiv}>
+            <Button
+              onClick={openDrawer}
+              variant="contained"
+              color="primary"
+              className={classes.leftInvis}
+            >
+              View Gas Usage
+              <TrendingUpIcon className={classes.rightIcon} />
+            </Button>
+            <Typography variant="title" noWrap>
+              Action Phase
+            </Typography>
+            <Button onClick={openDrawer} variant="outlined" color="primary">
+              View Gas Usage
+              <TrendingUpIcon className={classes.rightIcon} />
+            </Button>
+          </div>
         </Tooltip>
         <DiagramModal
           open={this.state.open}
@@ -317,7 +359,8 @@ BuildDiagram.propTypes = {
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func,
   updateDiagram: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired
+  bitsMode: PropTypes.bool.isRequired,
+  openDrawer: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);
