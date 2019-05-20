@@ -57,7 +57,9 @@ class DefaultBuildTab extends React.Component {
       diagram,
       onChangeView,
       updateDiagram,
-      bitsMode
+      bitsMode,
+      gasHistory,
+      updateGasHistory
     } = this.props;
     let variables = this.flattenParamsToObject(params, bitsMode);
     return (
@@ -96,6 +98,8 @@ class DefaultBuildTab extends React.Component {
           updateDiagram={updateDiagram}
           bitsMode={bitsMode}
           openDrawer={() => this.setState({ drawerOpen: true })}
+          gasHistory={gasHistory}
+          updateGasHistory={updateGasHistory}
         />
 
         <Drawer
@@ -131,7 +135,9 @@ DefaultBuildTab.propTypes = {
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func.isRequired,
   updateDiagram: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired
+  bitsMode: PropTypes.bool.isRequired,
+  gasHistory: PropTypes.array.isRequired,
+  updateGasHistory: PropTypes.func.isRequired
 };
 
 export default DefaultBuildTab;

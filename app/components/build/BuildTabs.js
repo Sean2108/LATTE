@@ -11,6 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InitialStateTab from './InitialStateTab';
+import { Web3Utils } from './Web3Utils';
 
 function TabContainer(props) {
   return (
@@ -56,7 +57,8 @@ class BuildTabs extends React.Component {
   state = {
     value: 0,
     addTabPopoverAnchor: null,
-    popoverContent: ''
+    popoverContent: '',
+    gasHistory: [[]]
   };
 
   handleChange = (event, value) => {
@@ -81,15 +83,23 @@ class BuildTabs extends React.Component {
     }
   };
 
+  getGasUsage() {
+    let web3Utils = new Web3Utils(this.props.connection);
+    // return web3Utils.getGasUsage();
+  }
+
   render() {
     const {
       classes,
       variables,
       onTabsChange,
       buildState,
-      bitsMode
+      bitsMode,
+      connection
     } = this.props;
     const { value } = this.state;
+
+    console.log(this.state)
 
     return (
       <div className={classes.buildtabs}>
@@ -173,6 +183,16 @@ class BuildTabs extends React.Component {
                     this.handleOnChange(diagram, i, 'diagrams')
                   }
                   bitsMode={bitsMode}
+                  gasHistory={this.state.gasHistory[i]}
+                  updateGasHistory={funcName => {
+                    if (i === 0) return;
+                    let history = this.state.gasHistory;
+                    if (history[i].length === 10) {
+                      history[i].shift();
+                    }
+                    history[i].push(newGas);
+                    this.setState({ gasHistory: history });
+                  }}
                 />
               </TabContainer>
             )
@@ -222,7 +242,8 @@ class BuildTabs extends React.Component {
                 };
                 this.setState({
                   popoverContent: '',
-                  addTabPopoverAnchor: null
+                  addTabPopoverAnchor: null,
+                  gasHistory: [...this.state.gasHistory, []]
                 });
                 onTabsChange(newTabsState);
               }
@@ -241,7 +262,8 @@ BuildTabs.propTypes = {
   variables: PropTypes.object.isRequired,
   onTabsChange: PropTypes.func.isRequired,
   buildState: PropTypes.object.isRequired,
-  bitsMode: PropTypes.bool.isRequired
+  bitsMode: PropTypes.bool.isRequired,
+  connection: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(BuildTabs);

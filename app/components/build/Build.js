@@ -60,6 +60,7 @@ class Build extends React.Component {
               onTabsChange={value => this.setState(value)}
               buildState={this.state}
               bitsMode={bitsMode}
+              connection={connection}
             />
             <BuildOptions
               onback={onback}

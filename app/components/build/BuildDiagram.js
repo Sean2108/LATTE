@@ -360,7 +360,9 @@ BuildDiagram.propTypes = {
   onChangeView: PropTypes.func,
   updateDiagram: PropTypes.func.isRequired,
   bitsMode: PropTypes.bool.isRequired,
-  openDrawer: PropTypes.func.isRequired
+  openDrawer: PropTypes.func.isRequired,
+  gasHistory: PropTypes.array.isRequired,
+  updateGasHistory: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);
