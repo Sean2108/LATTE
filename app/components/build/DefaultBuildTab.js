@@ -113,7 +113,7 @@ class DefaultBuildTab extends React.Component {
             onClick={this.closeDrawer}
             onKeyDown={this.closeDrawer}
           >
-            <GasDrawer/>
+            <GasDrawer history={gasHistory}/>
           </div>
         </Drawer>
       </div>

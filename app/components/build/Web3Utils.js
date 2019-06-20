@@ -5,6 +5,35 @@ export class Web3Utils {
     this.web3 = connection;
   }
 
+  getGasUsage(buildState, bitsMode, tabIndex, history) {
+    let funcName = buildState.tabs[tabIndex + 1];
+    let gas;
+    this.web3.eth.getAccounts((err, accs) => {
+      if (err) {
+        alert('There was an error fetching your accounts.');
+        return;
+      }
+      let account = accs[0];
+      this.web3.eth.defaultAccount = account;
+      let code = this.formCode(buildState, bitsMode);
+      ipcRenderer.send('request-compile', code);
+      ipcRenderer.on('request-compile-complete', (event, payload) => {
+        let compiledCode = JSON.parse(payload);
+        if ('errors' in compiledCode && !('contracts' in compiledCode)) {
+          alert(compiledCode['errors'][0]['formattedMessage']);
+          return;
+        }
+        let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
+        let contract = new this.web3.eth.Contract(abiDefinition);
+        contract.options.address = '0x6ee9957aef5f4073c6af71441ec7962527c37671';
+        contract.methods[this.toLowerCamelCase(funcName)]
+          .estimateGas()
+          .then(gas => history.push(gas))
+          .catch(err => console.log(err));
+      });
+    });
+  }
+
   deploySmartContract = (buildState, bitsMode) => {
     this.web3.eth.getAccounts((err, accs) => {
       if (err) {
@@ -18,8 +47,7 @@ export class Web3Utils {
         return;
       }
 
-      let accounts = accs;
-      let account = accounts[0];
+      let account = accs[0];
       this.web3.eth.defaultAccount = account;
       let code = this.formCode(buildState, bitsMode);
       ipcRenderer.send('request-compile', code);

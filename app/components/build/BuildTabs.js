@@ -67,6 +67,10 @@ class BuildTabs extends React.Component {
     });
   };
 
+  componentWillMount() {
+    this.web3Utils = new Web3Utils(this.props.connection);
+  }
+
   handleOnChange = (newState, i, state) => {
     let tabsState = [...this.props.buildState[state]];
     tabsState[i] = newState;
@@ -83,11 +87,6 @@ class BuildTabs extends React.Component {
     }
   };
 
-  getGasUsage() {
-    let web3Utils = new Web3Utils(this.props.connection);
-    // return web3Utils.getGasUsage();
-  }
-
   render() {
     const {
       classes,
@@ -98,8 +97,6 @@ class BuildTabs extends React.Component {
       connection
     } = this.props;
     const { value } = this.state;
-
-    console.log(this.state)
 
     return (
       <div className={classes.buildtabs}>
@@ -184,13 +181,13 @@ class BuildTabs extends React.Component {
                   }
                   bitsMode={bitsMode}
                   gasHistory={this.state.gasHistory[i]}
-                  updateGasHistory={funcName => {
+                  updateGasHistory={() => {
                     if (i === 0) return;
                     let history = this.state.gasHistory;
                     if (history[i].length === 10) {
                       history[i].shift();
                     }
-                    history[i].push(newGas);
+                    this.web3Utils.getGasUsage(buildState, bitsMode, i, history[i]);
                     this.setState({ gasHistory: history });
                   }}
                 />

@@ -96,6 +96,7 @@ class BuildDiagram extends React.Component {
           this.props.onChangeReturn(this.buildParser.getReturnVar());
           this.props.onChangeView(this.buildParser.getView());
           this.props.updateDiagram(this.model.serializeDiagram());
+          this.props.updateGasHistory();
         }, 5000);
       }
     });
