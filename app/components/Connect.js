@@ -9,7 +9,6 @@ import Button from '@material-ui/core/Button';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import { configureRequestOptions } from 'builder-util-runtime';
 import Tooltip from '@material-ui/core/Tooltip';
 
 var Web3 = require('web3');
@@ -28,14 +27,16 @@ const styles = theme => ({
     padding: theme.spacing.unit * 3,
     margin: theme.spacing.unit * 3
   },
+  connectionLine: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   formControl: {
     margin: theme.spacing.unit
   },
   button: {
     margin: theme.spacing.unit
-  },
-  text: {
-    color: 'black'
   },
   tooltipFont: {
     fontSize: 14
@@ -92,11 +93,11 @@ class Connect extends React.Component {
     );
   };
 
-  _handleKeyDown = (e) => {
+  _handleKeyDown = e => {
     if (e.key === 'Enter') {
       this.login();
     }
-  }
+  };
 
   changeProtocol = event => {
     this.setState({
@@ -110,59 +111,65 @@ class Connect extends React.Component {
     return (
       <main align="center" className={classes.content}>
         <div className={classes.toolbar} />
-        <Tooltip
-          title="Enter a valid blockchain address to connect to it."
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <Typography variant="title" noWrap>
-            Connect to blockchain
-          </Typography>
-        </Tooltip>
-        <br />
         <div>
-          <FormControl
-            error={this.state.connectionFailed}
-            className={classes.formControl}
+          <Tooltip
+            title="Enter a valid blockchain address to connect to it."
+            classes={{ tooltip: classes.tooltipFont }}
           >
-            <InputLabel htmlFor="protocol"> Protocol </InputLabel>
-            <Select
-              value={this.state.protocol}
-              onChange={this.changeProtocol}
-              inputProps={{
-                name: 'Protocol',
-                id: 'protocol'
-              }}
-            >
-              <MenuItem value="http"> HTTP </MenuItem>
-              <MenuItem value="https"> HTTPS </MenuItem>
-            </Select>
-            {this.state.connectionFailed ? (
-              <FormHelperText> URL not found! </FormHelperText>
-            ) : null}
-          </FormControl>
-          <span className={classes.text}> : //</span>
-          <FormControl
-            className={classes.formControl}
-            error={this.state.addressEmpty || this.state.connectionFailed}
-          >
-            <InputLabel htmlFor="name-simple"> Blockchain Address </InputLabel>
-            <Input id="address" onKeyDown={this._handleKeyDown} />
-            {this.state.addressEmpty ? (
-              <FormHelperText> Address cannot be empty! </FormHelperText>
-            ) : null}
-          </FormControl>
-          <span className={classes.text}> : </span>
-          <FormControl
-            className={classes.formControl}
-            error={this.state.portEmpty || this.state.connectionFailed}
-          >
-            <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>
-            <Input id="port" onKeyDown={this._handleKeyDown}/>
-            {this.state.portEmpty ? (
-              <FormHelperText> Port cannot be empty! </FormHelperText>
-            ) : null}
-          </FormControl>
+            <Typography variant="title" noWrap>
+              Connect to blockchain
+            </Typography>
+          </Tooltip>
           <br />
+          <div className={classes.connectionLine}>
+            <FormControl
+              error={this.state.connectionFailed}
+              className={classes.formControl}
+            >
+              <InputLabel htmlFor="protocol"> Protocol </InputLabel>
+              <Select
+                value={this.state.protocol}
+                onChange={this.changeProtocol}
+                inputProps={{
+                  name: 'Protocol',
+                  id: 'protocol'
+                }}
+              >
+                <MenuItem value="http"> HTTP </MenuItem>
+                <MenuItem value="https"> HTTPS </MenuItem>
+              </Select>
+              {this.state.connectionFailed ? (
+                <FormHelperText> URL not found! </FormHelperText>
+              ) : null}
+            </FormControl>
+            <Typography variant="title" noWrap>
+              : //
+            </Typography>
+            <FormControl
+              className={classes.formControl}
+              error={this.state.addressEmpty || this.state.connectionFailed}
+            >
+              <InputLabel htmlFor="name-simple">Blockchain Address</InputLabel>
+              <Input id="address" onKeyDown={this._handleKeyDown} />
+              {this.state.addressEmpty ? (
+                <FormHelperText> Address cannot be empty! </FormHelperText>
+              ) : null}
+            </FormControl>
+
+            <Typography variant="title" noWrap>
+              :
+            </Typography>
+            <FormControl
+              className={classes.formControl}
+              error={this.state.portEmpty || this.state.connectionFailed}
+            >
+              <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>
+              <Input id="port" onKeyDown={this._handleKeyDown} />
+              {this.state.portEmpty ? (
+                <FormHelperText> Port cannot be empty! </FormHelperText>
+              ) : null}
+            </FormControl>
+          </div>
           <br />
           <Button
             variant="contained"

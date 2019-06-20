@@ -76,7 +76,7 @@ class ReturnNode extends React.Component {
             onChange={event =>
               this.setState({ variableSelected: event.target.value })
             }
-            margin="none"
+            margin="dense"
           />
           <FormControl className={classes.innerFormControl}>
             <InputLabel htmlFor="assign">Assignment Type</InputLabel>
@@ -107,7 +107,7 @@ class ReturnNode extends React.Component {
               this.setState({ assignedVal: event.target.value })
             }
             value={this.state.assignedVal}
-            margin="none"
+            margin="dense"
           />
         </div>
         <br />

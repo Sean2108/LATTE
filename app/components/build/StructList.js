@@ -27,13 +27,20 @@ const styles = theme => ({
     overflow: 'auto'
   },
   button: {
-    margin: 0
+    margin: 0,
+    marginTop: '2%',
+    height: '50%'
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
   },
   tooltipFont: {
     fontSize: 14
+  },
+  row: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
 
@@ -83,6 +90,7 @@ class StructList extends React.Component {
             </Grid>
           ))}
         </Grid>
+        <div className={classes.row}>
         <TextField
           id="standard-name"
           label={header === 'Entities' ? 'Entity Name' : 'Event Name'}
@@ -109,6 +117,7 @@ class StructList extends React.Component {
         >
           Add <AddIcon className={classes.rightIcon} />
         </Button>
+        </div>
         <br />
       </Paper>
     );

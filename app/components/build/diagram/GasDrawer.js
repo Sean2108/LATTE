@@ -23,13 +23,13 @@ class GasDrawer extends React.Component {
 
     return (
       <div className={classes.drawerContainer}>
-        <Typography variant="subheading" noWrap>
+        <Typography variant="subheading">
           Current gas usage: {history[history.length - 1] || 'None'}
         </Typography>
-        <Typography variant="title" noWrap>
+        <Typography variant="title">
           Gas Usage History:
         </Typography>
-        <VictoryChart className={classes.chart} theme={VictoryTheme.material}>
+        {history.length > 0 ? <VictoryChart className={classes.chart} theme={VictoryTheme.material}>
           <VictoryLine
             style={{
               data: { stroke: '#c43a31' },
@@ -41,7 +41,7 @@ class GasDrawer extends React.Component {
               })
             )}
           />
-        </VictoryChart>
+        </VictoryChart> : 'No history yet.'}
       </div>
     );
   }

@@ -50,6 +50,9 @@ const styles = theme => ({
   tabs: {
     width: '100%',
     maxWidth: '80vw'
+  },
+  popover: {
+    display: 'flex'
   }
 });
 
@@ -111,7 +114,7 @@ class BuildTabs extends React.Component {
             }}
             indicatorColor="primary"
             textColor="primary"
-            scrollable
+            variant="scrollable"
             scrollButtons="auto"
           >
             {buildState.tabs.map(label => (
@@ -187,7 +190,12 @@ class BuildTabs extends React.Component {
                     if (history[i].length === 10) {
                       history[i].shift();
                     }
-                    this.web3Utils.getGasUsage(buildState, bitsMode, i, history[i]);
+                    this.web3Utils.getGasUsage(
+                      buildState,
+                      bitsMode,
+                      i,
+                      history[i]
+                    );
                     this.setState({ gasHistory: history });
                   }}
                 />
@@ -208,46 +216,47 @@ class BuildTabs extends React.Component {
             horizontal: 'center'
           }}
         >
-          <TextField
-            id="standard-name"
-            label="Function Name"
-            className={classes.textField}
-            onChange={event =>
-              this.setState({ popoverContent: event.target.value })
-            }
-            value={this.state.popoverContent}
-            margin="normal"
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={() => {
-              if (
-                this.state.popoverContent &&
-                !buildState.tabs
-                  .map(tab => tab.toLowerCase())
-                  .includes(this.state.popoverContent.toLowerCase())
-              ) {
-                let newTabsState = {
-                  tabs: [...buildState.tabs, this.state.popoverContent],
-                  tabsCode: [...buildState.tabsCode, ''],
-                  tabsParams: [...buildState.tabsParams, []],
-                  tabsRequire: [...buildState.tabsRequire, []],
-                  isView: [...buildState.isView, false],
-                  diagrams: [...buildState.diagrams, {}]
-                };
-                this.setState({
-                  popoverContent: '',
-                  addTabPopoverAnchor: null,
-                  gasHistory: [...this.state.gasHistory, []]
-                });
-                onTabsChange(newTabsState);
+          <div className={classes.popover}>
+            <TextField
+              id="standard-name"
+              label="Function Name"
+              className={classes.textField}
+              onChange={event =>
+                this.setState({ popoverContent: event.target.value })
               }
-            }}
-          >
-            Add <AddIcon className={classes.rightIcon} />
-          </Button>
+              value={this.state.popoverContent}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={() => {
+                if (
+                  this.state.popoverContent &&
+                  !buildState.tabs
+                    .map(tab => tab.toLowerCase())
+                    .includes(this.state.popoverContent.toLowerCase())
+                ) {
+                  let newTabsState = {
+                    tabs: [...buildState.tabs, this.state.popoverContent],
+                    tabsCode: [...buildState.tabsCode, ''],
+                    tabsParams: [...buildState.tabsParams, []],
+                    tabsRequire: [...buildState.tabsRequire, []],
+                    isView: [...buildState.isView, false],
+                    diagrams: [...buildState.diagrams, {}]
+                  };
+                  this.setState({
+                    popoverContent: '',
+                    addTabPopoverAnchor: null,
+                    gasHistory: [...this.state.gasHistory, []]
+                  });
+                  onTabsChange(newTabsState);
+                }
+              }}
+            >
+              Add <AddIcon className={classes.rightIcon} />
+            </Button>
+          </div>
         </Popover>
       </div>
     );

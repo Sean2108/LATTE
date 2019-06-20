@@ -40,7 +40,6 @@ class VariableRow extends React.Component {
                   .replace(/\s/g, '_')
               })
             }
-            margin="normal"
           />
         </FormControl>
 
