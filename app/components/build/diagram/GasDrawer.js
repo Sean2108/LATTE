@@ -26,22 +26,24 @@ class GasDrawer extends React.Component {
         <Typography variant="subheading">
           Current gas usage: {history[history.length - 1] || 'None'}
         </Typography>
-        <Typography variant="title">
-          Gas Usage History:
-        </Typography>
-        {history.length > 0 ? <VictoryChart className={classes.chart} theme={VictoryTheme.material}>
-          <VictoryLine
-            style={{
-              data: { stroke: '#c43a31' },
-              parent: { border: '1px solid #ccc' }
-            }}
-            data={[{ x: 0, y: 0 }].concat(
-              history.map((element, index) => {
-                return { x: index + 1, y: element };
-              })
-            )}
-          />
-        </VictoryChart> : 'No history yet.'}
+        <Typography variant="title">Gas Usage History:</Typography>
+        {history.length > 0 ? (
+          <VictoryChart className={classes.chart} theme={VictoryTheme.material}>
+            <VictoryLine
+              style={{
+                data: { stroke: '#c43a31' },
+                parent: { border: '1px solid #ccc' }
+              }}
+              data={[{ x: 0, y: 0 }].concat(
+                history.map((element, index) => {
+                  return { x: index + 1, y: element };
+                })
+              )}
+            />
+          </VictoryChart>
+        ) : (
+          'No history yet.'
+        )}
       </div>
     );
   }

@@ -61,7 +61,8 @@ class BuildTabs extends React.Component {
     value: 0,
     addTabPopoverAnchor: null,
     popoverContent: '',
-    gasHistory: [[]]
+    // gasHistory: [[]]
+    gasHistory: []
   };
 
   handleChange = (event, value) => {
@@ -183,18 +184,20 @@ class BuildTabs extends React.Component {
                     this.handleOnChange(diagram, i, 'diagrams')
                   }
                   bitsMode={bitsMode}
-                  gasHistory={this.state.gasHistory[i]}
+                  // gasHistory={this.state.gasHistory[i]}
+                  gasHistory={this.state.gasHistory}
                   updateGasHistory={() => {
-                    if (i === 0) return;
+                    // if (i === 0) return;
                     let history = this.state.gasHistory;
-                    if (history[i].length === 10) {
-                      history[i].shift();
-                    }
+                    // if (history[i].length === 10) {
+                    //   history[i].shift();
+                    // }
                     this.web3Utils.getGasUsage(
                       buildState,
                       bitsMode,
                       i,
-                      history[i]
+                      // history[i]
+                      history
                     );
                     this.setState({ gasHistory: history });
                   }}
@@ -248,7 +251,7 @@ class BuildTabs extends React.Component {
                   this.setState({
                     popoverContent: '',
                     addTabPopoverAnchor: null,
-                    gasHistory: [...this.state.gasHistory, []]
+                    // gasHistory: [...this.state.gasHistory, []]
                   });
                   onTabsChange(newTabsState);
                 }

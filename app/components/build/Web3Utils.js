@@ -25,11 +25,21 @@ export class Web3Utils {
         }
         let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
         let contract = new this.web3.eth.Contract(abiDefinition);
-        contract.options.address = '0x6ee9957aef5f4073c6af71441ec7962527c37671';
-        contract.methods[this.toLowerCamelCase(funcName)]
-          .estimateGas()
-          .then(gas => history.push(gas))
-          .catch(err => console.log(err));
+        contract.options.address = account;
+        let byteCode =
+          compiledCode.contracts['code.sol']['Code'].evm.bytecode.object;
+        this.web3.eth.estimateGas(
+          { data: byteCode, from: accs[1] },
+          (err, gas) => {
+            if (!err && history[history.length - 1] !== gas) {
+              history.push(gas);
+            }
+          }
+        );
+        // contract.methods[this.toLowerCamelCase(funcName)]()
+        //   .estimateGas({from: accs[1]})
+        // .then(gas => history.push(gas))
+        // .catch(err => console.log(err));
       });
     });
   }
@@ -50,6 +60,7 @@ export class Web3Utils {
       let account = accs[0];
       this.web3.eth.defaultAccount = account;
       let code = this.formCode(buildState, bitsMode);
+      console.log(code);
       ipcRenderer.send('request-compile', code);
       ipcRenderer.on('request-compile-complete', (event, payload) => {
         let compiledCode = JSON.parse(payload);
@@ -65,9 +76,8 @@ export class Web3Utils {
         if (buildState.constructorParams.length) {
           deploymentJson[
             'arguments'
-          ] = this.props.buildState.constructorParams.map(
-            param =>
-              param.type === 'int' ? parseInt(param.value) : param.value
+          ] = this.props.buildState.constructorParams.map(param =>
+            param.type === 'int' ? parseInt(param.value) : param.value
           );
         }
         contract
@@ -128,26 +138,21 @@ export class Web3Utils {
             this.isString(req.var2) &&
             req.comp == '=='
           ) {
-            return `require(keccak256(${req.var1}) == keccak256(${
-              req.var2
-            }), "${req.requireMessage}");\n`;
+            return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
           }
-          return `require(${req.var1} ${req.comp} ${req.var2}, "${
-            req.requireMessage
-          }");\n`;
+          return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
         })
         .join('');
       code += `${functionName}(${buildState.tabsParams[i]
         .filter(element => element.name)
-        .map(
-          element =>
-            element.type === 'string'
-              ? bitsMode && element.bits !== ''
-                ? `bytes${element.bits} ${element.name}`
-                : `${element.type} memory ${element.name}`
-              : bitsMode
-                ? `${element.type}${element.bits} ${element.name}`
-                : `${element.type} ${element.name}`
+        .map(element =>
+          element.type === 'string'
+            ? bitsMode && element.bits !== ''
+              ? `bytes${element.bits} ${element.name}`
+              : `${element.type} memory ${element.name}`
+            : bitsMode
+            ? `${element.type}${element.bits} ${element.name}`
+            : `${element.type} ${element.name}`
         )
         .join(', ')}) public ${
         buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
@@ -156,9 +161,7 @@ export class Web3Utils {
       } ${returnCode} {
           ${requires}${buildState.tabsCode[i]}}\n`;
     }
-    code += '}';
-    console.log(code);
-    return code;
+    return code + '}';
   }
 
   formStructsEvents(entities, bitsMode, isEvent) {
