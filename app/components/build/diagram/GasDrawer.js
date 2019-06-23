@@ -23,9 +23,10 @@ class GasDrawer extends React.Component {
 
     return (
       <div className={classes.drawerContainer}>
-        <Typography variant="subheading">
+        <Typography variant="title">
           Current gas usage: {history[history.length - 1] || 'None'}
         </Typography>
+        <br />
         <Typography variant="title">Gas Usage History:</Typography>
         {history.length > 0 ? (
           <VictoryChart className={classes.chart} theme={VictoryTheme.material}>

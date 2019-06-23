@@ -42,7 +42,8 @@ class Build extends React.Component {
     events: {},
     entities: {},
     isView: [false],
-    diagrams: [{}]
+    diagrams: [{}],
+    gasHistory: []
   };
 
   render() {

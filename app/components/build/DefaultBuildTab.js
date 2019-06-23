@@ -110,8 +110,8 @@ class DefaultBuildTab extends React.Component {
           <div
             tabIndex={0}
             role="button"
-            onClick={this.closeDrawer}
-            onKeyDown={this.closeDrawer}
+            // onClick={this.closeDrawer}
+            // onKeyDown={this.closeDrawer}
           >
             <GasDrawer history={gasHistory}/>
           </div>

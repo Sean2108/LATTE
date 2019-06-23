@@ -60,9 +60,7 @@ class BuildTabs extends React.Component {
   state = {
     value: 0,
     addTabPopoverAnchor: null,
-    popoverContent: '',
-    // gasHistory: [[]]
-    gasHistory: []
+    popoverContent: ''
   };
 
   handleChange = (event, value) => {
@@ -185,10 +183,10 @@ class BuildTabs extends React.Component {
                   }
                   bitsMode={bitsMode}
                   // gasHistory={this.state.gasHistory[i]}
-                  gasHistory={this.state.gasHistory}
+                  gasHistory={buildState.gasHistory}
                   updateGasHistory={() => {
                     // if (i === 0) return;
-                    let history = this.state.gasHistory;
+                    let history = buildState.gasHistory;
                     // if (history[i].length === 10) {
                     //   history[i].shift();
                     // }
@@ -199,7 +197,7 @@ class BuildTabs extends React.Component {
                       // history[i]
                       history
                     );
-                    this.setState({ gasHistory: history });
+                    onTabsChange({ gasHistory: history });
                   }}
                 />
               </TabContainer>
