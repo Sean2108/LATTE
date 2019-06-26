@@ -5,7 +5,7 @@ export class Web3Utils {
     this.web3 = connection;
   }
 
-  getGasUsage(buildState, bitsMode, tabIndex, history) {
+  async getGasUsage(buildState, bitsMode, tabIndex, history) {
     let funcName = buildState.tabs[tabIndex + 1];
     let gas;
     this.web3.eth.getAccounts((err, accs) => {
@@ -25,21 +25,38 @@ export class Web3Utils {
         }
         let abiDefinition = compiledCode.contracts['code.sol']['Code'].abi;
         let contract = new this.web3.eth.Contract(abiDefinition);
-        contract.options.address = account;
         let byteCode =
           compiledCode.contracts['code.sol']['Code'].evm.bytecode.object;
-        this.web3.eth.estimateGas(
-          { data: byteCode, from: accs[1] },
-          (err, gas) => {
-            if (!err && history[history.length - 1] !== gas) {
-              history.push(gas);
+        let deploymentJson = { data: byteCode };
+        if (buildState.constructorParams.length) {
+          deploymentJson['arguments'] = buildState.constructorParams.map(
+            param => {
+              switch (param.type) {
+                case 'int': return 0;
+                case 'string': return '';
+                case 'bool': return true;
+                default: return account;
+              }
             }
-          }
-        );
-        // contract.methods[this.toLowerCamelCase(funcName)]()
-        //   .estimateGas({from: accs[1]})
-        // .then(gas => history.push(gas))
-        // .catch(err => console.log(err));
+          );
+        }
+        // this.web3.eth.estimateGas(
+        //   { data: contract.deploy(deploymentJson).encodeABI(), from: accs[1] },
+        //   (err, gas) => {
+        //     if (err) {
+        //       console.log(err);
+        //     }
+        //     if (history[history.length - 1] !== gas) {
+        //       history.push(gas);
+        //     }
+        //   }
+        // );
+        // contract.options.address = account;
+        await contract.deploy(deploymentJson)
+        contract.methods[this.toLowerCamelCase(funcName)]()
+          .estimateGas({from: accs[1]})
+        .then(gas => history.push(gas))
+        .catch(err => console.log(err));
       });
     });
   }
@@ -74,10 +91,9 @@ export class Web3Utils {
           compiledCode.contracts['code.sol']['Code'].evm.bytecode.object;
         let deploymentJson = { data: byteCode };
         if (buildState.constructorParams.length) {
-          deploymentJson[
-            'arguments'
-          ] = this.props.buildState.constructorParams.map(param =>
-            param.type === 'int' ? parseInt(param.value) : param.value
+          deploymentJson['arguments'] = buildState.constructorParams.map(
+            param =>
+              param.type === 'int' ? parseInt(param.value) : param.value
           );
         }
         contract

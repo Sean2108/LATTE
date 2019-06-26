@@ -43,7 +43,7 @@ class Build extends React.Component {
     entities: {},
     isView: [false],
     diagrams: [{}],
-    gasHistory: []
+    gasHistory: [0]
   };
 
   render() {

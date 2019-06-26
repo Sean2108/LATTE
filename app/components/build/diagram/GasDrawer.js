@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { VictoryChart, VictoryLine, VictoryTheme } from 'victory';
+import {
+  VictoryChart,
+  VictoryLine,
+  VictoryTheme,
+  VictoryAxis,
+  VictoryZoomContainer
+} from 'victory';
 
 const styles = {
   drawerContainer: {
     width: 'auto',
     color: 'black',
-    padding: '0 20% 0 20%'
-  },
-  chart: {
-    width: 1000,
-    height: 1000
+    padding: '10%'
   }
 };
 
@@ -23,23 +25,36 @@ class GasDrawer extends React.Component {
 
     return (
       <div className={classes.drawerContainer}>
-        <Typography variant="title">
+        <Typography variant="title">Gas Usage</Typography>
+        <br />
+        <Typography variant="subheading">
           Current gas usage: {history[history.length - 1] || 'None'}
         </Typography>
         <br />
-        <Typography variant="title">Gas Usage History:</Typography>
-        {history.length > 0 ? (
-          <VictoryChart className={classes.chart} theme={VictoryTheme.material}>
+        <Typography variant="subheading">Gas Usage History:</Typography>
+        {history.length > 1 ? (
+          <VictoryChart
+            theme={VictoryTheme.material}
+            containerComponent={
+              <VictoryZoomContainer
+                zoomDomain={{ x: [0, history.length - 1] }}
+              />
+            }
+          >
             <VictoryLine
               style={{
                 data: { stroke: '#c43a31' },
                 parent: { border: '1px solid #ccc' }
               }}
-              data={[{ x: 0, y: 0 }].concat(
-                history.map((element, index) => {
-                  return { x: index + 1, y: element };
-                })
-              )}
+              data={history.map((element, index) => {
+                return { x: index, y: element / 1000 };
+              })}
+            />
+            <VictoryAxis label="Time" style={{ axisLabel: { padding: 40 } }} />
+            <VictoryAxis
+              dependentAxis
+              label="Gas usage (in thousands)"
+              style={{ axisLabel: { padding: 40 } }}
             />
           </VictoryChart>
         ) : (

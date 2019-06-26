@@ -8,6 +8,12 @@ import BuildDiagram from './BuildDiagram';
 import RequiresList from './RequiresList';
 import GasDrawer from './diagram/GasDrawer';
 
+const styles = {
+  drawer: {
+    width: '40%'
+  }
+};
+
 class DefaultBuildTab extends React.Component {
   varList;
 
@@ -27,9 +33,9 @@ class DefaultBuildTab extends React.Component {
           if (currentObject.type === 'string' && currentObject.bits !== '') {
             result[currentObject.name] = `bytes${currentObject.bits}`;
           } else {
-            result[currentObject.name] = `${currentObject.type}${
-              currentObject.bits
-            }`;
+            result[
+              currentObject.name
+            ] = `${currentObject.type}${currentObject.bits}`;
           }
         } else {
           result[currentObject.name] = currentObject.type;
@@ -106,14 +112,13 @@ class DefaultBuildTab extends React.Component {
           anchor="right"
           open={this.state.drawerOpen}
           onClose={this.closeDrawer}
+          className={classes.drawer}
+          classes={{
+            paper: classes.drawer,
+          }}
         >
-          <div
-            tabIndex={0}
-            role="button"
-            // onClick={this.closeDrawer}
-            // onKeyDown={this.closeDrawer}
-          >
-            <GasDrawer history={gasHistory}/>
+          <div tabIndex={0} role="button">
+            <GasDrawer history={gasHistory} />
           </div>
         </Drawer>
       </div>
@@ -140,4 +145,4 @@ DefaultBuildTab.propTypes = {
   updateGasHistory: PropTypes.func.isRequired
 };
 
-export default DefaultBuildTab;
+export default withStyles(styles)(DefaultBuildTab);
