@@ -12,16 +12,19 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
   button: {
-    margin: theme.spacing.unit
+    margin: 0
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: 0,
     minWidth: 200
   },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: 200
+  },
+  optionspopover: {
+    display: 'flex'
   }
 });
 
@@ -58,57 +61,58 @@ class BuildOptionsPopover extends React.Component {
           horizontal: 'center'
         }}
       >
-        {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? (
-          <TextField
-            id="standard-name"
-            label="File Name"
-            className={classes.textField}
-            value={fileName}
-            onChange={handleChange('fileName')}
-            margin="normal"
-          />
-        ) : (
-          <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="filename-simple">File Name</InputLabel>
-            <Select
+        <div className={classes.optionspopover}>
+          {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? (
+            <TextField
+              id="standard-name"
+              label="File Name"
+              className={classes.textField}
               value={fileName}
               onChange={handleChange('fileName')}
-              inputProps={{
-                name: 'filename',
-                id: 'filename-simple'
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {files.map(item => (
-                <MenuItem value={item} key={item}>
-                  {item}
+            />
+          ) : (
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="filename-simple">File Name</InputLabel>
+              <Select
+                value={fileName}
+                onChange={handleChange('fileName')}
+                inputProps={{
+                  name: 'filename',
+                  id: 'filename-simple'
+                }}
+              >
+                <MenuItem value="">
+                  <em>None</em>
                 </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={() => {
-            switch (dataOp) {
-              case DATA_OP.SAVE_DATA:
-                saveData();
-                break;
-              case DATA_OP.LOAD_DATA:
-                loadData();
-                break;
-              case DATA_OP.SAVE_CONTRACT:
-                saveContract();
-                break;
-            }
-          }}
-        >
-          Done
-        </Button>
+                {files.map(item => (
+                  <MenuItem value={item} key={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => {
+              switch (dataOp) {
+                case DATA_OP.SAVE_DATA:
+                  saveData();
+                  break;
+                case DATA_OP.LOAD_DATA:
+                  loadData();
+                  break;
+                case DATA_OP.SAVE_CONTRACT:
+                  saveContract();
+                  break;
+              }
+            }}
+          >
+            Done
+          </Button>
+        </div>
       </Popover>
     );
   }

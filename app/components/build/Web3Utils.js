@@ -5,7 +5,7 @@ export class Web3Utils {
     this.web3 = connection;
   }
 
-  async getGasUsage(buildState, bitsMode, tabIndex, history) {
+  getGasUsage(buildState, bitsMode, tabIndex, history) {
     let funcName = buildState.tabs[tabIndex + 1];
     let gas;
     this.web3.eth.getAccounts((err, accs) => {
@@ -40,23 +40,22 @@ export class Web3Utils {
             }
           );
         }
-        // this.web3.eth.estimateGas(
-        //   { data: contract.deploy(deploymentJson).encodeABI(), from: accs[1] },
-        //   (err, gas) => {
-        //     if (err) {
-        //       console.log(err);
-        //     }
-        //     if (history[history.length - 1] !== gas) {
-        //       history.push(gas);
-        //     }
-        //   }
-        // );
+        this.web3.eth.estimateGas(
+          { data: contract.deploy(deploymentJson).encodeABI(), from: accs[1] },
+          (err, gas) => {
+            if (err) {
+              console.log(err);
+            }
+            if (history[history.length - 1] !== gas) {
+              history.push(gas);
+            }
+          }
+        );
         // contract.options.address = account;
-        await contract.deploy(deploymentJson)
-        contract.methods[this.toLowerCamelCase(funcName)]()
-          .estimateGas({from: accs[1]})
-        .then(gas => history.push(gas))
-        .catch(err => console.log(err));
+        // contract.methods[this.toLowerCamelCase(funcName)]()
+        //   .estimateGas({from: accs[1]})
+        // .then(gas => history.push(gas))
+        // .catch(err => console.log(err));
       });
     });
   }
