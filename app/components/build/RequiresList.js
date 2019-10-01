@@ -62,7 +62,6 @@ class RequiresList extends React.Component {
           <RequireRow
             require={element}
             key={index}
-            vars={vars}
             showMessage={true}
             updateRequire={val => {
               let variables = [...requires];

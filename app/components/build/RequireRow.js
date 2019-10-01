@@ -58,7 +58,6 @@ class RequireRow extends React.Component {
       classes,
       theme,
       key,
-      vars,
       showMessage,
       submit,
       require
@@ -133,7 +132,6 @@ RequireRow.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
   key: PropTypes.any,
-  vars: PropTypes.object.isRequired,
   showMessage: PropTypes.bool,
   updateRequire: PropTypes.func.isRequired,
   buildParser: PropTypes.object,

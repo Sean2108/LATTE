@@ -47,7 +47,6 @@ class ConditionalNode extends React.Component {
     return (
       <FormControl className={classes.formControl}>
         <RequireRow
-          vars={varList}
           showMessage={false}
           updateRequire={state => this.setState(state)}
           require={this.state}
