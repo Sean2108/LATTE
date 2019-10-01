@@ -53,6 +53,18 @@ function setup() {
 }
 
 describe('VariableRow component', () => {
+  it('should show correct initial values', () => {
+    const { intComponent } = setup();
+    const variableName = intComponent.find(TextField);
+    expect(variableName).toHaveLength(1);
+    const selects = intComponent.find(Select);
+    expect(selects).toHaveLength(2);
+    const variableType = selects.at(0);
+    const variableBits = selects.at(1);
+    expect(variableName.props().value).toBe('Test Int');
+    expect(variableType.props().value).toBe('uint');
+    expect(variableBits.props().value).toBe('8');
+  });
   it(
     'should call updateVariables with new display name and formatted name when variab' +
       'le name changes',

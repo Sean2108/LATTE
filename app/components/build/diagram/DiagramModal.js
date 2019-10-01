@@ -86,7 +86,7 @@ class DiagramModal extends React.Component {
     switch (type) {
       case 'assignment':
         return (
-          <AssignmentNode close={close} submit={submit} varList={varList} bitsMode={bitsMode} />
+          <AssignmentNode close={close} submit={submit} bitsMode={bitsMode} />
         );
       case 'event':
         return <EventNode close={close} submit={submit} varList={events} />;
