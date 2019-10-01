@@ -10,8 +10,9 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
+import TextField from '@material-ui/core/TextField';
 
-var Web3 = require('web3');
+const Web3 = require('web3');
 
 const styles = theme => ({
   toolbar: {
@@ -45,14 +46,21 @@ const styles = theme => ({
 
 class Connect extends React.Component {
   state = {
-    addressEmpty: false,
-    portEmpty: false,
     connectionFailed: false,
-    protocol: 'http'
+    protocol: 'http',
+    address: '',
+    port: '',
+    submitted: false
   };
   id;
 
-  promiseTimeout = (ms, promise) => {
+  constructor(...args) {
+    super(...args);
+    this.promiseTimeout = this.promiseTimeout.bind(this);
+    this.login = this.login.bind(this);
+  }
+
+  promiseTimeout(ms, promise) {
     // Create a promise that rejects in <ms> milliseconds
     let timeout = new Promise((resolve, reject) => {
       this.id = setTimeout(() => {
@@ -64,22 +72,16 @@ class Connect extends React.Component {
     });
     // Returns a race between our timeout and the passed in promise
     return Promise.race([promise, timeout]);
-  };
+  }
 
-  login = () => {
-    const address = document.getElementById('address').value;
-    const port = document.getElementById('port').value;
-    this.setState({
-      addressEmpty: !address,
-      portEmpty: !port
-    });
+  login() {
+    this.setState({ submitted: true });
+    const { protocol, address, port } = this.state;
     if (!address || !port) {
       return;
     }
     let web3 = new Web3(
-      new Web3.providers.HttpProvider(
-        `${this.state.protocol}://${address}:${port}`
-      )
+      new Web3.providers.HttpProvider(`${protocol}://${address}:${port}`)
     );
     this.promiseTimeout(
       1000,
@@ -91,7 +93,7 @@ class Connect extends React.Component {
         this.props.onclick(web3);
       })
     );
-  };
+  }
 
   _handleKeyDown = e => {
     if (e.key === 'Enter') {
@@ -145,30 +147,37 @@ class Connect extends React.Component {
             <Typography variant="title" noWrap>
               : //
             </Typography>
-            <FormControl
+            <TextField
+              id="address"
+              label="Blockchain Address"
               className={classes.formControl}
-              error={this.state.addressEmpty || this.state.connectionFailed}
-            >
-              <InputLabel htmlFor="name-simple">Blockchain Address</InputLabel>
-              <Input id="address" onKeyDown={this._handleKeyDown} />
-              {this.state.addressEmpty ? (
-                <FormHelperText> Address cannot be empty! </FormHelperText>
-              ) : null}
-            </FormControl>
-
+              onChange={event => this.setState({ address: event.target.value })}
+              value={this.state.address}
+              margin="normal"
+              onKeyDown={this._handleKeyDown}
+              helperText={
+                this.state.submitted && !this.state.address
+                  ? 'Address cannot be empty!'
+                  : ''
+              }
+            />
             <Typography variant="title" noWrap>
               :
             </Typography>
-            <FormControl
+            <TextField
+              id="port"
+              label="Blockchain Port"
               className={classes.formControl}
-              error={this.state.portEmpty || this.state.connectionFailed}
-            >
-              <InputLabel htmlFor="name-simple"> Blockchain Port </InputLabel>
-              <Input id="port" onKeyDown={this._handleKeyDown} />
-              {this.state.portEmpty ? (
-                <FormHelperText> Port cannot be empty! </FormHelperText>
-              ) : null}
-            </FormControl>
+              onChange={event => this.setState({ port: event.target.value })}
+              value={this.state.port}
+              margin="normal"
+              onKeyDown={this._handleKeyDown}
+              helperText={
+                this.state.submitted && !this.state.port
+                  ? 'Port cannot be empty!'
+                  : ''
+              }
+            />
           </div>
           <br />
           <Button
