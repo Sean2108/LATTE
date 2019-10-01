@@ -61,7 +61,7 @@ class ReturnNode extends React.Component {
   };
 
   render() {
-    const { classes, close, submit, varList, bitsMode } = this.props;
+    const { classes, close, submit, bitsMode } = this.props;
 
     return (
       <FormControl className={classes.formControl}>
@@ -121,7 +121,7 @@ class ReturnNode extends React.Component {
                     isMemory: event.target.checked
                   })
                 }
-                value="isMemory"
+                value={this.state.isMemory}
                 color="primary"
               />
             }
@@ -148,6 +148,9 @@ class ReturnNode extends React.Component {
             color="primary"
             className={classes.button}
             onClick={() => {
+              if (!this.state.variableSelected || !this.state.assignedVal) {
+                return;
+              }
               close();
               submit(
                 `${this.state.variableSelected} ${this.state.assignment} ${
@@ -170,7 +173,6 @@ ReturnNode.propTypes = {
   classes: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
   submit: PropTypes.func.isRequired,
-  varList: PropTypes.object,
   bitsMode: PropTypes.bool.isRequired
 };
 
