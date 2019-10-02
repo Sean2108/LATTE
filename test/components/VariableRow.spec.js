@@ -11,7 +11,24 @@ import TextField from '@material-ui/core/TextField';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-function setup() {
+function strSetup() {
+  const onchange = jest.fn();
+  const strComponent = createMount()(
+    <VariableRow
+      updateVariables={onchange}
+      val={{
+        displayName: 'Test Str',
+        name: 'test_str',
+        type: 'string',
+        bits: '8'
+      }}
+      bitsMode={true}
+    />
+  );
+  return { strComponent, onchange };
+}
+
+function intSetup() {
   const onchange = jest.fn();
   const intComponent = createMount()(
     <VariableRow
@@ -25,18 +42,11 @@ function setup() {
       bitsMode={true}
     />
   );
-  const strComponent = createMount()(
-    <VariableRow
-      updateVariables={onchange}
-      val={{
-        displayName: 'Test Str',
-        name: 'test_str',
-        type: 'string',
-        bits: '8'
-      }}
-      bitsMode={true}
-    />
-  );
+  return { intComponent, onchange };
+}
+
+function noBitsSetup() {
+  const onchange = jest.fn();
   const noBitsComponent = createMount()(
     <VariableRow
       updateVariables={onchange}
@@ -49,12 +59,12 @@ function setup() {
       bitsMode={false}
     />
   );
-  return { intComponent, strComponent, noBitsComponent, onchange };
+  return { noBitsComponent, onchange };
 }
 
 describe('VariableRow component', () => {
   it('should show correct initial values', () => {
-    const { intComponent } = setup();
+    const { intComponent } = intSetup();
     const variableName = intComponent.find(TextField);
     expect(variableName).toHaveLength(1);
     const selects = intComponent.find(Select);
@@ -69,7 +79,7 @@ describe('VariableRow component', () => {
     'should call updateVariables with new display name and formatted name when variab' +
       'le name changes',
     () => {
-      const { intComponent, onchange } = setup();
+      const { intComponent, onchange } = intSetup();
       const variableName = intComponent.find(TextField);
       variableName.props().onChange({
         target: {
@@ -89,7 +99,7 @@ describe('VariableRow component', () => {
     'should call updateVariables with type string and reset empty bits when variable ' +
       'type changes',
     () => {
-      const { intComponent, onchange } = setup();
+      const { intComponent, onchange } = intSetup();
       const variableType = intComponent.find(Select).at(0);
       variableType.props().onChange({
         target: {
@@ -106,7 +116,7 @@ describe('VariableRow component', () => {
   );
 
   it('should call updateVariables with new bits when variable bits changes for int', () => {
-    const { intComponent, onchange } = setup();
+    const { intComponent, onchange } = intSetup();
     const selects = intComponent.find(Select);
     expect(selects).toHaveLength(2);
     selects
@@ -126,7 +136,7 @@ describe('VariableRow component', () => {
   });
 
   it('should call updateVariables with new bits when variable bits changes for string', () => {
-    const { strComponent, onchange } = setup();
+    const { strComponent, onchange } = strSetup();
     const selects = strComponent.find(Select);
     expect(selects).toHaveLength(2);
     selects
@@ -146,7 +156,7 @@ describe('VariableRow component', () => {
   });
 
   it('should not show bits field when bits mode is off', () => {
-    const { noBitsComponent, onchange } = setup();
+    const { noBitsComponent, onchange } = noBitsSetup();
     const bits = noBitsComponent.find(Select);
     expect(bits).toHaveLength(1);
   });
