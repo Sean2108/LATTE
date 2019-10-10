@@ -34,7 +34,7 @@ const styles = theme => ({
 
 class ParamList extends React.Component {
   handleChange = index => event => {
-    let params = [...this.props.params];
+    let params = this.props.params.filter(param => param.name && param.displayName);
     params[index].value = event.target.value;
     this.props.updateParams(params);
   };
@@ -62,7 +62,7 @@ class ParamList extends React.Component {
           </Typography>
         </Tooltip>
         <br />
-        {params.filter(param => param.name).map((param, index) => (
+        {params.filter(param => param.name && param.displayName).map((param, index) => (
           <div key={index}>
             {param.type === 'bool' ? (
               <FormControl className={classes.formControl}>
