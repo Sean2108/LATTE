@@ -67,7 +67,7 @@ class VariableRow extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="protocol"> Number of Bits </InputLabel>
               <Select
-                value={val.bits}
+                value={val.bits || ""}
                 onChange={event =>
                   updateVariables({ ...val, bits: event.target.value })
                 }
@@ -91,7 +91,7 @@ class VariableRow extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="protocol"> Number of Bytes </InputLabel>
               <Select
-                value={val.bits}
+                value={val.bits || ""}
                 onChange={event =>
                   updateVariables({ ...val, bits: event.target.value })
                 }

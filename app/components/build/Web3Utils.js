@@ -32,10 +32,14 @@ export class Web3Utils {
           deploymentJson['arguments'] = buildState.constructorParams.map(
             param => {
               switch (param.type) {
-                case 'int': return 0;
-                case 'string': return '';
-                case 'bool': return true;
-                default: return account;
+                case 'int':
+                  return 0;
+                case 'string':
+                  return '';
+                case 'bool':
+                  return true;
+                default:
+                  return account;
               }
             }
           );
@@ -51,11 +55,6 @@ export class Web3Utils {
             }
           }
         );
-        // contract.options.address = account;
-        // contract.methods[this.toLowerCamelCase(funcName)]()
-        //   .estimateGas({from: accs[1]})
-        // .then(gas => history.push(gas))
-        // .catch(err => console.log(err));
       });
     });
   }
@@ -132,51 +131,73 @@ export class Web3Utils {
     code += this.formVars(buildState.variables);
     code += this.formStructsEvents(buildState.events, bitsMode, true);
     for (let i = 0; i < buildState.tabsCode.length; i++) {
-      let functionName =
-        buildState.tabs[i + 1] === 'Initial State'
-          ? 'constructor'
-          : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
-      let returnCode = buildState.tabsReturn[i]
-        ? ['bool', 'address', 'address payable'].includes(
-            buildState.tabsReturn[i]
-          ) ||
-          buildState.tabsReturn[i].includes('bytes') ||
-          buildState.tabsReturn[i].includes('int')
-          ? `returns (${buildState.tabsReturn[i]})`
-          : `returns (${buildState.tabsReturn[i]} memory)`
-        : '';
-      let requires = buildState.tabsRequire[i]
-        .filter(req => req.var1 && req.var2 && req.comp)
-        .map(req => {
-          if (
-            this.isString(req.var1, this.props.buildState.variables) &&
-            this.isString(req.var2, this.props.buildState.variables) &&
-            req.comp == '=='
-          ) {
-            return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
-          }
-          return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
-        })
-        .join('');
-      code += `${functionName}(${buildState.tabsParams[i]
-        .filter(element => element.name)
-        .map(element =>
-          element.type === 'string'
-            ? bitsMode && element.bits !== ''
-              ? `bytes${element.bits} ${element.name}`
-              : `${element.type} memory ${element.name}`
-            : bitsMode
-            ? `${element.type}${element.bits} ${element.name}`
-            : `${element.type} ${element.name}`
-        )
-        .join(', ')}) public ${
-        buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
-          ? 'view'
-          : 'payable'
-      } ${returnCode} {
-          ${requires}${buildState.tabsCode[i]}}\n`;
+      code += this.formFunctionBody(buildState, i, bitsMode);
     }
     return code + '}';
+  }
+
+  formFunctionBody(buildState, i, bitsMode) {
+    let functionName =
+      buildState.tabs[i + 1] === 'Initial State'
+        ? 'constructor'
+        : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
+    let returnCode = this.formReturnCode(buildState.tabsReturn[i]);
+    let requires = this.formRequires(buildState.tabsRequire[i], buildState.variables);
+    let params = this.formParams(buildState.tabsParams[i], bitsMode);
+    return `${functionName}(${params}) public ${
+      buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
+        ? 'view'
+        : 'payable'
+    } ${returnCode} {
+          ${requires}${buildState.tabsCode[i]}}\n`;
+  }
+
+  formReturnCode(returnType) {
+    if (!returnType) {
+      return '';
+    }
+    return ['bool', 'address', 'address payable'].includes(returnType) ||
+      returnType.includes('bytes') ||
+      returnType.includes('int')
+      ? `returns (${returnType})`
+      : `returns (${returnType} memory)`;
+  }
+
+  formRequires(requires, variables) {
+    return requires
+      .filter(req => req.var1 && req.var2 && req.comp)
+      .map(req => {
+        if (
+          this.isString(req.var1, variables) &&
+          this.isString(req.var2, variables) &&
+          req.comp == '=='
+        ) {
+          return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
+        }
+        return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
+      })
+      .join('');
+  }
+
+  formParams(params, bitsMode) {
+    return params
+      .filter(element => element.name)
+      .map(element => {
+          if (bitsMode && element.bits) {
+            if (element.type === 'string') {
+              return `bytes${element.bits} ${element.name}`;
+            }
+            else {
+              return `${element.type}${element.bits} ${element.name}`;
+            }
+          }
+          if (element.type === 'string') {
+            return `${element.type} memory ${element.name}`;
+          }
+          return `${element.type} ${element.name}`;
+        }
+      )
+      .join(', ');
   }
 
   formStructsEvents(entities, bitsMode, isEvent) {

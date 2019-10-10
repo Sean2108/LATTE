@@ -22,20 +22,6 @@ const styles = theme => ({
 });
 
 class RequireRow extends React.Component {
-  validate() {
-    let lhs = this.props.buildParser.parseVariable(this.props.var1);
-    let rhs = this.props.buildParser.parseVariable(this.props.var2);
-    if (lhs.type === 'var') {
-      alert('left variable type is unknown');
-    }
-    if (rhs.type === 'var') {
-      alert('right variable type is unknown');
-    }
-    if (lhs.type !== rhs.type) {
-      alert('left and right variables are of differing types');
-    }
-  }
-
   handleChange = name => event => {
     let state = { ...this.props.require, [name]: event.target.value };
     if (this.props.buildParser) {
