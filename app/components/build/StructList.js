@@ -92,7 +92,7 @@ class StructList extends React.Component {
         </Grid>
         <div className={classes.row}>
         <TextField
-          id="standard-name"
+          id="name-input"
           label={header === 'Entities' ? 'Entity Name' : 'Event Name'}
           className={classes.textField}
           onChange={this.handleChange('contents')}
@@ -100,17 +100,19 @@ class StructList extends React.Component {
           margin="normal"
         />
         <Button
+          id="add-struct-button"
           variant="contained"
           color="primary"
           className={classes.button}
           onClick={() => {
-            if (!this.state.contents || this.state.contents in initialVars)
+            const contents = this.state.contents
+            .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
+            .replace(/\s+/g, '');
+            if (!contents || contents in initialVars)
               return;
             updateVariables({
               ...initialVars,
-              [this.state.contents
-                .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
-                .replace(/\s+/g, '')]: []
+              [contents]: []
             });
             this.setState({ contents: '' });
           }}

@@ -219,7 +219,6 @@ export class Web3Utils {
         code += `${type} private ${name};\n`;
       }
     }
-    console.log(code);
     return code;
   }
 
