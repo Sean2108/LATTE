@@ -1,8 +1,8 @@
-import { Web3Utils } from '../../app/components/build/Web3Utils';
+import { CodeGenUtils } from '../../app/components/build/CodeGenUtils';
 import { string } from 'postcss-selector-parser';
 
 function setup() {
-  const web3 = new Web3Utils(null);
+  const codeGen = new CodeGenUtils();
   const entities = {
     itemA: [
       {
@@ -58,93 +58,93 @@ function setup() {
       type: 'mapping'
     }
   };
-  return { web3, entities, variables };
+  return { codeGen, entities, variables };
 }
 
-describe('Web3Utils class toLowerCamelCase function', () => {
+describe('codeGenUtils class toLowerCamelCase function', () => {
   it('should work correctly', () => {
-    const { web3 } = setup();
-    expect(web3.toLowerCamelCase('This is a test')).toEqual('thisIsATest');
+    const { codeGen } = setup();
+    expect(codeGen.toLowerCamelCase('This is a test')).toEqual('thisIsATest');
   });
 
   it('should not change result if input is already in lower camel case', () => {
-    const { web3 } = setup();
-    expect(web3.toLowerCamelCase('thisIsATest')).toEqual('thisIsATest');
+    const { codeGen } = setup();
+    expect(codeGen.toLowerCamelCase('thisIsATest')).toEqual('thisIsATest');
   });
 });
 
-describe('Web3Utils class formStructsEvents function', () => {
+describe('codeGenUtils class formStructsEvents function', () => {
   it('should return correct result for events when bitsMode is off', () => {
-    const { web3, entities } = setup();
+    const { codeGen, entities } = setup();
     const expected =
       'event itemA (uint paramA, string paramB);\nevent itemB (string paramC, address paramD, bool paramE);\n';
-    expect(web3.formStructsEvents(entities, false, true)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, false, true)).toEqual(expected);
   });
 
   it('should return correct result for events when bitsMode is on', () => {
-    const { web3, entities } = setup();
+    const { codeGen, entities } = setup();
     const expected =
       'event itemA (uint8 paramA, string paramB);\nevent itemB (bytes16 paramC, address paramD, bool paramE);\n';
-    expect(web3.formStructsEvents(entities, true, true)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, true, true)).toEqual(expected);
   });
 
   it('should return correct result for structs when bitsMode is off', () => {
-    const { web3, entities } = setup();
+    const { codeGen, entities } = setup();
     const expected =
       'struct itemA {\nuint paramA;\nstring paramB;\n}\nstruct itemB {\nstring paramC;\naddress paramD;\nbool paramE;\n}\n';
-    expect(web3.formStructsEvents(entities, false, false)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, false, false)).toEqual(expected);
   });
 
   it('should return correct result for structs when bitsMode is off', () => {
-    const { web3, entities } = setup();
+    const { codeGen, entities } = setup();
     const expected =
       'struct itemA {\nuint8 paramA;\nstring paramB;\n}\nstruct itemB {\nbytes16 paramC;\naddress paramD;\nbool paramE;\n}\n';
-    expect(web3.formStructsEvents(entities, true, false)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, true, false)).toEqual(expected);
   });
 });
 
-describe('Web3Utils class formVars function', () => {
+describe('codeGenUtils class formVars function', () => {
   it('should work correctly', () => {
-    const { web3, variables } = setup();
+    const { codeGen, variables } = setup();
     const expected =
       'string private varA;\nuint private varB;\nmapping(uint => bool) varC;\nmapping(uint => mapping(address => string)) varD;\nmapping(address payable => mapping(uint => bool)) varE;\n';
-    expect(web3.formVars(variables)).toEqual(expected);
+    expect(codeGen.formVars(variables)).toEqual(expected);
   });
 });
 
-describe('Web3Utils class isString function', () => {
+describe('codeGenUtils class isString function', () => {
   it('should work correctly', () => {
-    const { web3 } = setup();
-    expect(web3.isString('   "test    ', {})).toEqual(false);
-    expect(web3.isString('   test"    ', {})).toEqual(false);
-    expect(web3.isString('   test    ', {})).toEqual(false);
-    expect(web3.isString('   "test"    ', {})).toEqual(true);
-    expect(web3.isString("   'test'    ", {})).toEqual(true);
-    expect(web3.isString('   test    ', { test: 'uint' })).toEqual(false);
-    expect(web3.isString('   test    ', { test: 'string' })).toEqual(true);
+    const { codeGen } = setup();
+    expect(codeGen.isString('   "test    ', {})).toEqual(false);
+    expect(codeGen.isString('   test"    ', {})).toEqual(false);
+    expect(codeGen.isString('   test    ', {})).toEqual(false);
+    expect(codeGen.isString('   "test"    ', {})).toEqual(true);
+    expect(codeGen.isString("   'test'    ", {})).toEqual(true);
+    expect(codeGen.isString('   test    ', { test: 'uint' })).toEqual(false);
+    expect(codeGen.isString('   test    ', { test: 'string' })).toEqual(true);
   });
 });
 
-describe('Web3Utils class formReturnCode function', () => {
+describe('codeGenUtils class formReturnCode function', () => {
   it('should work correctly', () => {
-    const { web3 } = setup();
-    expect(web3.formReturnCode('')).toEqual('');
-    expect(web3.formReturnCode('bool')).toEqual('returns (bool)');
-    expect(web3.formReturnCode('address')).toEqual('returns (address)');
-    expect(web3.formReturnCode('address payable')).toEqual(
+    const { codeGen } = setup();
+    expect(codeGen.formReturnCode('')).toEqual('');
+    expect(codeGen.formReturnCode('bool')).toEqual('returns (bool)');
+    expect(codeGen.formReturnCode('address')).toEqual('returns (address)');
+    expect(codeGen.formReturnCode('address payable')).toEqual(
       'returns (address payable)'
     );
-    expect(web3.formReturnCode('bytes32')).toEqual('returns (bytes32)');
-    expect(web3.formReturnCode('bytes16')).toEqual('returns (bytes16)');
-    expect(web3.formReturnCode('uint8')).toEqual('returns (uint8)');
-    expect(web3.formReturnCode('uint')).toEqual('returns (uint)');
-    expect(web3.formReturnCode('string')).toEqual('returns (string memory)');
+    expect(codeGen.formReturnCode('bytes32')).toEqual('returns (bytes32)');
+    expect(codeGen.formReturnCode('bytes16')).toEqual('returns (bytes16)');
+    expect(codeGen.formReturnCode('uint8')).toEqual('returns (uint8)');
+    expect(codeGen.formReturnCode('uint')).toEqual('returns (uint)');
+    expect(codeGen.formReturnCode('string')).toEqual('returns (string memory)');
   });
 });
 
-describe('Web3Utils class formRequires function', () => {
+describe('codeGenUtils class formRequires function', () => {
   it('should work correctly', () => {
-    const { web3 } = setup();
+    const { codeGen } = setup();
     const input = [
       { var1: 'nocomp', var2: 'shouldfail' },
       {
@@ -161,15 +161,15 @@ describe('Web3Utils class formRequires function', () => {
       }
     ];
     const vars = { x: 'string', y: 'string' };
-    expect(web3.formRequires(input, vars)).toEqual(
+    expect(codeGen.formRequires(input, vars)).toEqual(
       'require(keccak256(x) == keccak256(y), "this should use keccak");\nrequire(a > b, "this should not use keccak");\n'
     );
   });
 });
 
-describe('Web3Utils class formParams function', () => {
+describe('codeGenUtils class formParams function', () => {
   it('should work correctly with bitsMode on', () => {
-    const { web3 } = setup();
+    const { codeGen } = setup();
     const input = [
       { type: 'string' },
       { name: 'bitsstr', type: 'string', bits: '8' },
@@ -177,11 +177,11 @@ describe('Web3Utils class formParams function', () => {
       { name: 'bitsint', type: 'uint', bits: '8' },
       { name: 'nobitsint', type: 'uint' }
     ];
-    expect(web3.formParams(input, true)).toEqual('bytes8 bitsstr, string memory nobitsstr, uint8 bitsint, uint nobitsint');
+    expect(codeGen.formParams(input, true)).toEqual('bytes8 bitsstr, string memory nobitsstr, uint8 bitsint, uint nobitsint');
   });
 
   it('should work correctly with bitsMode off', () => {
-    const { web3 } = setup();
+    const { codeGen } = setup();
     const input = [
       { type: 'string' },
       { name: 'bitsstr', type: 'string', bits: '8' },
@@ -189,6 +189,6 @@ describe('Web3Utils class formParams function', () => {
       { name: 'bitsint', type: 'uint', bits: '8' },
       { name: 'nobitsint', type: 'uint' }
     ];
-    expect(web3.formParams(input, false)).toEqual('string memory bitsstr, string memory nobitsstr, uint bitsint, uint nobitsint');
+    expect(codeGen.formParams(input, false)).toEqual('string memory bitsstr, string memory nobitsstr, uint bitsint, uint nobitsint');
   });
 });

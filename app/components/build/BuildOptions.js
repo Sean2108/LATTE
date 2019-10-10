@@ -7,6 +7,7 @@ import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Web3Utils } from './Web3Utils';
+import { CodeGenUtils } from './CodeGenUtils';
 
 const styles = theme => ({
   button: {
@@ -27,6 +28,7 @@ class BuildOptions extends React.Component {
 
   componentWillMount() {
     this.web3Utils = new Web3Utils(this.props.connection);
+    this.codeGenUtils = new CodeGenUtils();
     this.getFiles();    
   }
 
@@ -108,7 +110,7 @@ class BuildOptions extends React.Component {
             })
           }
           saveContract={() => {
-            let code = this.web3Utils.formCode(buildState, bitsMode);
+            let code = this.codeGenUtils.formCode(buildState, bitsMode);
             let filename = fileName.replace(/\s+/g, '_') + '.sol';
             writeFile(join('saved_contracts', filename), code, err => {
               if (err) throw err;
