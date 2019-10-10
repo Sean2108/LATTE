@@ -149,8 +149,8 @@ export class Web3Utils {
         .filter(req => req.var1 && req.var2 && req.comp)
         .map(req => {
           if (
-            this.isString(req.var1) &&
-            this.isString(req.var2) &&
+            this.isString(req.var1, this.props.buildState.variables) &&
+            this.isString(req.var2, this.props.buildState.variables) &&
             req.comp == '=='
           ) {
             return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
@@ -219,15 +219,16 @@ export class Web3Utils {
         code += `${type} private ${name};\n`;
       }
     }
+    console.log(code);
     return code;
   }
 
-  isString(variable) {
+  isString(variable, vars) {
     variable = variable.trim();
     return (
       (variable[0] === '"' && variable[variable.length - 1] === '"') ||
       (variable[0] === "'" && variable[variable.length - 1] === "'") ||
-      this.props.buildState.variables[variable] === 'string'
+      vars[variable] === 'string'
     );
   }
 }
