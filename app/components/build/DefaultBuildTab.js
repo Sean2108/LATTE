@@ -29,8 +29,8 @@ class DefaultBuildTab extends React.Component {
     return params
       .filter(element => element.name)
       .reduce((result, currentObject) => {
-        if (bitsMode) {
-          if (currentObject.type === 'string' && currentObject.bits !== '') {
+        if (bitsMode && currentObject.bits) {
+          if (currentObject.type === 'string') {
             result[currentObject.name] = `bytes${currentObject.bits}`;
           } else {
             result[
@@ -114,7 +114,7 @@ class DefaultBuildTab extends React.Component {
           onClose={this.closeDrawer}
           className={classes.drawer}
           classes={{
-            paper: classes.drawer,
+            paper: classes.drawer
           }}
         >
           <div tabIndex={0} role="button">

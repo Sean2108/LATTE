@@ -21,7 +21,7 @@ function setup(emptyParamsList) {
     <InitialStateTab
       entities={{}}
       events={{}}
-      params={emptyParamsList ? [] : [{name: 'test1'}, {name: 'test2'}]}
+      params={emptyParamsList ? [] : [{ name: 'test1' }, { name: 'test2' }]}
       updateEntities={updateEntities}
       updateEvents={updateEvents}
       updateParams={updateParams}

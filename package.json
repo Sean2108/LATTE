@@ -121,7 +121,8 @@
       "^.+\\.js$": "babel-jest"
     },
     "setupFiles": [
-      "./internals/scripts/CheckBuiltsExist.js"
+      "./internals/scripts/CheckBuiltsExist.js",
+      "./internals/scripts/jest-setup.js"
     ]
   },
   "devDependencies": {
