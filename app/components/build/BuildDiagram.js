@@ -18,7 +18,7 @@ import {
   DiagramWidget
 } from 'storm-react-diagrams';
 import DiagramModal from './diagram/DiagramModal';
-import { BuildParser } from './BuildParser';
+import { BuildParser } from './parsers/BuildParser';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Button } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';

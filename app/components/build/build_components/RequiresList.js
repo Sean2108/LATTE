@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import RequireRow from './RequireRow';
-import { BuildParser } from '../BuildParser';
+import { BuildParser } from '../parsers/BuildParser';
 import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({

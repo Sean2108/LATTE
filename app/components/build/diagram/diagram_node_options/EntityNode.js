@@ -101,9 +101,9 @@ class EntityNode extends React.Component {
               label="Store Locally"
             />
           )}
-          {bitsMode &&
+          {/* {bitsMode &&
             !this.state.isMemory &&
-            'Warning: Storing the variable globally costs significantly more gas! Store globally only if the variable is shared between functions.'}
+            'Warning: Storing the variable globally costs significantly more gas! Store globally only if the variable is shared between functions.'} */}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
