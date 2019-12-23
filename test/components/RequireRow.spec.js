@@ -5,7 +5,6 @@ import Adapter from 'enzyme-adapter-react-16';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 import RequireRow from '../../app/components/build/build_components/RequireRow';
-import { BuildParser } from '../../app/components/build/BuildParser';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
 import TextField from '@material-ui/core/TextField';
@@ -14,8 +13,6 @@ Enzyme.configure({ adapter: new Adapter() });
 
 function setup() {
   const onchange = jest.fn();
-  const buildParser = new BuildParser(null);
-  buildParser.reset(['test_int', 'test_str'], {}, {}, []);
   const component = createMount()(
     <RequireRow
       updateRequire={onchange}
@@ -28,7 +25,8 @@ function setup() {
         requireMessage: 'test msg',
         comp: '=='
       }}
-      buildParser={buildParser}
+      variables={{}}
+      structList={{}}
     />
   );
   const textFields = component.find(TextField);

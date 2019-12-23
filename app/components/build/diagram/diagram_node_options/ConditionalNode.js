@@ -42,7 +42,7 @@ class ConditionalNode extends React.Component {
   };
 
   render() {
-    const { classes, close, submit, varList } = this.props;
+    const { classes, close, submit } = this.props;
 
     return (
       <FormControl className={classes.formControl}>
@@ -95,8 +95,7 @@ class ConditionalNode extends React.Component {
 ConditionalNode.propTypes = {
   classes: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired,
-  varList: PropTypes.object
+  submit: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(ConditionalNode);

@@ -184,12 +184,14 @@ export class BuildParser {
         parsedLhs = parseVariable(
           nodeData.variableSelected,
           variables,
-          this.structList
+          this.structList,
+          this.bitsMode
         );
         parsedRhs = parseVariable(
           nodeData.assignedVal,
           variables,
-          this.structList
+          this.structList,
+          this.bitsMode
         );
         if (!parsedLhs.type || !parsedRhs.type) {
           return true;
@@ -245,7 +247,8 @@ export class BuildParser {
         parsedLhs = parseVariable(
           nodeData.assignVar,
           variables,
-          this.structList
+          this.structList,
+          this.bitsMode
         );
         if (this.bitsMode) {
           this.bitsModeParseParams(
@@ -266,9 +269,15 @@ export class BuildParser {
         parsedLhs = parseVariable(
           nodeData.variableSelected,
           variables,
-          this.structList
+          this.structList,
+          this.bitsMode
         );
-        parsedRhs = parseVariable(nodeData.value, variables, this.structList);
+        parsedRhs = parseVariable(
+          nodeData.value,
+          variables,
+          this.structList,
+          this.bitsMode
+        );
         if (!this.bitsMode && parsedLhs.type === 'var') {
           this.variables[parsedLhs.name] = 'uint';
         }
@@ -284,7 +293,12 @@ export class BuildParser {
     for (let i = 0; i < params.length; i++) {
       let param = params[i];
       let info = infoList[varSelected][i];
-      let parsedParam = parseVariable(param, variables, structList);
+      let parsedParam = parseVariable(
+        param,
+        variables,
+        structList,
+        this.bitsMode
+      );
       if (
         parsedParam.type !== 'string' &&
         parsedParam.type !== 'uint' &&
@@ -325,7 +339,8 @@ export class BuildParser {
         let returnVar = parseVariable(
           nodeData.variableSelected,
           variables,
-          structList
+          structList,
+          this.bitsMode
         );
         this.returnVar = returnVar.type;
         return `return ${returnVar.name};`;
@@ -336,8 +351,18 @@ export class BuildParser {
   }
 
   parseAssignmentNode(data, memoryVarsDeclared, variables, structList) {
-    let parsedLhs = parseVariable(data.variableSelected, variables, structList);
-    let parsedRhs = parseVariable(data.assignedVal, variables, structList);
+    let parsedLhs = parseVariable(
+      data.variableSelected,
+      variables,
+      structList,
+      this.bitsMode
+    );
+    let parsedRhs = parseVariable(
+      data.assignedVal,
+      variables,
+      structList,
+      this.bitsMode
+    );
     if (!parsedLhs.type || !parsedRhs.type) {
       return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
     }
@@ -386,15 +411,24 @@ export class BuildParser {
 
   parseEventNode(data, variables, structList) {
     let params = data.params
-      .map(param => parseVariable(param, variables, structList).name)
+      .map(
+        param => parseVariable(param, variables, structList, this.bitsMode).name
+      )
       .join(', ');
     return `emit ${data.variableSelected}(${params});`;
   }
 
   parseEntityNode(data, variables, structList) {
-    let parsedLhs = parseVariable(data.assignVar, variables, structList);
+    let parsedLhs = parseVariable(
+      data.assignVar,
+      variables,
+      structList,
+      this.bitsMode
+    );
     let params = data.params
-      .map(param => parseVariable(param, variables, structList).name)
+      .map(
+        param => parseVariable(param, variables, structList, this.bitsMode).name
+      )
       .join(', ');
     if (data.isMemory) {
       this.memoryVars[parsedLhs.name] = data.variableSelected;
@@ -407,8 +441,18 @@ export class BuildParser {
   }
 
   parseTransferNode(data, variables, structList) {
-    let parsedLhs = parseVariable(data.value, variables, structList);
-    let parsedRhs = parseVariable(data.variableSelected, variables, structList);
+    let parsedLhs = parseVariable(
+      data.value,
+      variables,
+      structList,
+      this.bitsMode
+    );
+    let parsedRhs = parseVariable(
+      data.variableSelected,
+      variables,
+      structList,
+      this.bitsMode
+    );
     if (parsedLhs.type !== 'uint') {
       console.log(`value should be an integer at transfer node`);
     }
@@ -421,8 +465,18 @@ export class BuildParser {
   }
 
   parseCompareNode(data, variables, structList) {
-    let parsedLhs = parseVariable(data.var1, variables, structList);
-    let parsedRhs = parseVariable(data.var2, variables, structList);
+    let parsedLhs = parseVariable(
+      data.var1,
+      variables,
+      structList,
+      this.bitsMode
+    );
+    let parsedRhs = parseVariable(
+      data.var2,
+      variables,
+      structList,
+      this.bitsMode
+    );
     if (parsedLhs.type !== parsedRhs.type) {
       let mismatch = this.checkIntUintMismatch(
         parsedLhs,

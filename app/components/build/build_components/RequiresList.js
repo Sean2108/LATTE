@@ -36,9 +36,9 @@ class RequiresList extends React.Component {
       vars,
       onChangeRequire,
       requires,
-      tooltipText
+      tooltipText,
+      entities
     } = this.props;
-    this.buildParser.reset(this.props.vars, {}, {}, this.props.entities);
 
     if (requires.length === 0) {
       requires.push({
@@ -68,7 +68,8 @@ class RequiresList extends React.Component {
               variables[index] = val;
               onChangeRequire(variables);
             }}
-            buildParser={this.buildParser}
+            variables={vars}
+            structList={entities}
           />
         ))}
         <Button

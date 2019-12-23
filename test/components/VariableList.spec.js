@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 import VariableList from '../../app/components/build/build_components/VariableList';
-import { BuildParser } from '../../app/components/build/BuildParser';
+import { BuildParser } from '../../app/components/build/parsers/BuildParser';
 import { createMount } from '@material-ui/core/test-utils';
 import VariableRow from '../../app/components/build/build_components/VariableRow';
 import Button from '@material-ui/core/Button';
