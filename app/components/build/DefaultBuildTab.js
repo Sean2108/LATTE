@@ -3,9 +3,9 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
-import VariableList from './VariableList';
+import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
-import RequiresList from './RequiresList';
+import RequiresList from './build_components/RequiresList';
 import GasDrawer from './diagram/GasDrawer';
 
 const styles = {

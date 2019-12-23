@@ -11,7 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InitialStateTab from './InitialStateTab';
-import { Web3Utils } from './Web3Utils';
+import { Web3Utils } from './build_utils/Web3Utils';
 
 function TabContainer(props) {
   return (

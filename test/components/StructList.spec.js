@@ -5,12 +5,12 @@ import Adapter from 'enzyme-adapter-react-16';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 import { createMount } from '@material-ui/core/test-utils';
-import StructList from '../../app/components/build/StructList';
+import StructList from '../../app/components/build/build_components/StructList';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { TextField } from '@material-ui/core';
-import VariableList from '../../app/components/build/VariableList';
+import VariableList from '../../app/components/build/build_components/VariableList';
 
 Enzyme.configure({ adapter: new Adapter() });
 

@@ -7,9 +7,9 @@ import renderer from 'react-test-renderer';
 import { createMount } from '@material-ui/core/test-utils';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import ParamList from '../../app/components/build/ParamList';
+import ParamList from '../../app/components/build/build_components/ParamList';
 import InitialStateTab from '../../app/components/build/InitialStateTab';
-import StructList from '../../app/components/build/StructList';
+import StructList from '../../app/components/build/build_components/StructList';
 
 Enzyme.configure({ adapter: new Adapter() });
 

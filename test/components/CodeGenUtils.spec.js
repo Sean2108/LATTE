@@ -1,4 +1,4 @@
-import { CodeGenUtils } from '../../app/components/build/CodeGenUtils';
+import { CodeGenUtils } from '../../app/components/build/build_utils/CodeGenUtils';
 import { string } from 'postcss-selector-parser';
 
 function setup() {

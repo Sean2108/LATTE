@@ -7,7 +7,7 @@ import renderer from 'react-test-renderer';
 import { createMount } from '@material-ui/core/test-utils';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import ParamList from '../../app/components/build/ParamList';
+import ParamList from '../../app/components/build/build_components/ParamList';
 import { TextField, Select } from '@material-ui/core';
 
 Enzyme.configure({ adapter: new Adapter() });

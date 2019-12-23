@@ -6,8 +6,8 @@ import BuildOptionsPopover from './BuildOptionsPopover';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Web3Utils } from './Web3Utils';
-import { CodeGenUtils } from './CodeGenUtils';
+import { Web3Utils } from './build_utils/Web3Utils';
+import { CodeGenUtils } from './build_utils/CodeGenUtils';
 
 const styles = theme => ({
   button: {

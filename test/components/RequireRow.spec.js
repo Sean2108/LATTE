@@ -4,7 +4,7 @@ import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
-import RequireRow from '../../app/components/build/RequireRow';
+import RequireRow from '../../app/components/build/build_components/RequireRow';
 import { BuildParser } from '../../app/components/build/BuildParser';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';

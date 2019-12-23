@@ -6,7 +6,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import RequireRow from '../../RequireRow';
+import RequireRow from '../../build_components/RequireRow';
 
 const styles = theme => ({
   paper: {

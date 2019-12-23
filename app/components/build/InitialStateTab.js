@@ -1,8 +1,8 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import StructList from './StructList';
-import ParamList from './ParamList';
+import StructList from './build_components/StructList';
+import ParamList from './build_components/ParamList';
 
 class InitialStateTab extends React.Component {
   render() {

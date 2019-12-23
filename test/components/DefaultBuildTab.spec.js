@@ -6,8 +6,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 import { createMount, createShallow } from '@material-ui/core/test-utils';
 import DefaultBuildTab from '../../app/components/build/DefaultBuildTab';
-import VariableList from '../../app/components/build/VariableList';
-import RequiresList from '../../app/components/build/RequiresList';
+import VariableList from '../../app/components/build/build_components/VariableList';
+import RequiresList from '../../app/components/build/build_components/RequiresList';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import { Drawer } from '@material-ui/core';
 
