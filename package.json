@@ -31,7 +31,8 @@
     "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js",
     "test-all": "yarn lint && yarn flow && yarn build && yarn test && yarn test-e2e",
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js e2e",
-    "test-watch": "yarn test --watch"
+    "test-watch": "yarn test --watch",
+    "test-cover": "yarn test --collectCoverage"
   },
   "browserslist": "electron 1.6",
   "lint-staged": {
