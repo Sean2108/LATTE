@@ -71,9 +71,9 @@ export class NodeParser {
         }
         return true;
       case 'entity':
-        this.parseEntityNodeForVariables(nodeData, variables);
+        return this.parseEntityNodeForVariables(nodeData, variables);
       case 'transfer':
-        this.parseTransferNodeForVariables(nodeData, variables);
+        return this.parseTransferNodeForVariables(nodeData, variables);
     }
     return true;
   }

@@ -101,9 +101,6 @@ class EntityNode extends React.Component {
               label="Store Locally"
             />
           )}
-          {/* {bitsMode &&
-            !this.state.isMemory &&
-            'Warning: Storing the variable globally costs significantly more gas! Store globally only if the variable is shared between functions.'} */}
 
           {this.state.variableSelected !== '' &&
             varList[this.state.variableSelected].length > 0 && (
@@ -113,17 +110,16 @@ class EntityNode extends React.Component {
                 tooltipText={'The information that the entity will contain'}
                 updateParams={params =>
                   this.setState({
-                    params: params.map(
-                      param =>
-                        param.value
-                          ? `${param.value}`
-                          : param.type === 'uint'
-                            ? '0'
-                            : param.type === 'string'
-                              ? '""'
-                              : param.type === 'bool'
-                                ? 'false'
-                                : 'an address'
+                    params: params.map(param =>
+                      param.value
+                        ? `${param.value}`
+                        : param.type === 'uint'
+                        ? '0'
+                        : param.type === 'string'
+                        ? '""'
+                        : param.type === 'bool'
+                        ? 'false'
+                        : 'an address'
                     )
                   })
                 }

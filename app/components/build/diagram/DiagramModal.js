@@ -82,6 +82,10 @@ class DiagramModal extends React.Component {
     );
   }
 
+  deepClone(toClone) {
+    return JSON.parse(JSON.stringify(toClone));
+  }
+
   getTypeFields(type, classes, varList, events, entities, close, submit, bitsMode) {
     switch (type) {
       case 'assignment':
@@ -89,9 +93,9 @@ class DiagramModal extends React.Component {
           <AssignmentNode close={close} submit={submit} bitsMode={bitsMode} />
         );
       case 'event':
-        return <EventNode close={close} submit={submit} varList={events} />;
+        return <EventNode close={close} submit={submit} varList={this.deepClone(events)} />;
       case 'entity':
-        return <EntityNode close={close} submit={submit} varList={entities} bitsMode={bitsMode} />;
+        return <EntityNode close={close} submit={submit} varList={this.deepClone(entities)} bitsMode={bitsMode} />;
       case 'transfer':
         return <TransferNode close={close} submit={submit} varList={varList} />;
       case 'return':

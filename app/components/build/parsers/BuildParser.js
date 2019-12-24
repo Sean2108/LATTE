@@ -67,7 +67,7 @@ export class BuildParser {
     }
     visitedNodes.add(node);
     if (node instanceof DiamondNodeModel) {
-      this.parseNode(node.data, this.nodeParser.structList);
+      this.nodeParser.parseNode(node.data);
       let falseNextNode = this.getNextNode(node.outPortFalse);
       let trueNextNode = this.getNextNode(node.outPortTrue);
       this.traverseForVariables(
@@ -149,8 +149,8 @@ export class BuildParser {
       if (node instanceof DiamondNodeModel) {
         return null;
       }
-      (code += this.nodeParser),
-        parseNode(node.data, {
+      code +=
+        this.nodeParser.parseNode(node.data, {
           ...this.memoryVarsDeclared
         }) + '\n';
       node = this.getNextNodeForDefaultNode(node);
