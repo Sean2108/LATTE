@@ -1,6 +1,6 @@
 # LATTE: Visual Smart Contract Builder
 
-[![Build Status](https://travis-ci.com/Sean2108/LATTE.svg?token=FcLFkh211qmFY1Deqxzn&branch=master)](https://travis-ci.com/Sean2108/LATTE)
+[![Build Status](https://travis-ci.com/Sean2108/LATTE.svg?token=FcLFkh211qmFY1Deqxzn&branch=master)](https://travis-ci.com/Sean2108/LATTE)[![codecov](https://codecov.io/gh/Sean2108/LATTE/branch/master/graph/badge.svg?token=jmB5atsZia)](https://codecov.io/gh/Sean2108/LATTE)
 
 LATTE is a graphical user interface tool that makes it easy for both developers and non-developers to create and deploy smart contracts. It uses a drag and drop interface to simplify the task of creating smart contracts, and it helps users to compile and deploy smart contracts onto the blockchain.
 
