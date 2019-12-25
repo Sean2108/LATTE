@@ -2,7 +2,6 @@ import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import ReturnNode from '../../app/components/build/diagram/diagram_node_options/ReturnNode';
-import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -73,5 +72,17 @@ describe('ReturnNode component', () => {
       variableSelected: 'testReturn',
       type: 'return'
     });
+  });
+
+  it('should not call submit when close button is clicked', () => {
+    const { textField, closeButton, onchange, close } = setup();
+    textField.props().onChange({
+      target: {
+        value: 'testReturn'
+      }
+    });
+    closeButton.props().onClick();
+    expect(close).toHaveBeenCalled();
+    expect(onchange).not.toHaveBeenCalled();
   });
 });

@@ -38,7 +38,7 @@ class TransferNode extends React.Component {
   };
 
   render() {
-    const { classes, close, submit, varList } = this.props;
+    const { classes, close, submit } = this.props;
 
     return (
       <form>
@@ -80,6 +80,9 @@ class TransferNode extends React.Component {
               color="primary"
               className={classes.button}
               onClick={() => {
+                if (!this.state.value || !this.state.variableSelected) {
+                  return;
+                }
                 close();
                 submit(`${this.state.value} to ${this.state.variableSelected}`, {...this.state, type: 'transfer'});
               }}
@@ -97,8 +100,7 @@ class TransferNode extends React.Component {
 TransferNode.propTypes = {
   classes: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired,
-  varList: PropTypes.object
+  submit: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(TransferNode);

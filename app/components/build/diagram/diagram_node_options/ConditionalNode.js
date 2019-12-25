@@ -69,11 +69,12 @@ class ConditionalNode extends React.Component {
             color="primary"
             className={classes.button}
             onClick={() => {
+              if (!this.state.displayVar1 || !this.state.displayVar2) {
+                return;
+              }
               close();
               submit(
-                `${this.state.displayVar1} ${this.state.comp} ${
-                  this.state.displayVar2
-                }`,
+                `${this.state.displayVar1} ${this.state.comp} ${this.state.displayVar2}`,
                 {
                   var1: this.state.displayVar1,
                   var2: this.state.displayVar2,
