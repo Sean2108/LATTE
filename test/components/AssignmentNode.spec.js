@@ -1,9 +1,6 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 import AssignmentNode from '../../app/components/build/diagram/diagram_node_options/AssignmentNode';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
@@ -40,7 +37,7 @@ function setup() {
   };
 }
 
-describe('VariableRow component', () => {
+describe('AssignmentNode component', () => {
   it('should show correct initial values', () => {
     const { assignedTo, operator, value } = setup();
     expect(assignedTo.props().value).toBe('');
