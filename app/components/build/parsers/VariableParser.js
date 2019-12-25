@@ -40,12 +40,12 @@ function parseOperator(variable, variables, structList, bitsMode) {
           parsedLhs,
           parsedRhs,
           {
-            name: `${parsedLhs.name} ${operator} uint(${parsedRhs.name})`,
-            type: 'uint'
+            name: `${parsedLhs.name} ${operator} int(${parsedRhs.name})`,
+            type: 'int'
           },
           {
-            name: `uint(${parsedLhs.name}) ${operator} ${parsedRhs.name}`,
-            type: 'uint'
+            name: `int(${parsedLhs.name}) ${operator} ${parsedRhs.name}`,
+            type: 'int'
           }
         );
         if (mismatch) {

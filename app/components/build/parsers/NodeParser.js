@@ -1,7 +1,11 @@
-import { parseVariable, bitsModeGetType } from './VariableParser';
+import {
+  parseVariable,
+  bitsModeGetType,
+  checkIntUintMismatch
+} from './VariableParser';
 
 export class NodeParser {
-  constructor(onVariablesChange) {
+  constructor() {
     this.reset({}, {});
   }
 
@@ -55,6 +59,19 @@ export class NodeParser {
     }
   }
 
+  updateVariablesForMap(parsedLhs, parsedRhs) {
+    let lhsType =
+      parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
+    this.variables[parsedLhs.mapName] = {
+      type: 'mapping',
+      from: lhsType,
+      to: parsedRhs.type
+    };
+    if ('innerKeyType' in parsedLhs) {
+      this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
+    }
+  }
+
   parseNodeForVariables(nodeData) {
     const variables = this.getAllVariables();
     switch (nodeData.type) {
@@ -96,18 +113,7 @@ export class NodeParser {
     }
     if ('mapName' in parsedLhs) {
       if (parsedLhs.keyType !== 'var' && parsedRhs.type !== 'var') {
-        let lhsType =
-          parsedLhs.keyType === 'address payable'
-            ? 'address'
-            : parsedLhs.keyType;
-        this.variables[parsedLhs.mapName] = {
-          type: 'mapping',
-          from: lhsType,
-          to: parsedRhs.type
-        };
-        if ('innerKeyType' in parsedLhs) {
-          this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
-        }
+        this.updateVariablesForMap(parsedLhs, parsedRhs);
         return true;
       }
       return false;
@@ -227,16 +233,7 @@ export class NodeParser {
       return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
     }
     if ('mapName' in parsedLhs) {
-      let lhsType =
-        parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
-      this.variables[parsedLhs.mapName] = {
-        type: 'mapping',
-        from: lhsType,
-        to: parsedRhs.type
-      };
-      if ('innerKeyType' in parsedLhs) {
-        this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
-      }
+      this.updateVariablesForMap(parsedLhs, parsedRhs);
     } else if (
       !parsedLhs.name.includes('.') &&
       (parsedLhs.type === 'var' ||
@@ -343,8 +340,8 @@ export class NodeParser {
       let mismatch = checkIntUintMismatch(
         parsedLhs,
         parsedRhs,
-        `uint(${parsedLhs.name}) ${data.comp} ${parsedRhs.name}`,
-        `${parsedLhs.name} ${data.comp} uint(${parsedRhs.name})`
+        `${parsedLhs.name} ${data.comp} int(${parsedRhs.name})`,
+        `int(${parsedLhs.name}) ${data.comp} ${parsedRhs.name}`
       );
       if (mismatch) {
         return mismatch;
@@ -353,7 +350,7 @@ export class NodeParser {
     if (
       parsedLhs.type === 'string' &&
       parsedRhs.type === 'string' &&
-      comp === '=='
+      data.comp === '=='
     ) {
       return `keccak256(${parsedLhs.name}) == keccak256(${parsedRhs.name})`;
     }

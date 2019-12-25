@@ -29,15 +29,15 @@ describe('VariableParser parseVariable function', () => {
 
   it('should return the correct expression for uint * int', () => {
     expect(parseVariable('-1 * 1', {}, {})).toEqual({
-      name: '-1 * uint(1)',
-      type: 'uint'
+      name: '-1 * int(1)',
+      type: 'int'
     });
   });
 
   it('should return the correct expression for int * uint', () => {
     expect(parseVariable('1 + -1', {}, {})).toEqual({
-      name: 'uint(1) + -1',
-      type: 'uint'
+      name: 'int(1) + -1',
+      type: 'int'
     });
   });
 
