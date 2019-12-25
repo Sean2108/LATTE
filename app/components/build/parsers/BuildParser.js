@@ -76,6 +76,7 @@ export class BuildParser {
         visitedNodes
       );
       this.traverseForVariables(trueNextNode, unparsedStatements, visitedNodes);
+      return;
     }
     if (
       node.name !== 'Start' &&
@@ -90,8 +91,8 @@ export class BuildParser {
   traverseDiamondNode(node, stopNode) {
     let falseNextNode = this.getNextNode(node.outPortFalse);
     let trueNextNode = this.getNextNode(node.outPortTrue);
-    let trueWhileCode = this.generateCodeForCycle(node, true);
     let conditionCode = this.nodeParser.parseNode(node.data);
+    let trueWhileCode = this.generateCodeForCycle(node, true);
     if (trueWhileCode) {
       return `while (${conditionCode}) {\n${trueWhileCode}}\n${this.traverseNextNode(
         falseNextNode,
