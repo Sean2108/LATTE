@@ -142,7 +142,7 @@ class EntityNode extends React.Component {
               color="primary"
               className={classes.button}
               onClick={() => {
-                if (!this.state.variableSelected) {
+                if (!this.state.assignVar || !this.state.variableSelected) {
                   return;
                 }
                 close();

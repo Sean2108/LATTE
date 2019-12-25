@@ -51,6 +51,11 @@ describe('AssignmentNode component', () => {
         value: 'testVar'
       }
     });
+    operator.props().onChange({
+      target: {
+        value: '+='
+      }
+    });
     value.props().onChange({
       target: {
         value: 'testStr'
@@ -58,9 +63,9 @@ describe('AssignmentNode component', () => {
     });
     button.props().onClick();
     expect(close).toHaveBeenCalled();
-    expect(onchange).toHaveBeenCalledWith('testVar = testStr', {
+    expect(onchange).toHaveBeenCalledWith('testVar += testStr', {
       variableSelected: 'testVar',
-      assignment: '=',
+      assignment: '+=',
       assignedVal: 'testStr',
       isMemory: true,
       type: 'assignment'
