@@ -46,9 +46,10 @@ class GasDrawer extends React.Component {
                 data: { stroke: '#c43a31' },
                 parent: { border: '1px solid #ccc' }
               }}
-              data={history.map((element, index) => {
-                return { x: index, y: element / 1000 };
-              })}
+              data={history.map((element, index) => ({
+                x: index,
+                y: element / 1000
+              }))}
             />
             <VictoryAxis label="Time" style={{ axisLabel: { padding: 40 } }} />
             <VictoryAxis

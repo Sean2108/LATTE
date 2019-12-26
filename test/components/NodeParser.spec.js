@@ -168,6 +168,34 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
   });
 });
 
+describe('NodeParser parseEntityNodeForVariables', () => {
+  let nodeParser = new NodeParser();
+
+  it('should update memoryVars when isMemory is on', () => {
+    nodeParser.reset({}, {});
+    const result = nodeParser.parseNodeForVariables({
+      type: 'entity',
+      assignVar: 'struct A',
+      variableSelected: 'StructA',
+      isMemory: true
+    });
+    expect(nodeParser.memoryVars).toEqual({ struct_a: 'StructA' });
+    expect(nodeParser.variables).toEqual({});
+  });
+
+  it('should update variables when isMemory is off', () => {
+    nodeParser.reset({}, {});
+    const result = nodeParser.parseNodeForVariables({
+      type: 'entity',
+      assignVar: 'struct A',
+      variableSelected: 'StructA',
+      isMemory: false
+    });
+    expect(nodeParser.variables).toEqual({ struct_a: 'StructA' });
+    expect(nodeParser.memoryVars).toEqual({});
+  });
+});
+
 describe('NodeParser parseTransferNodeForVariables', () => {
   let nodeParser = new NodeParser();
 

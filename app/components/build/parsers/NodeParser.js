@@ -1,8 +1,4 @@
-import {
-  parseVariable,
-  bitsModeGetType,
-  checkIntUintMismatch
-} from './VariableParser';
+import { parseVariable, checkIntUintMismatch } from './VariableParser';
 
 export class NodeParser {
   constructor() {
@@ -37,28 +33,6 @@ export class NodeParser {
     };
   }
 
-  bitsModeParseParams(params, infoList, varSelected, variables) {
-    for (let i = 0; i < params.length; i++) {
-      let param = params[i];
-      let info = infoList[varSelected][i];
-      let parsedParam = parseVariable(
-        param,
-        variables,
-        this.structList,
-        this.bitsMode
-      );
-      if (
-        parsedParam.type !== 'string' &&
-        parsedParam.type !== 'uint' &&
-        parsedParam.type !== 'int' &&
-        parsedParam.type !== 'bool' &&
-        !parsedParam.type.includes('address')
-      ) {
-        this.variables[parsedParam.name] = bitsModeGetType(info);
-      }
-    }
-  }
-
   updateVariablesForMap(parsedLhs, parsedRhs) {
     let lhsType =
       parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
@@ -77,16 +51,6 @@ export class NodeParser {
     switch (nodeData.type) {
       case 'assignment':
         return this.parseAssignmentNodeForVariables(nodeData, variables);
-      case 'event':
-        if (this.bitsMode) {
-          this.bitsModeParseParams(
-            nodeData.params,
-            this.eventList,
-            nodeData.variableSelected,
-            variables
-          );
-        }
-        return true;
       case 'entity':
         return this.parseEntityNodeForVariables(nodeData, variables);
       case 'transfer':
@@ -144,14 +108,6 @@ export class NodeParser {
       this.structList,
       this.bitsMode
     );
-    if (this.bitsMode) {
-      this.bitsModeParseParams(
-        nodeData.params,
-        this.structList,
-        nodeData.variableSelected,
-        variables
-      );
-    }
     if (nodeData.isMemory) {
       this.memoryVars[parsedLhs.name] = nodeData.variableSelected;
     } else {

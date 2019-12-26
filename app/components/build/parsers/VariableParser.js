@@ -214,7 +214,7 @@ export function checkIntUintMismatch(
   return null;
 }
 
-export function bitsModeGetType(info) {
+function bitsModeGetType(info) {
   return `${info.type === 'string' && info.bits ? 'bytes' : info.type}${
     info['bits']
   }`;

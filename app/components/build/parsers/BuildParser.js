@@ -1,8 +1,7 @@
 import { DiamondNodeModel } from '../diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import {
   parseVariable,
-  checkIntUintMismatch,
-  bitsModeGetType
+  checkIntUintMismatch
 } from './VariableParser';
 import { NodeParser } from './NodeParser';
 
