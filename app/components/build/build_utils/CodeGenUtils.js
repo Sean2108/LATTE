@@ -33,8 +33,7 @@ export class CodeGenUtils {
       buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
         ? 'view'
         : 'payable'
-    } ${returnCode} {
-              ${requires}${buildState.tabsCode[i]}}\n`;
+    } ${returnCode}{\n${requires}${buildState.tabsCode[i]}}\n`;
   }
 
   formReturnCode(returnType) {
@@ -44,8 +43,8 @@ export class CodeGenUtils {
     return ['bool', 'address', 'address payable'].includes(returnType) ||
       returnType.includes('bytes') ||
       returnType.includes('int')
-      ? `returns (${returnType})`
-      : `returns (${returnType} memory)`;
+      ? `returns (${returnType}) `
+      : `returns (${returnType} memory) `;
   }
 
   formRequires(requires, variables) {
