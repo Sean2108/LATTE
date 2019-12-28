@@ -69,7 +69,7 @@ script:
   - yarn package
   - yarn lint
   - yarn test
-  - yarn test-e2e
+  # - yarn test-e2e
 
 after_success:
   - codecov --file coverage/lcov.info --disable search
