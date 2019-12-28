@@ -327,12 +327,12 @@ describe('BuildDiagram component', () => {
         outPortTrue: expect.objectContaining({
           name: 'bottom',
           position: 'bottom',
-          in: false
+          in: true
         }),
         outPortFalse: expect.objectContaining({
           name: 'right',
           position: 'right',
-          in: false
+          in: true
         })
       })
     );

@@ -190,7 +190,6 @@ class BuildTabs extends React.Component {
                     this.web3Utils.getGasUsage(
                       buildState,
                       bitsMode,
-                      i,
                       history,
                       updateBuildError
                     );

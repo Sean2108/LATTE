@@ -7,27 +7,14 @@ export default class Web3Utils {
     this.codeGen = new CodeGenUtils();
   }
 
-  getGasUsage(buildState, bitsMode, tabIndex, history, updateCompileError) {
-    this.web3.eth.getAccounts((err, accs) => {
-      if (err) {
-        updateCompileError('There was an error fetching your accounts.');
-        return;
-      }
-      const account = accs[0];
-      this.web3.eth.defaultAccount = account;
-      const code = this.codeGen.formCode(buildState, bitsMode);
-      ipcRenderer.send('request-compile', code);
-      ipcRenderer.on('request-compile-complete', (event, payload) => {
-        const compiledCode = JSON.parse(payload);
-        if ('errors' in compiledCode && !('contracts' in compiledCode)) {
-          updateCompileError(compiledCode.errors[0].formattedMessage);
-          return;
-        }
-        const abiDefinition = compiledCode.contracts['code.sol'].Code.abi;
-        const contract = new this.web3.eth.Contract(abiDefinition);
-        const byteCode =
-          compiledCode.contracts['code.sol'].Code.evm.bytecode.object;
-        const deploymentJson = { data: byteCode };
+  getGasUsage(buildState, bitsMode, history, updateCompileError) {
+    this.requestCompile(
+      updateCompileError,
+      false,
+      buildState,
+      bitsMode,
+      (accs, deploymentJsonParam, contract) => {
+        const deploymentJson = deploymentJsonParam;
         if (buildState.constructorParams.length) {
           deploymentJson.arguments = buildState.constructorParams.map(param => {
             switch (param.type) {
@@ -38,7 +25,7 @@ export default class Web3Utils {
               case 'bool':
                 return true;
               default:
-                return account;
+                return accs[0];
             }
           });
         }
@@ -53,39 +40,18 @@ export default class Web3Utils {
             }
           }
         );
-      });
-    });
+      }
+    );
   }
 
   deploySmartContract = (buildState, bitsMode, updateCompileError) => {
-    this.web3.eth.getAccounts((err, accs) => {
-      if (err) {
-        alert('There was an error fetching your accounts.'); // eslint-disable-line no-alert
-        return;
-      }
-      if (accs.length === 0) {
-        console.log(
-          "Couldn't get any accounts! Make sure your Ethereum client is configured correctly."
-        );
-        return;
-      }
-
-      const account = accs[0];
-      this.web3.eth.defaultAccount = account;
-      const code = this.codeGen.formCode(buildState, bitsMode);
-      console.log(code);
-      ipcRenderer.send('request-compile', code);
-      ipcRenderer.on('request-compile-complete', (event, payload) => {
-        const compiledCode = JSON.parse(payload);
-        if ('errors' in compiledCode && !('contracts' in compiledCode)) {
-          updateCompileError(compiledCode.errors[0].formattedMessage);
-          return;
-        }
-        const abiDefinition = compiledCode.contracts['code.sol'].Code.abi;
-        const contract = new this.web3.eth.Contract(abiDefinition);
-        const byteCode =
-          compiledCode.contracts['code.sol'].Code.evm.bytecode.object;
-        const deploymentJson = { data: byteCode };
+    this.requestCompile(
+      updateCompileError,
+      true,
+      buildState,
+      bitsMode,
+      (accs, deploymentJsonParam, contract) => {
+        const deploymentJson = deploymentJsonParam;
         if (buildState.constructorParams.length) {
           deploymentJson.arguments = buildState.constructorParams.map(param =>
             param.type === 'int' ? parseInt(param.value, 10) : param.value
@@ -94,15 +60,25 @@ export default class Web3Utils {
         contract
           .deploy(deploymentJson)
           .send({
-            from: account,
-            gas: 15000000000,
-            gasPrice: '30000000000000'
+            from: accs[0],
+            gas: 15000000,
+            gasPrice: '30000000'
           })
           .on('error', error => {
-            updateCompileError(error); // eslint-disable-line no-alert
+            if (error === Object(error)) {
+              if (error.toString().includes('Exceeds block gas limit')) {
+                updateCompileError(
+                  'Error: Block gas limit exceeded, please increase gas limit'
+                );
+              } else {
+                updateCompileError(error.error);
+              }
+            } else {
+              updateCompileError(error);
+            }
           })
           .on('transactionHash', transactionHash => {
-            alert(`Transaction Hash: ${transactionHash}`); // eslint-disable-line no-alert
+            console.log(`Transaction Hash: ${transactionHash}`);
             updateCompileError('');
           })
           .on('receipt', receipt => {
@@ -113,6 +89,41 @@ export default class Web3Utils {
             console.log(`Confirmation Number: ${confirmationNumber}`);
             updateCompileError('');
           });
+      }
+    );
+  };
+
+  requestCompile = (updateCompileError, logCode, buildState, bitsMode, callback) => {
+    this.web3.eth.getAccounts((err, accs) => {
+      if (err) {
+        updateCompileError('There was an error fetching your accounts.');
+        return;
+      }
+      if (accs.length === 0) {
+        console.log(
+          "Couldn't get any accounts! Make sure your Ethereum client is configured correctly."
+        );
+        return;
+      }
+      const account = accs[0];
+      this.web3.eth.defaultAccount = account;
+      const code = this.codeGen.formCode(buildState, bitsMode);
+      if (logCode) {
+        console.log(code);
+      }
+      ipcRenderer.send('request-compile', code);
+      ipcRenderer.once('request-compile-complete', (event, payload) => {
+        const compiledCode = JSON.parse(payload);
+        if ('errors' in compiledCode && !('contracts' in compiledCode)) {
+          updateCompileError(compiledCode.errors[0].formattedMessage);
+          return;
+        }
+        const abiDefinition = compiledCode.contracts['code.sol'].Code.abi;
+        const contract = new this.web3.eth.Contract(abiDefinition);
+        const byteCode =
+          compiledCode.contracts['code.sol'].Code.evm.bytecode.object;
+        const deploymentJson = { data: byteCode };
+        callback(accs, deploymentJson, contract);
       });
     });
   };

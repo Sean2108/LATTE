@@ -34,14 +34,6 @@ class BuildOptions extends React.Component {
     this.getFiles();
   }
 
-  toLowerCamelCase(str) {
-    return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
-        index === 0 ? letter.toLowerCase() : letter.toUpperCase()
-      )
-      .replace(/\s+/g, '');
-  }
-
   handleClick = (event, dataOp) => {
     this.setState({
       anchorEl: event.currentTarget,

@@ -1,4 +1,6 @@
-export function parseVariable(
+import { checkIntUintMismatch, bitsModeGetType } from '../build_utils/TypeCheckFormattingUtils';
+
+export default function parseVariable(
   rawVariable,
   variables,
   structList,
@@ -191,27 +193,4 @@ function lookupVariableName(varName, variables) {
     return { name: varName, type: 'var' };
   }
   return { name: varName, type: variables[varName] };
-}
-
-export function checkIntUintMismatch(
-  parsedLhs,
-  parsedRhs,
-  leftIntReturn,
-  rightIntReturn
-) {
-  if (
-    parsedLhs.type &&
-    parsedRhs.type &&
-    parsedLhs.type.slice(-3) === 'int' &&
-    parsedRhs.type.slice(-3) === 'int'
-  ) {
-    return parsedLhs.type === 'int' ? leftIntReturn : rightIntReturn;
-  }
-  return null;
-}
-
-function bitsModeGetType(info) {
-  return `${info.type === 'string' && info.bits ? 'bytes' : info.type}${
-    info.bits
-  }`;
 }

@@ -10,6 +10,7 @@ import TransferNode from './diagram_node_options/TransferNode';
 import ConditionalNode from './diagram_node_options/ConditionalNode';
 import EventNode from './diagram_node_options/EventNode';
 import EntityNode from './diagram_node_options/EntityNode';
+import { deepClone } from '../build_utils/TypeCheckFormattingUtils';
 
 function getModalStyle() {
   return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
@@ -29,10 +30,6 @@ const styles = theme => ({
 });
 
 class DiagramModal extends React.Component {
-  deepClone(toClone) {
-    return JSON.parse(JSON.stringify(toClone));
-  }
-
   getTypeFields(
     type,
     classes,
@@ -53,7 +50,7 @@ class DiagramModal extends React.Component {
           <EventNode
             close={close}
             submit={submit}
-            varList={this.deepClone(events)}
+            varList={deepClone(events)}
           />
         );
       case 'entity':
@@ -61,7 +58,7 @@ class DiagramModal extends React.Component {
           <EntityNode
             close={close}
             submit={submit}
-            varList={this.deepClone(entities)}
+            varList={deepClone(entities)}
             bitsMode={bitsMode}
           />
         );

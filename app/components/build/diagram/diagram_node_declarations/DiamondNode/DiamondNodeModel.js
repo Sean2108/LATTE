@@ -15,13 +15,13 @@ export default class DiamondNodeModel extends NodeModel {
     super('diamond', message);
     this.name = message;
     this.data = data;
-    this.addPort(new DiamondPortModel('top', true, ''));
-    this.addPort(new DiamondPortModel('left', true, ''));
+    this.addPort(new DiamondPortModel('top', false, ''));
+    this.addPort(new DiamondPortModel('left', false, ''));
     this.outPortTrue = this.addPort(
-      new DiamondPortModel('bottom', false, <font color="white">True</font>)
+      new DiamondPortModel('bottom', true, <font color="white">True</font>)
     );
     this.outPortFalse = this.addPort(
-      new DiamondPortModel('right', false, <font color="white">False</font>)
+      new DiamondPortModel('right', true, <font color="white">False</font>)
     );
   }
 

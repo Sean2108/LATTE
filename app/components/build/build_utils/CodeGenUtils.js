@@ -1,12 +1,6 @@
-export default class CodeGenUtils {
-  toLowerCamelCase(str) {
-    return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
-        index === 0 ? letter.toLowerCase() : letter.toUpperCase()
-      )
-      .replace(/\s+/g, '');
-  }
+import { toLowerCamelCase, isString } from './TypeCheckFormattingUtils';
 
+export default class CodeGenUtils {
   formCode(buildState, bitsMode) {
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
     code += this.formStructsEvents(buildState.entities, bitsMode, false);
@@ -22,7 +16,7 @@ export default class CodeGenUtils {
     const functionName =
       buildState.tabs[i + 1] === 'Initial State'
         ? 'constructor'
-        : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
+        : `function ${toLowerCamelCase(buildState.tabs[i + 1])}`;
     const returnCode = this.formReturnCode(buildState.tabsReturn[i]);
     const requires = this.formRequires(
       buildState.tabsRequire[i],
@@ -52,8 +46,8 @@ export default class CodeGenUtils {
       .filter(req => req.var1 && req.var2 && req.comp)
       .map(req => {
         if (
-          this.isString(req.var1, variables) &&
-          this.isString(req.var2, variables) &&
+          isString(req.var1, variables) &&
+          isString(req.var2, variables) &&
           req.comp === '=='
         ) {
           return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
@@ -122,14 +116,5 @@ export default class CodeGenUtils {
       }
     }
     return code;
-  }
-
-  isString(rawVariable, vars) {
-    const variable = rawVariable.trim();
-    return (
-      (variable[0] === '"' && variable[variable.length - 1] === '"') ||
-      (variable[0] === "'" && variable[variable.length - 1] === "'") ||
-      vars[variable] === 'string'
-    );
   }
 }

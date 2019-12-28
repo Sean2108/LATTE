@@ -54,7 +54,7 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
 
   it('should return true and variables should be correct when map types are known', () => {
     nodeParser.reset(
-      { map: { from: 'string', to: 'uint' }, key: 'string', rhs: 'uint' },
+      { key: 'string', rhs: 'uint' },
       {}
     );
     const result = nodeParser.parseNodeForVariables({
@@ -71,7 +71,6 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
   it('should cut off address when map type is address payable', () => {
     nodeParser.reset(
       {
-        map: { from: 'address payable', to: 'uint' },
         key: 'address payable',
         rhs: 'uint'
       },
@@ -91,7 +90,6 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
   it('should return true and variables should be correct when map types are known and map is nested', () => {
     nodeParser.reset(
       {
-        a: { from: 'string', to: 'uint' },
         b: 'string',
         c: 'bool',
         rhs: 'uint'
@@ -107,6 +105,20 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
     expect(nodeParser.variables).toEqual({
       a: { type: 'mapping', from: 'string', to: 'uint', inner: 'bool' }
     });
+  });
+
+  it('should return true and variables should not be updated when map is already in variables', () => {
+    nodeParser.reset(
+      { map: { from: 'string', to: 'uint' }, key: 'string', rhs: 'uint' },
+      {}
+    );
+    const result = nodeParser.parseNodeForVariables({
+      type: 'assignment',
+      variableSelected: 'map of key',
+      assignedVal: 'rhs'
+    });
+    expect(result).toBe(true);
+    expect(nodeParser.variables).toEqual({});
   });
 
   it('should return false for structs', () => {
@@ -255,7 +267,7 @@ describe('NodeParser parseAssignmentNode', () => {
 
   it('should return correct code and variables should be correct for single layer map', () => {
     nodeParser.reset(
-      { map: { from: 'string', to: 'uint' }, key: 'string', rhs: 'uint' },
+      { key: 'string', rhs: 'uint' },
       {}
     );
     const result = nodeParser.parseNode({
@@ -273,7 +285,6 @@ describe('NodeParser parseAssignmentNode', () => {
   it('should cut off address when map type is address payable', () => {
     nodeParser.reset(
       {
-        map: { from: 'address payable', to: 'uint' },
         key: 'address payable',
         rhs: 'uint'
       },
@@ -291,10 +302,24 @@ describe('NodeParser parseAssignmentNode', () => {
     });
   });
 
+  it('should return correct code and variables should not be updated when map is already in variables', () => {
+    nodeParser.reset(
+      { map: { from: 'string', to: 'uint' }, key: 'string', rhs: 'uint' },
+      {}
+    );
+    const result = nodeParser.parseNode({
+      type: 'assignment',
+      variableSelected: 'map of key',
+      assignedVal: 'rhs',
+      assignment: '='
+    });
+    expect(result).toBe('map[key] = rhs;');
+    expect(nodeParser.variables).toEqual({});
+  });
+
   it('should return correct code and variables should be correct when map types are known and map is nested', () => {
     nodeParser.reset(
       {
-        a: { from: 'string', to: 'uint' },
         b: 'string',
         c: 'bool',
         rhs: 'uint'

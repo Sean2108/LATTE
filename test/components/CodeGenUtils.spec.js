@@ -441,18 +441,6 @@ function setup() {
   return { codeGen, entities, variables, buildState };
 }
 
-describe('codeGenUtils class toLowerCamelCase function', () => {
-  it('should work correctly', () => {
-    const { codeGen } = setup();
-    expect(codeGen.toLowerCamelCase('This is a test')).toEqual('thisIsATest');
-  });
-
-  it('should not change result if input is already in lower camel case', () => {
-    const { codeGen } = setup();
-    expect(codeGen.toLowerCamelCase('thisIsATest')).toEqual('thisIsATest');
-  });
-});
-
 describe('codeGenUtils class formStructsEvents function', () => {
   it('should return correct result for events when bitsMode is off', () => {
     const { codeGen, entities } = setup();
@@ -489,19 +477,6 @@ describe('codeGenUtils class formVars function', () => {
     const expected =
       'string private varA;\nuint private varB;\nmapping(uint => bool) varC;\nmapping(uint => mapping(address => string)) varD;\nmapping(address payable => mapping(uint => bool)) varE;\n';
     expect(codeGen.formVars(variables)).toEqual(expected);
-  });
-});
-
-describe('codeGenUtils class isString function', () => {
-  it('should work correctly', () => {
-    const { codeGen } = setup();
-    expect(codeGen.isString('   "test    ', {})).toEqual(false);
-    expect(codeGen.isString('   test"    ', {})).toEqual(false);
-    expect(codeGen.isString('   test    ', {})).toEqual(false);
-    expect(codeGen.isString('   "test"    ', {})).toEqual(true);
-    expect(codeGen.isString("   'test'    ", {})).toEqual(true);
-    expect(codeGen.isString('   test    ', { test: 'uint' })).toEqual(false);
-    expect(codeGen.isString('   test    ', { test: 'string' })).toEqual(true);
   });
 });
 

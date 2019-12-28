@@ -1,4 +1,9 @@
-import { parseVariable, checkIntUintMismatch } from './VariableParser';
+import parseVariable from './VariableParser';
+import {
+  checkIntUintMismatch,
+  isSameBaseType,
+  isPrimitiveType
+} from '../build_utils/TypeCheckFormattingUtils';
 
 export default class NodeParser {
   constructor(updateBuildError) {
@@ -34,7 +39,14 @@ export default class NodeParser {
     };
   }
 
-  updateVariablesForMap(parsedLhs, parsedRhs) {
+  updateVariablesForMap(parsedLhs, parsedRhs, variables) {
+    if (
+      parsedLhs.mapName in variables &&
+      variables[parsedLhs.mapName].from !== 'var' &&
+      variables[parsedLhs.mapName].to !== 'var'
+    ) {
+      return;
+    }
     const lhsType =
       parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
     this.variables[parsedLhs.mapName] = {
@@ -79,7 +91,7 @@ export default class NodeParser {
     }
     if ('mapName' in parsedLhs) {
       if (parsedLhs.keyType !== 'var' && parsedRhs.type !== 'var') {
-        this.updateVariablesForMap(parsedLhs, parsedRhs);
+        this.updateVariablesForMap(parsedLhs, parsedRhs, variables);
         return true;
       }
       return false;
@@ -193,11 +205,12 @@ export default class NodeParser {
       return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
     }
     if ('mapName' in parsedLhs) {
-      this.updateVariablesForMap(parsedLhs, parsedRhs);
-    } else if (
+      this.updateVariablesForMap(parsedLhs, parsedRhs, variables);
+    }
+    else if (
       parsedLhs.type !== 'var' &&
       parsedRhs.type !== 'var' &&
-      parsedLhs.type !== parsedRhs.type
+      !isSameBaseType(parsedLhs.type, parsedRhs.type, this.bitsMode)
     ) {
       this.updateBuildError(
         `Invalid assignment at node ${data.variableSelected} ${data.assignment} ${data.assignedVal}`
@@ -224,7 +237,7 @@ export default class NodeParser {
     ) {
       memoryVarsDeclared[parsedLhs.name] = true; // eslint-disable-line no-param-reassign
       return `${parsedRhs.type}${
-        parsedRhs.type === 'string' ? ' memory ' : ' '
+        !isPrimitiveType(parsedRhs.type) ? ' memory ' : ' '
       }${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
     }
     return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;

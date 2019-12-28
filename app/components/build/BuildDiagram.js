@@ -90,6 +90,43 @@ class BuildDiagram extends React.Component {
       this.model.addAll(this.start);
     }
     this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
+    this.resetListener(
+      varList,
+      functionParams,
+      events,
+      entities,
+      bitsMode,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    );
+
+    this.engine.setDiagramModel(this.model);
+  }
+
+  engine;
+
+  start;
+
+  model;
+
+  buildParser;
+
+  resetListener(
+    varList,
+    functionParams,
+    events,
+    entities,
+    bitsMode,
+    onChangeLogic,
+    onChangeReturn,
+    onChangeView,
+    updateDiagram,
+    updateGasHistory
+  ) {
+    this.model.clearListeners();
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
@@ -109,17 +146,7 @@ class BuildDiagram extends React.Component {
         }, 5000);
       }
     });
-
-    this.engine.setDiagramModel(this.model);
   }
-
-  engine;
-
-  start;
-
-  model;
-
-  buildParser;
 
   findStart() {
     for (const node of Object.values(this.model.getNodes())) {
@@ -197,13 +224,31 @@ class BuildDiagram extends React.Component {
     const {
       classes,
       varList,
+      functionParams,
       events,
       entities,
       bitsMode,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory,
       openDrawer
     } = this.props;
 
     const { open, type } = this.state;
+    this.resetListener(
+      varList,
+      functionParams,
+      events,
+      entities,
+      bitsMode,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    );
 
     const tooltips = {
       assignment:

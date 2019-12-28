@@ -22,14 +22,14 @@ describe('DiamondNodeModel', () => {
       expect.objectContaining({
         name: 'bottom',
         position: 'bottom',
-        in: false
+        in: true
       })
     );
     expect(diamondNodeModel.outPortFalse).toEqual(
       expect.objectContaining({
         name: 'right',
         position: 'right',
-        in: false
+        in: true
       })
     );
   });

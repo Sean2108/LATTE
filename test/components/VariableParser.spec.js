@@ -1,4 +1,4 @@
-import { parseVariable } from '../../app/components/build/parsers/VariableParser';
+import parseVariable from '../../app/components/build/parsers/VariableParser';
 
 describe('VariableParser parseVariable function', () => {
   it('should return a string for single quotes with whitespace', () => {
