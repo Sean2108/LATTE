@@ -1,14 +1,11 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 import { createMount } from '@material-ui/core/test-utils';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import ParamList from '../../app/components/build/build_components/ParamList';
 import { TextField, Select } from '@material-ui/core';
+import ParamList from '../../app/components/build/build_components/ParamList';
 
 Enzyme.configure({ adapter: new Adapter() });
 

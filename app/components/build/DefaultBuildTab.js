@@ -2,7 +2,6 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Drawer from '@material-ui/core/Drawer';
-import Button from '@material-ui/core/Button';
 import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './build_components/RequiresList';
@@ -15,20 +14,22 @@ const styles = {
 };
 
 class DefaultBuildTab extends React.Component {
-  varList;
-
   state = {
     drawerOpen: false
   };
 
   componentWillMount() {
-    this.varList = this.props.varList;
+    const { varList } = this.props;
+    this.varList = varList;
   }
+
+  varList;
 
   flattenParamsToObject(params, bitsMode) {
     return params
       .filter(element => element.name)
-      .reduce((result, currentObject) => {
+      .reduce((resultParam, currentObject) => {
+        const result = resultParam;
         if (bitsMode && currentObject.bits) {
           if (currentObject.type === 'string') {
             result[currentObject.name] = `bytes${currentObject.bits}`;
@@ -49,7 +50,6 @@ class DefaultBuildTab extends React.Component {
   render() {
     const {
       classes,
-      theme,
       varList,
       events,
       entities,
@@ -65,29 +65,27 @@ class DefaultBuildTab extends React.Component {
       updateDiagram,
       bitsMode,
       gasHistory,
-      updateGasHistory
+      updateGasHistory,
+      updateBuildError
     } = this.props;
-    let variables = this.flattenParamsToObject(params, bitsMode);
+    const { drawerOpen } = this.state;
+    const variables = this.flattenParamsToObject(params, bitsMode);
     return (
       <div>
         <VariableList
-          header={'Function Inputs'}
+          header="Function Inputs"
           updateVariables={vars => onChangeParams(vars)}
           vars={params}
-          tooltipText={
-            'These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below.'
-          }
+          tooltipText="These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below."
           bitsMode={bitsMode}
         />
         <br />
         <RequiresList
-          header={'Checking Phase'}
+          header="Checking Phase"
           vars={{ ...varList, ...variables }}
           onChangeRequire={onChangeRequire}
           requires={requires}
-          tooltipText={
-            'Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user.'
-          }
+          tooltipText="Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user."
           entities={entities}
         />
         <br />
@@ -106,11 +104,12 @@ class DefaultBuildTab extends React.Component {
           openDrawer={() => this.setState({ drawerOpen: true })}
           gasHistory={gasHistory}
           updateGasHistory={updateGasHistory}
+          updateBuildError={updateBuildError}
         />
 
         <Drawer
           anchor="right"
-          open={this.state.drawerOpen}
+          open={drawerOpen}
           onClose={this.closeDrawer}
           className={classes.drawer}
           classes={{
@@ -142,7 +141,8 @@ DefaultBuildTab.propTypes = {
   updateDiagram: PropTypes.func.isRequired,
   bitsMode: PropTypes.bool.isRequired,
   gasHistory: PropTypes.array.isRequired,
-  updateGasHistory: PropTypes.func.isRequired
+  updateGasHistory: PropTypes.func.isRequired,
+  updateBuildError: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(DefaultBuildTab);

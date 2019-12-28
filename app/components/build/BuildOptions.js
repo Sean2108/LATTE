@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import BuildOptionsPopover from './BuildOptionsPopover';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Web3Utils } from './build_utils/Web3Utils';
-import { CodeGenUtils } from './build_utils/CodeGenUtils';
+import Web3Utils from './build_utils/Web3Utils';
+import CodeGenUtils from './build_utils/CodeGenUtils';
+import BuildOptionsPopover from './BuildOptionsPopover';
 
 const styles = theme => ({
   button: {
@@ -23,27 +23,29 @@ class BuildOptions extends React.Component {
     anchorEl: null,
     dataOp: 1,
     fileName: '',
-    files: []
+    files: [],
+    compileError: ''
   };
 
   componentWillMount() {
-    this.web3Utils = new Web3Utils(this.props.connection);
+    const { connection } = this.props;
+    this.web3Utils = new Web3Utils(connection);
     this.codeGenUtils = new CodeGenUtils();
-    this.getFiles();    
+    this.getFiles();
   }
 
   toLowerCamelCase(str) {
     return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-        return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-      })
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
+        index === 0 ? letter.toLowerCase() : letter.toUpperCase()
+      )
       .replace(/\s+/g, '');
   }
 
   handleClick = (event, dataOp) => {
     this.setState({
       anchorEl: event.currentTarget,
-      dataOp: dataOp
+      dataOp
     });
   };
 
@@ -67,20 +69,21 @@ class BuildOptions extends React.Component {
   render() {
     const {
       classes,
-      theme,
       onback,
       buildState,
       loadState,
-      bitsMode
+      bitsMode,
+      connection
     } = this.props;
-    const { anchorEl, dataOp, fileName, files } = this.state;
-    const open = Boolean(anchorEl);
+    const { anchorEl, dataOp, fileName, files, compileError } = this.state;
 
     const DATA_OP = {
       LOAD_DATA: 1,
       SAVE_DATA: 2,
       SAVE_CONTRACT: 3
     };
+
+    const showError = buildState.buildError || compileError;
 
     return (
       <div>
@@ -92,8 +95,8 @@ class BuildOptions extends React.Component {
           handleClose={this.handleClose}
           handleChange={this.handleChange}
           saveData={() => {
-            let data = JSON.stringify(buildState);
-            let filename = fileName.replace(/\s+/g, '_') + '.json';
+            const data = JSON.stringify(buildState);
+            const filename = `${fileName.replace(/\s+/g, '_')}.json`;
             writeFile(join('saved_data', filename), data, err => {
               if (err) throw err;
               this.handleClose();
@@ -110,8 +113,8 @@ class BuildOptions extends React.Component {
             })
           }
           saveContract={() => {
-            let code = this.codeGenUtils.formCode(buildState, bitsMode);
-            let filename = fileName.replace(/\s+/g, '_') + '.sol';
+            const code = this.codeGenUtils.formCode(buildState, bitsMode);
+            const filename = `${fileName.replace(/\s+/g, '_')}.sol`;
             writeFile(join('saved_contracts', filename), code, err => {
               if (err) throw err;
               this.handleClose();
@@ -185,14 +188,24 @@ class BuildOptions extends React.Component {
         </Tooltip>
 
         <Tooltip
-          title={`Deploy smart contract to ${this.props.connection.currentProvider.host}`}
+          title={`Deploy smart contract to ${connection.currentProvider.host}${
+            showError ? `\nError: ${showError}` : ''
+          }`}
           classes={{ tooltip: classes.tooltipFont }}
         >
           <Button
             variant="contained"
-            color="primary"
+            color={showError ? 'secondary' : 'primary'}
             className={classes.button}
-            onClick={() => this.web3Utils.deploySmartContract(buildState, bitsMode)}
+            onClick={() =>
+              this.web3Utils.deploySmartContract(
+                buildState,
+                bitsMode,
+                compileErrorParam => {
+                  this.setState({ compileError: compileErrorParam });
+                }
+              )
+            }
           >
             Deploy
           </Button>
@@ -204,7 +217,6 @@ class BuildOptions extends React.Component {
 
 BuildOptions.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   onback: PropTypes.func.isRequired,
   connection: PropTypes.object.isRequired,
   buildState: PropTypes.object.isRequired,

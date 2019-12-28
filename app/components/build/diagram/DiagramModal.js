@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
+import Tooltip from '@material-ui/core/Tooltip';
 import ReturnNode from './diagram_node_options/ReturnNode';
 import AssignmentNode from './diagram_node_options/AssignmentNode';
 import TransferNode from './diagram_node_options/TransferNode';
 import ConditionalNode from './diagram_node_options/ConditionalNode';
 import EventNode from './diagram_node_options/EventNode';
 import EntityNode from './diagram_node_options/EntityNode';
-import Tooltip from '@material-ui/core/Tooltip';
 
 function getModalStyle() {
   return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
@@ -29,9 +29,54 @@ const styles = theme => ({
 });
 
 class DiagramModal extends React.Component {
-  state = {
-    variableSelected: ''
-  };
+  deepClone(toClone) {
+    return JSON.parse(JSON.stringify(toClone));
+  }
+
+  getTypeFields(
+    type,
+    classes,
+    varList,
+    events,
+    entities,
+    close,
+    submit,
+    bitsMode
+  ) {
+    switch (type) {
+      case 'assignment':
+        return (
+          <AssignmentNode close={close} submit={submit} bitsMode={bitsMode} />
+        );
+      case 'event':
+        return (
+          <EventNode
+            close={close}
+            submit={submit}
+            varList={this.deepClone(events)}
+          />
+        );
+      case 'entity':
+        return (
+          <EntityNode
+            close={close}
+            submit={submit}
+            varList={this.deepClone(entities)}
+            bitsMode={bitsMode}
+          />
+        );
+      case 'transfer':
+        return <TransferNode close={close} submit={submit} varList={varList} />;
+      case 'return':
+        return <ReturnNode close={close} submit={submit} varList={varList} />;
+      case 'conditional':
+        return (
+          <ConditionalNode close={close} submit={submit} varList={varList} />
+        );
+      default:
+        return null;
+    }
+  }
 
   render() {
     const {
@@ -80,31 +125,6 @@ class DiagramModal extends React.Component {
         </Modal>
       </div>
     );
-  }
-
-  deepClone(toClone) {
-    return JSON.parse(JSON.stringify(toClone));
-  }
-
-  getTypeFields(type, classes, varList, events, entities, close, submit, bitsMode) {
-    switch (type) {
-      case 'assignment':
-        return (
-          <AssignmentNode close={close} submit={submit} bitsMode={bitsMode} />
-        );
-      case 'event':
-        return <EventNode close={close} submit={submit} varList={this.deepClone(events)} />;
-      case 'entity':
-        return <EntityNode close={close} submit={submit} varList={this.deepClone(entities)} bitsMode={bitsMode} />;
-      case 'transfer':
-        return <TransferNode close={close} submit={submit} varList={varList} />;
-      case 'return':
-        return <ReturnNode close={close} submit={submit} varList={varList} />;
-      case 'conditional':
-        return (
-          <ConditionalNode close={close} submit={submit} varList={varList} />
-        );
-    }
   }
 }
 

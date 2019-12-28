@@ -1,5 +1,4 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import StructList from './build_components/StructList';
 import ParamList from './build_components/ParamList';
@@ -7,8 +6,6 @@ import ParamList from './build_components/ParamList';
 class InitialStateTab extends React.Component {
   render() {
     const {
-      classes,
-      theme,
       entities,
       events,
       updateEntities,
@@ -20,32 +17,31 @@ class InitialStateTab extends React.Component {
     return (
       <div>
         <StructList
-          header={'Events'}
-          tooltipText={'Events are messages that contain information about an occurrence. For example, when an auction has ended, an event can be emitted that tells users that the auction ended, who purchased the item and at what price.'}
+          header="Events"
+          tooltipText="Events are messages that contain information about an occurrence. For example, when an auction has ended, an event can be emitted that tells users that the auction ended, who purchased the item and at what price."
           updateVariables={updateEvents}
           initialVars={events}
-          varListTooltipText={`The names and types of information that will be announced with the event.`}
+          varListTooltipText="The names and types of information that will be announced with the event."
           bitsMode={bitsMode}
         />
         <br />
         <StructList
-          header={'Entities'}
-          tooltipText={'Entities are ways to logically group data and information together. For example, a car would be an entity containing information about its brand, its price, and its seller.'}
+          header="Entities"
+          tooltipText="Entities are ways to logically group data and information together. For example, a car would be an entity containing information about its brand, its price, and its seller."
           updateVariables={updateEntities}
           initialVars={entities}
-          varListTooltipText={'The names and types of information that the entity will contain.'}
+          varListTooltipText="The names and types of information that the entity will contain."
           bitsMode={bitsMode}
         />
         <br />
-        {params &&
-          params.filter(param => param.name).length > 0 && (
-            <ParamList
-              header={'Constructor Parameters'}
-              params={params}
-              updateParams={updateParams}
-              tooltipText={'These are the initial values of the parameters provided in the Initial State Tab. When the smart contract is deployed, these values will be used to initialise the smart contract.'}
-            />
-          )}
+        {params && params.filter(param => param.name).length > 0 && (
+          <ParamList
+            header="Constructor Parameters"
+            params={params}
+            updateParams={updateParams}
+            tooltipText="These are the initial values of the parameters provided in the Initial State Tab. When the smart contract is deployed, these values will be used to initialise the smart contract."
+          />
+        )}
       </div>
     );
   }

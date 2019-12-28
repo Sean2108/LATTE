@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import RequireRow from './RequireRow';
-import { BuildParser } from '../parsers/BuildParser';
 import Tooltip from '@material-ui/core/Tooltip';
+import RequireRow from './RequireRow';
+import BuildParser from '../parsers/BuildParser';
 
 const styles = theme => ({
   paper: {
@@ -31,7 +30,6 @@ class RequiresList extends React.Component {
   render() {
     const {
       classes,
-      theme,
       header,
       vars,
       onChangeRequire,
@@ -62,9 +60,9 @@ class RequiresList extends React.Component {
           <RequireRow
             require={element}
             key={index}
-            showMessage={true}
+            showMessage
             updateRequire={val => {
-              let variables = [...requires];
+              const variables = [...requires];
               variables[index] = val;
               onChangeRequire(variables);
             }}
@@ -100,7 +98,6 @@ class RequiresList extends React.Component {
 
 RequiresList.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   vars: PropTypes.object.isRequired,
   onChangeRequire: PropTypes.func.isRequired,

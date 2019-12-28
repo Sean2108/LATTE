@@ -1,15 +1,12 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 import { createMount, createShallow } from '@material-ui/core/test-utils';
+import { Drawer } from '@material-ui/core';
 import DefaultBuildTab from '../../app/components/build/DefaultBuildTab';
 import VariableList from '../../app/components/build/build_components/VariableList';
 import RequiresList from '../../app/components/build/build_components/RequiresList';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
-import { Drawer } from '@material-ui/core';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -30,9 +27,10 @@ function setup(createComponentMount=true) {
       diagram={{}}
       onChangeView={jest.fn()}
       updateDiagram={jest.fn()}
-      bitsMode={true}
+      bitsMode
       gasHistory={[]}
       updateGasHistory={jest.fn()}
+      updateBuildError={jest.fn()}
     />
   );
   const input = [

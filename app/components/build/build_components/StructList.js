@@ -7,8 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import VariableList from './VariableList';
 import Tooltip from '@material-ui/core/Tooltip';
+import VariableList from './VariableList';
 
 const styles = theme => ({
   container: {
@@ -46,10 +46,7 @@ const styles = theme => ({
 
 class StructList extends React.Component {
   state = {
-    contents: '',
-    propcontents: '',
-    modalAdd: '',
-    anchor: null
+    contents: ''
   };
 
   handleChange = name => event => {
@@ -59,7 +56,6 @@ class StructList extends React.Component {
   render() {
     const {
       classes,
-      theme,
       header,
       updateVariables,
       initialVars,
@@ -91,34 +87,33 @@ class StructList extends React.Component {
           ))}
         </Grid>
         <div className={classes.row}>
-        <TextField
-          id="name-input"
-          label={header === 'Entities' ? 'Entity Name' : 'Event Name'}
-          className={classes.textField}
-          onChange={this.handleChange('contents')}
-          value={this.state.contents}
-          margin="normal"
-        />
-        <Button
-          id="add-struct-button"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={() => {
-            const contents = this.state.contents
-            .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
-            .replace(/\s+/g, '');
-            if (!contents || contents in initialVars)
-              return;
-            updateVariables({
-              ...initialVars,
-              [contents]: []
-            });
-            this.setState({ contents: '' });
-          }}
-        >
-          Add <AddIcon className={classes.rightIcon} />
-        </Button>
+          <TextField
+            id="name-input"
+            label={header === 'Entities' ? 'Entity Name' : 'Event Name'}
+            className={classes.textField}
+            onChange={this.handleChange('contents')}
+            value={this.state.contents}
+            margin="normal"
+          />
+          <Button
+            id="add-struct-button"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => {
+              const contents = this.state.contents
+                .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
+                .replace(/\s+/g, '');
+              if (!contents || contents in initialVars) return;
+              updateVariables({
+                ...initialVars,
+                [contents]: []
+              });
+              this.setState({ contents: '' });
+            }}
+          >
+            Add <AddIcon className={classes.rightIcon} />
+          </Button>
         </div>
         <br />
       </Paper>
@@ -128,7 +123,6 @@ class StructList extends React.Component {
 
 StructList.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   updateVariables: PropTypes.func,
   initialVars: PropTypes.object.isRequired,

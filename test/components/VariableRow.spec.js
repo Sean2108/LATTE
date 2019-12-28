@@ -1,13 +1,10 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
-import VariableRow from '../../app/components/build/build_components/VariableRow';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
 import TextField from '@material-ui/core/TextField';
+import VariableRow from '../../app/components/build/build_components/VariableRow';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -22,7 +19,7 @@ function strSetup() {
         type: 'string',
         bits: '8'
       }}
-      bitsMode={true}
+      bitsMode
     />
   );
   return { strComponent, onchange };
@@ -39,7 +36,7 @@ function intSetup() {
         type: 'uint',
         bits: '8'
       }}
-      bitsMode={true}
+      bitsMode
     />
   );
   return { intComponent, onchange };
@@ -156,7 +153,7 @@ describe('VariableRow component', () => {
   });
 
   it('should not show bits field when bits mode is off', () => {
-    const { noBitsComponent, onchange } = noBitsSetup();
+    const { noBitsComponent } = noBitsSetup();
     const bits = noBitsComponent.find(Select);
     expect(bits).toHaveLength(1);
   });

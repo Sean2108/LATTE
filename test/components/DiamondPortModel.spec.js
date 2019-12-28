@@ -1,7 +1,5 @@
-import { DiagramEngine, DefaultPortModel } from 'storm-react-diagrams';
-import { SimplePortFactory } from '../../app/components/build/diagram/SimplePortFactory';
-import { DiamondPortModel } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
-import { DiamondNodeFactory } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
+import { DefaultPortModel } from 'storm-react-diagrams';
+import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 
 describe('DiamondPortModel', () => {
   it('should construct correctly', () => {

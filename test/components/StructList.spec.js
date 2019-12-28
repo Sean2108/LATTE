@@ -1,16 +1,13 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 import { createMount } from '@material-ui/core/test-utils';
-import StructList from '../../app/components/build/build_components/StructList';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { TextField } from '@material-ui/core';
 import VariableList from '../../app/components/build/build_components/VariableList';
+import StructList from '../../app/components/build/build_components/StructList';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -23,7 +20,7 @@ function noRowSetup() {
       header="test header"
       tooltipText="test tooltip"
       varListTooltipText="test var list tooltip"
-      bitsMode={true}
+      bitsMode
     />
   );
   const rows = component.find(VariableList);
@@ -34,7 +31,7 @@ function noRowSetup() {
 
 function threeRowSetup() {
   const onchange = jest.fn();
-  let oldRow = [
+  const oldRow = [
     {
       displayName: 'Test Int',
       name: 'test_int',
@@ -42,7 +39,7 @@ function threeRowSetup() {
       bits: '8'
     }
   ];
-  let newRow = [
+  const newRow = [
     {
       displayName: 'Test Str',
       name: 'test_str',
@@ -61,7 +58,7 @@ function threeRowSetup() {
       header="test header"
       tooltipText="test tooltip"
       varListTooltipText="test var list tooltip"
-      bitsMode={true}
+      bitsMode
     />
   );
   const rows = component.find(VariableList);
@@ -109,7 +106,11 @@ describe('StructList component', () => {
       .at(0)
       .props()
       .updateVariables(newRow);
-    expect(onchange).toHaveBeenCalledWith({StructA: newRow, StructB: oldRow, StructC: oldRow});
+    expect(onchange).toHaveBeenCalledWith({
+      StructA: newRow,
+      StructB: oldRow,
+      StructC: oldRow
+    });
   });
 
   it('should change only the correct row when 2nd row is altered', () => {
@@ -118,7 +119,11 @@ describe('StructList component', () => {
       .at(1)
       .props()
       .updateVariables(newRow);
-      expect(onchange).toHaveBeenCalledWith({StructA: oldRow, StructB: newRow, StructC: oldRow});
+    expect(onchange).toHaveBeenCalledWith({
+      StructA: oldRow,
+      StructB: newRow,
+      StructC: oldRow
+    });
   });
 
   it('should change only the correct row when 3rd row is altered', () => {
@@ -127,6 +132,10 @@ describe('StructList component', () => {
       .at(2)
       .props()
       .updateVariables(newRow);
-      expect(onchange).toHaveBeenCalledWith({StructA: oldRow, StructB: oldRow, StructC: newRow});
+    expect(onchange).toHaveBeenCalledWith({
+      StructA: oldRow,
+      StructB: oldRow,
+      StructC: newRow
+    });
   });
 });

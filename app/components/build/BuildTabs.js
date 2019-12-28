@@ -5,15 +5,16 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import DefaultBuildTab from './DefaultBuildTab';
 import Popover from '@material-ui/core/Popover';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InitialStateTab from './InitialStateTab';
-import { Web3Utils } from './build_utils/Web3Utils';
+import Web3Utils from './build_utils/Web3Utils';
+import DefaultBuildTab from './DefaultBuildTab';
 
 function TabContainer(props) {
+  const { children } = props;
   return (
     <Typography
       component="div"
@@ -22,7 +23,7 @@ function TabContainer(props) {
         paddingBottom: 24
       }}
     >
-      {props.children}
+      {children}
     </Typography>
   );
 }
@@ -63,29 +64,30 @@ class BuildTabs extends React.Component {
     popoverContent: ''
   };
 
+  componentWillMount() {
+    const { connection } = this.props;
+    this.web3Utils = new Web3Utils(connection);
+  }
+
   handleChange = (event, value) => {
     this.setState({
       value
     });
   };
 
-  componentWillMount() {
-    this.web3Utils = new Web3Utils(this.props.connection);
-  }
-
   handleOnChange = (newState, i, state) => {
-    let tabsState = [...this.props.buildState[state]];
+    const { buildState, onTabsChange } = this.props;
+    const tabsState = [...buildState[state]];
     tabsState[i] = newState;
-    this.props.onTabsChange({ [state]: tabsState });
+    onTabsChange({ [state]: tabsState });
   };
 
   handleChangeParams = (newState, i) => {
+    const { onTabsChange } = this.props;
     this.handleOnChange(newState, i, 'tabsParams');
-    if (i == 0) {
-      let newParams = newState.map(param => {
-        return { ...param, value: '' };
-      });
-      this.props.onTabsChange({ constructorParams: newParams });
+    if (i === 0) {
+      const newParams = newState.map(param => ({ ...param, value: '' }));
+      onTabsChange({ constructorParams: newParams });
     }
   };
 
@@ -95,10 +97,12 @@ class BuildTabs extends React.Component {
       variables,
       onTabsChange,
       buildState,
-      bitsMode,
-      connection
+      bitsMode
     } = this.props;
-    const { value } = this.state;
+    const { value, addTabPopoverAnchor, popoverContent } = this.state;
+    const updateBuildError = buildError => {
+      onTabsChange({ buildError });
+    };
 
     return (
       <div className={classes.buildtabs}>
@@ -106,9 +110,9 @@ class BuildTabs extends React.Component {
           <Tabs
             className={classes.tabs}
             value={value}
-            onChange={(event, value) => {
-              if (value !== buildState.tabs.length) {
-                this.handleChange(event, value);
+            onChange={(event, val) => {
+              if (val !== buildState.tabs.length) {
+                this.handleChange(event, val);
               }
             }}
             indicatorColor="primary"
@@ -133,15 +137,12 @@ class BuildTabs extends React.Component {
               entities={buildState.entities}
               events={buildState.events}
               updateEntities={entities =>
-                onTabsChange({ ...buildState, entities: entities })
+                onTabsChange({ ...buildState, entities })
               }
-              updateEvents={events =>
-                onTabsChange({ ...buildState, events: events })
-              }
+              updateEvents={events => onTabsChange({ ...buildState, events })}
               params={buildState.constructorParams}
               updateParams={params => {
-                this.setState({ constructorParams: params });
-                this.props.onTabsChange({
+                onTabsChange({
                   constructorParams: params
                 });
               }}
@@ -169,8 +170,8 @@ class BuildTabs extends React.Component {
                   onChangeRequire={newRequire =>
                     this.handleOnChange(newRequire, i, 'tabsRequire')
                   }
-                  onVariablesChange={variables =>
-                    onTabsChange({ variables: variables })
+                  onVariablesChange={newVariables =>
+                    onTabsChange({ variables: newVariables })
                   }
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
@@ -185,28 +186,25 @@ class BuildTabs extends React.Component {
                   // gasHistory={this.state.gasHistory[i]}
                   gasHistory={buildState.gasHistory}
                   updateGasHistory={() => {
-                    // if (i === 0) return;
-                    let history = buildState.gasHistory;
-                    // if (history[i].length === 10) {
-                    //   history[i].shift();
-                    // }
+                    const history = buildState.gasHistory;
                     this.web3Utils.getGasUsage(
                       buildState,
                       bitsMode,
                       i,
-                      // history[i]
-                      history
+                      history,
+                      updateBuildError
                     );
                     onTabsChange({ gasHistory: history });
                   }}
+                  updateBuildError={updateBuildError}
                 />
               </TabContainer>
             )
         )}
         <Popover
           id="simple-popper"
-          open={Boolean(this.state.addTabPopoverAnchor)}
-          anchorEl={this.state.addTabPopoverAnchor}
+          open={Boolean(addTabPopoverAnchor)}
+          anchorEl={addTabPopoverAnchor}
           onClose={() => this.setState({ addTabPopoverAnchor: null })}
           anchorOrigin={{
             vertical: 'bottom',
@@ -225,7 +223,7 @@ class BuildTabs extends React.Component {
               onChange={event =>
                 this.setState({ popoverContent: event.target.value })
               }
-              value={this.state.popoverContent}
+              value={popoverContent}
             />
             <Button
               variant="contained"
@@ -238,7 +236,7 @@ class BuildTabs extends React.Component {
                     .map(tab => tab.toLowerCase())
                     .includes(this.state.popoverContent.toLowerCase())
                 ) {
-                  let newTabsState = {
+                  const newTabsState = {
                     tabs: [...buildState.tabs, this.state.popoverContent],
                     tabsCode: [...buildState.tabsCode, ''],
                     tabsParams: [...buildState.tabsParams, []],
@@ -248,8 +246,7 @@ class BuildTabs extends React.Component {
                   };
                   this.setState({
                     popoverContent: '',
-                    addTabPopoverAnchor: null,
-                    // gasHistory: [...this.state.gasHistory, []]
+                    addTabPopoverAnchor: null
                   });
                   onTabsChange(newTabsState);
                 }

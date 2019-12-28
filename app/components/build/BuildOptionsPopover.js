@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import { ipcRenderer } from 'electron';
 import Popover from '@material-ui/core/Popover';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
@@ -32,7 +31,6 @@ class BuildOptionsPopover extends React.Component {
   render() {
     const {
       classes,
-      theme,
       anchorEl,
       dataOp,
       fileName,
@@ -107,6 +105,8 @@ class BuildOptionsPopover extends React.Component {
                 case DATA_OP.SAVE_CONTRACT:
                   saveContract();
                   break;
+                default:
+                  break;
               }
             }}
           >
@@ -120,7 +120,6 @@ class BuildOptionsPopover extends React.Component {
 
 BuildOptionsPopover.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   anchorEl: PropTypes.object,
   dataOp: PropTypes.number.isRequired,
   fileName: PropTypes.string.isRequired,

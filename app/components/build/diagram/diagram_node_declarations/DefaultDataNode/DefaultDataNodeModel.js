@@ -1,16 +1,17 @@
-import * as React from 'react';
 import {
   NodeModel,
   NodeModelListener,
   Toolkit,
-  DiagramEngine,
   DefaultPortModel
 } from 'storm-react-diagrams';
 
-export class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
+export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
   name;
+
   color;
+
   data;
+
   ports;
 
   constructor(name = 'Untitled', color = 'rgb(0,192,255)', data = {}) {
@@ -44,14 +45,10 @@ export class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
   }
 
   getInPorts() {
-    return _.filter(this.ports, portModel => {
-      return portModel.in;
-    });
+    return _.filter(this.ports, portModel => portModel.in);
   }
 
   getOutPorts() {
-    return _.filter(this.ports, portModel => {
-      return !portModel.in;
-    });
+    return _.filter(this.ports, portModel => !portModel.in);
   }
 }

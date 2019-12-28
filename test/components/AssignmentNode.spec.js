@@ -1,12 +1,12 @@
 import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import AssignmentNode from '../../app/components/build/diagram/diagram_node_options/AssignmentNode';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
+import AssignmentNode from '../../app/components/build/diagram/diagram_node_options/AssignmentNode';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -14,7 +14,7 @@ function setup() {
   const onchange = jest.fn();
   const close = jest.fn();
   const component = createMount()(
-    <AssignmentNode submit={onchange} bitsMode={true} close={close} />
+    <AssignmentNode submit={onchange} bitsMode close={close} />
   );
   const textFields = component.find(TextField);
   const assignedTo = textFields.at(0);
@@ -73,7 +73,7 @@ describe('AssignmentNode component', () => {
   });
 
   it('should not call submit if assignedTo is empty', () => {
-    const { assignedTo, operator, value, button, onchange, close } = setup();
+    const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
       target: {
         value: ''
@@ -90,7 +90,7 @@ describe('AssignmentNode component', () => {
   });
 
   it('should not call submit if value is empty', () => {
-    const { assignedTo, operator, value, button, onchange, close } = setup();
+    const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
       target: {
         value: 'testVar'
@@ -107,7 +107,7 @@ describe('AssignmentNode component', () => {
   });
 
   it('should not call submit if both fields are empty', () => {
-    const { assignedTo, operator, value, button, onchange, close } = setup();
+    const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
       target: {
         value: ''
@@ -124,15 +124,7 @@ describe('AssignmentNode component', () => {
   });
 
   it('should call submit with isMemory false when switch is toggled', () => {
-    const {
-      assignedTo,
-      operator,
-      value,
-      isMemory,
-      button,
-      onchange,
-      close
-    } = setup();
+    const { assignedTo, value, isMemory, button, onchange, close } = setup();
     assignedTo.props().onChange({
       target: {
         value: 'testVar'
@@ -160,14 +152,7 @@ describe('AssignmentNode component', () => {
   });
 
   it('should call not call submit when close button is clicked', () => {
-    const {
-      assignedTo,
-      operator,
-      value,
-      closeButton,
-      onchange,
-      close
-    } = setup();
+    const { assignedTo, value, closeButton, onchange, close } = setup();
     assignedTo.props().onChange({
       target: {
         value: 'testVar'

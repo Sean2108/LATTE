@@ -75,7 +75,7 @@ describe('TransferNode component', () => {
     expect(onchange).not.toHaveBeenCalled();
   });
 
-  it('should not call submit when address is empty', () => {
+  it('should not call submit when value is empty', () => {
     const { address, value, button, onchange, close } = setup();
     address.props().onChange({
       target: {

@@ -1,8 +1,8 @@
-import { DiamondNodeModel } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import { DiagramEngine } from 'storm-react-diagrams';
-import { SimplePortFactory } from '../../app/components/build/diagram/SimplePortFactory';
-import { DiamondPortModel } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
-import { DiamondNodeFactory } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
+import DiamondNodeModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
+import SimplePortFactory from '../../app/components/build/diagram/SimplePortFactory';
+import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
+import DiamondNodeFactory from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
 
 describe('DiamondNodeModel', () => {
   it('should construct correctly', () => {
@@ -44,7 +44,7 @@ describe('DiamondNodeModel', () => {
     const deserialisedModel = new DiamondNodeModel('');
     const engine = new DiagramEngine();
     engine.registerPortFactory(
-      new SimplePortFactory('diamond', config => new DiamondPortModel())
+      new SimplePortFactory('diamond', () => new DiamondPortModel())
     );
     engine.registerNodeFactory(new DiamondNodeFactory());
     deserialisedModel.deSerialize(serialisedModel, engine);

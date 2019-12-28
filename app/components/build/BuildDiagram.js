@@ -3,25 +3,24 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import { TrayWidget } from './diagram/TrayWidget';
-import { TrayItemWidget } from './diagram/TrayItemWidget';
-import { DiamondNodeModel } from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
-import { DiamondNodeFactory } from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
-import { SimplePortFactory } from './diagram/SimplePortFactory';
-import { DiamondPortModel } from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
-import { DefaultDataNodeModel } from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import { DefaultDataNodeFactory } from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
-import {
-  DiagramEngine,
-  DiagramModel,
-  LinkModel,
-  DiagramWidget
-} from 'storm-react-diagrams';
-import DiagramModal from './diagram/DiagramModal';
-import { BuildParser } from './parsers/BuildParser';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Button } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import {
+  DiagramEngine,
+  DiagramModel,
+  DiagramWidget
+} from 'storm-react-diagrams';
+import TrayWidget from './diagram/TrayWidget';
+import TrayItemWidget from './diagram/TrayItemWidget';
+import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
+import DiamondNodeFactory from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
+import SimplePortFactory from './diagram/SimplePortFactory';
+import DiamondPortModel from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
+import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
+import DiagramModal from './diagram/DiagramModal';
+import BuildParser from './parsers/BuildParser';
 
 const styles = theme => ({
   paper: {
@@ -54,49 +53,59 @@ class BuildDiagram extends React.Component {
     points: null
   };
 
-  engine;
-  start;
-  model;
-  buildParser;
-
   componentWillMount() {
+    const {
+      diagram,
+      onVariablesChange,
+      varList,
+      functionParams,
+      events,
+      entities,
+      bitsMode,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory,
+      updateBuildError
+    } = this.props;
     this.engine = new DiagramEngine();
     this.engine.installDefaultFactories();
     this.engine.registerPortFactory(
-      new SimplePortFactory('diamond', config => new DiamondPortModel())
+      new SimplePortFactory('diamond', () => new DiamondPortModel())
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());
     this.engine.registerNodeFactory(new DefaultDataNodeFactory());
 
     this.model = new DiagramModel();
-    if (Object.entries(this.props.diagram).length > 0) {
-      this.model.deSerializeDiagram(this.props.diagram, this.engine);
+    if (Object.entries(diagram).length > 0) {
+      this.model.deSerializeDiagram(diagram, this.engine);
       this.start = this.findStart();
     }
     if (!this.start) {
       this.start = new DefaultDataNodeModel('Start', 'rgb(0,192,255)');
-      var startOut = this.start.addOutPort(' ');
+      const startOut = this.start.addOutPort(' ');
       startOut.setMaximumLinks(1);
       this.start.setPosition(100, 100);
       this.model.addAll(this.start);
     }
-    this.buildParser = new BuildParser(this.props.onVariablesChange);
+    this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
           this.buildParser.reset(
-            this.props.varList,
-            this.props.functionParams,
-            this.props.events,
-            this.props.entities,
-            this.props.bitsMode
+            varList,
+            functionParams,
+            events,
+            entities,
+            bitsMode
           );
-          let code = this.buildParser.parse(this.start);
-          this.props.onChangeLogic(code);
-          this.props.onChangeReturn(this.buildParser.getReturnVar());
-          this.props.onChangeView(this.buildParser.getView());
-          this.props.updateDiagram(this.model.serializeDiagram());
-          this.props.updateGasHistory();
+          const code = this.buildParser.parse(this.start);
+          onChangeLogic(code);
+          onChangeReturn(this.buildParser.getReturnVar());
+          onChangeView(this.buildParser.getView());
+          updateDiagram(this.model.serializeDiagram());
+          updateGasHistory();
         }, 5000);
       }
     });
@@ -104,8 +113,16 @@ class BuildDiagram extends React.Component {
     this.engine.setDiagramModel(this.model);
   }
 
+  engine;
+
+  start;
+
+  model;
+
+  buildParser;
+
   findStart() {
-    for (let node of Object.values(this.model.getNodes())) {
+    for (const node of Object.values(this.model.getNodes())) {
       if (node.name === 'Start') {
         return node;
       }
@@ -114,10 +131,10 @@ class BuildDiagram extends React.Component {
   }
 
   createDefaultNode(label, color, data, isReturn) {
-    var node = new DefaultDataNodeModel(label, color, data);
+    const node = new DefaultDataNodeModel(label, color, data);
     node.addInPort(' ');
     if (!isReturn) {
-      let outPort = node.addOutPort(' ');
+      const outPort = node.addOutPort(' ');
       outPort.setMaximumLinks(1);
     }
     return node;
@@ -162,14 +179,16 @@ class BuildDiagram extends React.Component {
         );
       case 'conditional':
         return new DiamondNodeModel(`${desc}`, data);
+      default:
+        return null;
     }
-    return null;
   }
 
   addNode(info, data) {
-    let node = this.selectNode(this.state.type, info, data);
-    node.x = this.state.points.x;
-    node.y = this.state.points.y;
+    const { type, points } = this.state;
+    const node = this.selectNode(type, info, data);
+    node.x = points.x;
+    node.y = points.y;
     this.engine.getDiagramModel().addNode(node);
     this.forceUpdate();
   }
@@ -177,13 +196,14 @@ class BuildDiagram extends React.Component {
   render() {
     const {
       classes,
-      theme,
       varList,
       events,
       entities,
       bitsMode,
       openDrawer
     } = this.props;
+
+    const { open, type } = this.state;
 
     const tooltips = {
       assignment:
@@ -225,17 +245,17 @@ class BuildDiagram extends React.Component {
           </div>
         </Tooltip>
         <DiagramModal
-          open={this.state.open}
+          open={open}
           close={() => {
             this.setState({ open: false });
           }}
           submit={(info, data) => this.addNode(info, data)}
-          type={this.state.type}
+          type={type}
           varList={varList}
           events={events}
           entities={entities}
           addNode={this.addNode}
-          tooltipText={tooltips[this.state.type] || ''}
+          tooltipText={tooltips[type] || ''}
           bitsMode={bitsMode}
         />
         <div className="body">
@@ -320,7 +340,7 @@ class BuildDiagram extends React.Component {
             <div
               className="diagram-layer"
               onDrop={event => {
-                var data = JSON.parse(
+                const data = JSON.parse(
                   event.dataTransfer.getData('storm-diagram-node')
                 );
                 this.setState({
@@ -349,7 +369,6 @@ class BuildDiagram extends React.Component {
 
 BuildDiagram.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   varList: PropTypes.object.isRequired,
   functionParams: PropTypes.object.isRequired,
   events: PropTypes.object.isRequired,
@@ -362,8 +381,8 @@ BuildDiagram.propTypes = {
   updateDiagram: PropTypes.func.isRequired,
   bitsMode: PropTypes.bool.isRequired,
   openDrawer: PropTypes.func.isRequired,
-  gasHistory: PropTypes.array.isRequired,
-  updateGasHistory: PropTypes.func.isRequired
+  updateGasHistory: PropTypes.func.isRequired,
+  updateBuildError: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);

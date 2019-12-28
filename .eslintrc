@@ -9,11 +9,16 @@
     "browser": true,
     "node": true
   },
+  "globals": {
+    "_": true
+  },
   "rules": {
     "arrow-parens": ["off"],
+    "class-methods-use-this": "off",
     "compat/compat": "error",
     "consistent-return": "off",
     "comma-dangle": "off",
+    "no-restricted-syntax": "off",
     "flowtype/boolean-style": ["error", "boolean"],
     "flowtype/define-flow-type": "warn",
     "flowtype/delimiter-dangle": ["error", "never"],
@@ -38,10 +43,16 @@
     "no-console": "off",
     "no-use-before-define": "off",
     "no-multi-assign": "off",
+    "prefer-template": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
     "promise/no-native": "off",
+    "react/destructuring-assignment": "off",
+    "react/forbid-prop-types": "off",
+    "react/no-array-index-key": "off",
+    "react/prop-types": "off",
+    "react/require-default-props": "off",
     "react/sort-comp": [
       "error",
       {

@@ -17,7 +17,7 @@ function setup() {
   const component = createMount()(
     <EntityNode
       submit={onchange}
-      bitsMode={true}
+      bitsMode
       close={close}
       varList={{
         structA: [
@@ -200,7 +200,6 @@ describe('EntityNode component', () => {
 
   it('should not submit when entity is not populated', () => {
     const {
-      component,
       textField,
       entity,
       isMemory,

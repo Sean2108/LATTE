@@ -1,9 +1,9 @@
-export class CodeGenUtils {
+export default class CodeGenUtils {
   toLowerCamelCase(str) {
     return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-        return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-      })
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
+        index === 0 ? letter.toLowerCase() : letter.toUpperCase()
+      )
       .replace(/\s+/g, '');
   }
 
@@ -12,23 +12,23 @@ export class CodeGenUtils {
     code += this.formStructsEvents(buildState.entities, bitsMode, false);
     code += this.formVars(buildState.variables);
     code += this.formStructsEvents(buildState.events, bitsMode, true);
-    for (let i = 0; i < buildState.tabsCode.length; i++) {
+    for (let i = 0; i < buildState.tabsCode.length; i += 1) {
       code += this.formFunctionBody(buildState, i, bitsMode);
     }
-    return code + '}';
+    return `${code}}`;
   }
 
   formFunctionBody(buildState, i, bitsMode) {
-    let functionName =
+    const functionName =
       buildState.tabs[i + 1] === 'Initial State'
         ? 'constructor'
         : `function ${this.toLowerCamelCase(buildState.tabs[i + 1])}`;
-    let returnCode = this.formReturnCode(buildState.tabsReturn[i]);
-    let requires = this.formRequires(
+    const returnCode = this.formReturnCode(buildState.tabsReturn[i]);
+    const requires = this.formRequires(
       buildState.tabsRequire[i],
       buildState.variables
     );
-    let params = this.formParams(buildState.tabsParams[i], bitsMode);
+    const params = this.formParams(buildState.tabsParams[i], bitsMode);
     return `${functionName}(${params}) public ${
       buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
         ? 'view'
@@ -54,7 +54,7 @@ export class CodeGenUtils {
         if (
           this.isString(req.var1, variables) &&
           this.isString(req.var2, variables) &&
-          req.comp == '=='
+          req.comp === '=='
         ) {
           return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
         }
@@ -70,9 +70,8 @@ export class CodeGenUtils {
         if (bitsMode && element.bits) {
           if (element.type === 'string') {
             return `bytes${element.bits} ${element.name}`;
-          } else {
-            return `${element.type}${element.bits} ${element.name}`;
           }
+          return `${element.type}${element.bits} ${element.name}`;
         }
         if (element.type === 'string') {
           return `${element.type} memory ${element.name}`;
@@ -90,7 +89,7 @@ export class CodeGenUtils {
       }${params
         .filter(param => param.name)
         .map(param => {
-          let suffix = isEvent ? '' : ';\n';
+          const suffix = isEvent ? '' : ';\n';
           if (bitsMode) {
             if (param.type === 'string' && param.bits !== '') {
               return `bytes${param.bits} ${param.name}${suffix}`;
@@ -125,8 +124,8 @@ export class CodeGenUtils {
     return code;
   }
 
-  isString(variable, vars) {
-    variable = variable.trim();
+  isString(rawVariable, vars) {
+    const variable = rawVariable.trim();
     return (
       (variable[0] === '"' && variable[variable.length - 1] === '"') ||
       (variable[0] === "'" && variable[variable.length - 1] === "'") ||

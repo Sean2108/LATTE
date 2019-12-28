@@ -3,11 +3,9 @@ import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { createMount } from '@material-ui/core/test-utils';
 import Button from '@material-ui/core/Button';
-import ParamList from '../../app/components/build/build_components/ParamList';
+import { DiagramModel } from 'storm-react-diagrams';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
-import { DiagramModel } from 'storm-react-diagrams';
-import { DefaultDataNodeModel } from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -130,10 +128,11 @@ function setup(emptyDiagram = true) {
       diagram={diagram}
       onChangeView={jest.fn()}
       updateDiagram={jest.fn()}
-      bitsMode={true}
+      bitsMode
       openDrawer={jest.fn()}
       gasHistory={[]}
       updateGasHistory={jest.fn()}
+      updateBuildError={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -161,7 +160,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add assignment node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest.fn().mockReturnValueOnce({ type: 'assignment' });
     diagramLayer.props().onDrop({
@@ -189,7 +188,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add event node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest
       .fn()
@@ -220,7 +219,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add entity node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest
       .fn()
@@ -251,7 +250,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add transfer node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest.fn().mockReturnValueOnce({ type: 'transfer' });
     diagramLayer.props().onDrop({
@@ -279,7 +278,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add return node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest.fn().mockReturnValueOnce({ type: 'return' });
     diagramLayer.props().onDrop({
@@ -307,7 +306,7 @@ describe('BuildDiagram component', () => {
   });
 
   it('should add conditional node correctly', () => {
-    const { component, buttons, diagramLayer } = setup();
+    const { component, diagramLayer } = setup();
     const addNodeFn = jest.spyOn(DiagramModel.prototype, 'addNode');
     JSON.parse = jest.fn().mockReturnValueOnce({ type: 'conditional' });
     diagramLayer.props().onDrop({

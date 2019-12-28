@@ -74,25 +74,26 @@ class EventNode extends React.Component {
           varList[this.state.variableSelected].filter(param => param.name)
             .length > 0 && (
             <ParamList
-              header={'Event Information'}
+              header="Event Information"
               params={varList[this.state.variableSelected]}
-              tooltipText={
-                'The information that will be emitted together with the event'
-              }
+              tooltipText="The information that will be emitted together with the event"
               updateParams={params =>
                 this.setState({
-                  params: params.map(
-                    param =>
-                      param.value
-                        ? `${param.value}`
-                        : param.type === 'uint'
-                          ? '0'
-                          : param.type === 'string'
-                            ? '""'
-                            : param.type === 'bool'
-                              ? 'false'
-                              : 'an address'
-                  )
+                  params: params.map(param => {
+                    if (param.value) {
+                      return param.value;
+                    }
+                    switch (param.type) {
+                      case 'uint':
+                        return '0';
+                      case 'string':
+                        return '""';
+                      case 'bool':
+                        return 'false';
+                      default:
+                        return 'an address';
+                    }
+                  })
                 })
               }
             />

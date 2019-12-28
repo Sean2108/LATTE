@@ -1,5 +1,4 @@
-import { CodeGenUtils } from '../../app/components/build/build_utils/CodeGenUtils';
-import { string } from 'postcss-selector-parser';
+import CodeGenUtils from '../../app/components/build/build_utils/CodeGenUtils';
 
 function setup() {
   const codeGen = new CodeGenUtils();
@@ -476,7 +475,7 @@ describe('codeGenUtils class formStructsEvents function', () => {
     expect(codeGen.formStructsEvents(entities, false, false)).toEqual(expected);
   });
 
-  it('should return correct result for structs when bitsMode is off', () => {
+  it('should return correct result for structs when bitsMode is on', () => {
     const { codeGen, entities } = setup();
     const expected =
       'struct itemA {\nuint8 paramA;\nstring paramB;\n}\nstruct itemB {\nbytes16 paramC;\naddress paramD;\nbool paramE;\n}\n';

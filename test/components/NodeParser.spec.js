@@ -1,7 +1,7 @@
-import { NodeParser } from '../../app/components/build/parsers/NodeParser';
+import NodeParser from '../../app/components/build/parsers/NodeParser';
 
 describe('NodeParser getAllVariables', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return correct object for empty object inputs', () => {
     nodeParser.reset({}, {});
@@ -27,7 +27,7 @@ describe('NodeParser getAllVariables', () => {
 });
 
 describe('NodeParser parseAssignmentNodeForVariables', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return false when map lhs has unknown keyType', () => {
     nodeParser.reset({ rhs: 'uint' }, {});
@@ -169,7 +169,7 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
 });
 
 describe('NodeParser parseEntityNodeForVariables', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should update memoryVars when isMemory is on', () => {
     nodeParser.reset({}, {});
@@ -179,6 +179,7 @@ describe('NodeParser parseEntityNodeForVariables', () => {
       variableSelected: 'StructA',
       isMemory: true
     });
+    expect(result).toBe(true);
     expect(nodeParser.memoryVars).toEqual({ struct_a: 'StructA' });
     expect(nodeParser.variables).toEqual({});
   });
@@ -191,13 +192,14 @@ describe('NodeParser parseEntityNodeForVariables', () => {
       variableSelected: 'StructA',
       isMemory: false
     });
+    expect(result).toBe(true);
     expect(nodeParser.variables).toEqual({ struct_a: 'StructA' });
     expect(nodeParser.memoryVars).toEqual({});
   });
 });
 
 describe('NodeParser parseTransferNodeForVariables', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should update variables when both value and variableSelected are var', () => {
     nodeParser.reset({ lhs: 'var', rhs: 'var' }, {});
@@ -248,7 +250,8 @@ describe('NodeParser parseTransferNodeForVariables', () => {
 });
 
 describe('NodeParser parseAssignmentNode', () => {
-  let nodeParser = new NodeParser();
+  const updateBuildError = jest.fn();
+  const nodeParser = new NodeParser(updateBuildError);
 
   it('should return correct code and variables should be correct for single layer map', () => {
     nodeParser.reset(
@@ -369,10 +372,23 @@ describe('NodeParser parseAssignmentNode', () => {
     });
     expect(result).toBe('lhs.b = rhs;');
   });
+
+  it('should call updateBuildError when lhs and rhs have different types', () => {
+    nodeParser.parseNode({
+      type: 'assignment',
+      variableSelected: '"a"',
+      assignedVal: '5',
+      isMemory: false,
+      assignment: '='
+    });
+    expect(updateBuildError).toHaveBeenCalledWith(
+      'Invalid assignment at node "a" = 5'
+    );
+  });
 });
 
 describe('NodeParser parseEventNode', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return empty parens for empty params', () => {
     const result = nodeParser.parseNode({
@@ -394,7 +410,7 @@ describe('NodeParser parseEventNode', () => {
 });
 
 describe('NodeParser parseEntityNode', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return empty parens for empty params', () => {
     const result = nodeParser.parseNode({
@@ -433,7 +449,7 @@ describe('NodeParser parseEntityNode', () => {
 });
 
 describe('NodeParser parseReturnNode', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return correct code and update return type for int', () => {
     const result = nodeParser.parseNode({
@@ -455,7 +471,8 @@ describe('NodeParser parseReturnNode', () => {
 });
 
 describe('NodeParser parseTransferNode', () => {
-  let nodeParser = new NodeParser();
+  const updateBuildError = jest.fn();
+  const nodeParser = new NodeParser(updateBuildError);
 
   it('should return correct code for literal address', () => {
     const result = nodeParser.parseNode({
@@ -474,10 +491,28 @@ describe('NodeParser parseTransferNode', () => {
     });
     expect(result).toEqual('address(uint160(0)).transfer(5);');
   });
+
+  it('should call updateBuildError for string variableSelected', () => {
+    nodeParser.parseNode({
+      type: 'transfer',
+      variableSelected: '"a"',
+      value: '5'
+    });
+    expect(updateBuildError).toHaveBeenCalledWith(`Transfer target should be a payable address at transfer node`);
+  });
+
+  it('should call updateBuildError for string value', () => {
+    nodeParser.parseNode({
+      type: 'transfer',
+      variableSelected: 'an address',
+      value: '"5"'
+    });
+    expect(updateBuildError).toHaveBeenCalledWith(`Value should be an integer at transfer node`);
+  });
 });
 
 describe('NodeParser parseCompareNode', () => {
-  let nodeParser = new NodeParser();
+  const nodeParser = new NodeParser();
 
   it('should return correct code when comparing 2 uints', () => {
     const result = nodeParser.parseNode({
@@ -499,7 +534,7 @@ describe('NodeParser parseCompareNode', () => {
     expect(result).toEqual('int(5) > -6');
   });
 
-  it('should return correct code when comparing uint and int', () => {
+  it('should return correct code when comparing int and uint', () => {
     const result = nodeParser.parseNode({
       type: 'conditional',
       var1: '-5',

@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import RequireRow from '../../build_components/RequireRow';
 
@@ -36,9 +35,9 @@ class ConditionalNode extends React.Component {
   state = {
     comp: '==',
     displayVar1: '',
-    var1: '',
+    var1: '', // eslint-disable-line react/no-unused-state
     displayVar2: '',
-    var2: ''
+    var2: '' // eslint-disable-line react/no-unused-state
   };
 
   render() {

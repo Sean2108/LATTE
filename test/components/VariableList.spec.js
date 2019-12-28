@@ -1,16 +1,12 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
-import VariableList from '../../app/components/build/build_components/VariableList';
-import { BuildParser } from '../../app/components/build/parsers/BuildParser';
 import { createMount } from '@material-ui/core/test-utils';
-import VariableRow from '../../app/components/build/build_components/VariableRow';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import VariableList from '../../app/components/build/build_components/VariableList';
+import VariableRow from '../../app/components/build/build_components/VariableRow';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -22,12 +18,12 @@ function singleRowSetup() {
       vars={[]}
       tooltipText="test tooltip"
       header="test header"
-      bitsMode={true}
+      bitsMode
     />
   );
   const rows = component.find(VariableRow);
   const button = component.find(Button);
-  let emptyRow = {
+  const emptyRow = {
     displayName: '',
     name: '',
     type: 'uint',
@@ -37,13 +33,13 @@ function singleRowSetup() {
 }
 
 function threeRowSetup() {
-  let oldRow = {
+  const oldRow = {
     displayName: 'Test Int',
     name: 'test_int',
     type: 'uint',
     bits: '8'
   };
-  let newRow = {
+  const newRow = {
     displayName: 'Test Str',
     name: 'test_str',
     type: 'string',
@@ -56,7 +52,7 @@ function threeRowSetup() {
       vars={[oldRow, oldRow, oldRow]}
       tooltipText="test tooltip"
       header="test header"
-      bitsMode={true}
+      bitsMode
     />
   );
   const rows = component.find(VariableRow);

@@ -1,10 +1,10 @@
 import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import ReturnNode from '../../app/components/build/diagram/diagram_node_options/ReturnNode';
 import { createMount } from '@material-ui/core/test-utils';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import ReturnNode from '../../app/components/build/diagram/diagram_node_options/ReturnNode';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -35,7 +35,7 @@ describe('ReturnNode component', () => {
   });
 
   it('should call submit when button is clicked and field is empty', () => {
-    const { textField, button, onchange, close } = setup();
+    const { button, onchange, close } = setup();
     button.props().onClick();
     expect(close).toHaveBeenCalled();
     expect(onchange).toHaveBeenCalledWith('', {

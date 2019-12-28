@@ -1,7 +1,7 @@
-import { BuildParser } from '../../app/components/build/parsers/BuildParser';
-import { DefaultDataNodeModel } from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import { NodeParser } from '../../app/components/build/parsers/NodeParser';
-import { DiamondNodeModel } from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
+import BuildParser from '../../app/components/build/parsers/BuildParser';
+import DefaultDataNodeModel from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
+import NodeParser from '../../app/components/build/parsers/NodeParser';
+import DiamondNodeModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 
 jest.mock('../../app/components/build/parsers/NodeParser');
 
@@ -46,7 +46,8 @@ function addNodeToDiamondNode(
 }
 
 function createTargetNode(isTargetDataNode, targetNodeName, targetNodeData) {
-  let targetNode, targetPort;
+  let targetNode;
+  let targetPort;
   if (isTargetDataNode) {
     targetNode = new DefaultDataNodeModel(targetNodeName, '', targetNodeData);
     targetPort = targetNode.addInPort(targetNodeName);
@@ -66,7 +67,7 @@ function addLink(sourcePort, targetPort) {
 function expectFunctionCalledWithTimes(fn, expectedValArr, times, offset = 0) {
   expect(fn).toHaveBeenCalledTimes(expectedValArr.length * times + offset);
   expectedValArr.forEach(val => {
-    for (let i = 0; i < times; i++) {
+    for (let i = 0; i < times; i += 1) {
       expect(fn).toHaveBeenCalledWith(val);
     }
   });
@@ -90,7 +91,7 @@ describe('BuildParser findVariables', () => {
   it('should call node parser twice for diagram with 1 data node', () => {
     const buildParser = new BuildParser();
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
-    const targetNode = addNodeToDataNode(startNode, 'first', { first: 2 });
+    addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
@@ -117,8 +118,8 @@ describe('BuildParser findVariables', () => {
       { t1: 3 },
       { f1: 4 }
     );
-    const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
-    const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
+    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
@@ -146,7 +147,7 @@ describe('BuildParser findVariables', () => {
       { t1: 3 },
       { f1: 4 }
     );
-    const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
     const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     addLink(f2Node.addOutPort('f2'), compareNode.getPort('left'));
     const mockNodeParserInstance = NodeParser.mock.instances[0];
@@ -178,7 +179,7 @@ describe('BuildParser traverseNextNode', () => {
   it('should call node parser once for diagram with 1 data node', () => {
     const buildParser = new BuildParser();
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
-    const targetNode = addNodeToDataNode(startNode, 'first', { first: 2 });
+    addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode.mockReturnValueOnce('first');
     const code = buildParser.traverseNextNode(startNode);
@@ -206,8 +207,8 @@ describe('BuildParser traverseNextNode', () => {
       { t1: 3 },
       { f1: 4 }
     );
-    const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
-    const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
+    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')
@@ -246,7 +247,7 @@ describe('BuildParser traverseNextNode', () => {
       { f1: 4 }
     );
     const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
-    const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     addLink(t2Node.addOutPort('t2'), compareNode.getPort('left'));
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
@@ -275,7 +276,7 @@ describe('BuildParser traverseNextNode', () => {
       { t1: 3 },
       { f1: 4 }
     );
-    const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
     const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     addLink(f2Node.addOutPort('f2'), compareNode.getPort('left'));
     const mockNodeParserInstance = NodeParser.mock.instances[0];
@@ -309,7 +310,7 @@ describe('BuildParser traverseNextNode', () => {
     );
     const i1Node = addNodeToDataNode(t1Node, 'i1', { i1: 5 });
     addLink(f1Node.addOutPort('f1'), i1Node.getInPorts()[0]);
-    const i2Node = addNodeToDataNode(i1Node, 'i2', { i2: 6 });
+    addNodeToDataNode(i1Node, 'i2', { i2: 6 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')
@@ -346,7 +347,7 @@ describe('BuildParser traverseNextNode', () => {
     const t2Node = addNodeToDataNode(t1Node, 't2', { t2: 5 });
     const i1Node = addNodeToDataNode(t2Node, 'i1', { i1: 5 });
     addLink(f1Node.addOutPort('f1'), i1Node.getInPorts()[0]);
-    const i2Node = addNodeToDataNode(i1Node, 'i2', { i2: 6 });
+    addNodeToDataNode(i1Node, 'i2', { i2: 6 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')

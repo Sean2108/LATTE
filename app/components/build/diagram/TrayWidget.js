@@ -4,7 +4,7 @@ export interface TrayWidgetProps {}
 
 export interface TrayWidgetState {}
 
-export class TrayWidget extends React.Component<
+export default class TrayWidget extends React.Component<
   TrayWidgetProps,
   TrayWidgetState
 > {

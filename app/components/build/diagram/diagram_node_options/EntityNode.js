@@ -9,9 +9,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import ParamList from '../../build_components/ParamList';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import ParamList from '../../build_components/ParamList';
 
 const styles = theme => ({
   paper: {
@@ -42,11 +42,12 @@ class EntityNode extends React.Component {
     variableSelected: '',
     assignVar: '',
     params: [],
-    isMemory: this.props.bitsMode
+    isMemory: this.props.bitsMode // eslint-disable-line react/destructuring-assignment
   };
 
   render() {
     const { classes, close, submit, varList, bitsMode } = this.props;
+    const { assignVar, variableSelected, isMemory } = this.state;
 
     return (
       <div>
@@ -54,14 +55,14 @@ class EntityNode extends React.Component {
           id="standard-name"
           label="Entity Name"
           className={classes.formControl}
-          value={this.state.assignVar}
+          value={assignVar}
           onChange={event => this.setState({ assignVar: event.target.value })}
           margin="none"
         />
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="var">Entity Type</InputLabel>
           <Select
-            value={this.state.variableSelected}
+            value={variableSelected}
             onChange={event =>
               this.setState({
                 variableSelected: event.target.value,
@@ -88,7 +89,7 @@ class EntityNode extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.isMemory}
+                  checked={isMemory}
                   onChange={event =>
                     this.setState({
                       isMemory: event.target.checked
@@ -102,29 +103,32 @@ class EntityNode extends React.Component {
             />
           )}
 
-          {this.state.variableSelected !== '' &&
-            varList[this.state.variableSelected].length > 0 && (
-              <ParamList
-                header={'Entity Information'}
-                params={varList[this.state.variableSelected]}
-                tooltipText={'The information that the entity will contain'}
-                updateParams={params =>
-                  this.setState({
-                    params: params.map(param =>
-                      param.value
-                        ? `${param.value}`
-                        : param.type === 'uint'
-                        ? '0'
-                        : param.type === 'string'
-                        ? '""'
-                        : param.type === 'bool'
-                        ? 'false'
-                        : 'an address'
-                    )
+          {variableSelected !== '' && varList[variableSelected].length > 0 && (
+            <ParamList
+              header='Entity Information'
+              params={varList[variableSelected]}
+              tooltipText='The information that the entity will contain'
+              updateParams={params =>
+                this.setState({
+                  params: params.map(param => {
+                    if (param.value) {
+                      return param.value;
+                    }
+                    switch (param.type) {
+                      case 'uint':
+                        return '0';
+                      case 'string':
+                        return '""';
+                      case 'bool':
+                        return 'false';
+                      default:
+                        return 'an address';
+                    }
                   })
-                }
-              />
-            )}
+                })
+              }
+            />
+          )}
 
           <div className={classes.rightIcon}>
             <Button

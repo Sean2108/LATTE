@@ -1,1 +1,1 @@
-window.ipc = require('ipc')
+window.ipc = require('ipc') // eslint-disable-line import/no-unresolved

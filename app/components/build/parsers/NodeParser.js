@@ -1,8 +1,9 @@
 import { parseVariable, checkIntUintMismatch } from './VariableParser';
 
-export class NodeParser {
-  constructor() {
+export default class NodeParser {
+  constructor(updateBuildError) {
     this.reset({}, {});
+    this.updateBuildError = updateBuildError;
   }
 
   reset(
@@ -34,7 +35,7 @@ export class NodeParser {
   }
 
   updateVariablesForMap(parsedLhs, parsedRhs) {
-    let lhsType =
+    const lhsType =
       parsedLhs.keyType === 'address payable' ? 'address' : parsedLhs.keyType;
     this.variables[parsedLhs.mapName] = {
       type: 'mapping',
@@ -42,7 +43,7 @@ export class NodeParser {
       to: parsedRhs.type
     };
     if ('innerKeyType' in parsedLhs) {
-      this.variables[parsedLhs.mapName]['inner'] = parsedLhs.innerKeyType;
+      this.variables[parsedLhs.mapName].inner = parsedLhs.innerKeyType;
     }
   }
 
@@ -55,8 +56,9 @@ export class NodeParser {
         return this.parseEntityNodeForVariables(nodeData, variables);
       case 'transfer':
         return this.parseTransferNodeForVariables(nodeData, variables);
+      default:
+        return true;
     }
-    return true;
   }
 
   parseAssignmentNodeForVariables(nodeData, variables) {
@@ -157,8 +159,8 @@ export class NodeParser {
       case 'transfer':
         this.isView = false;
         return this.parseTransferNode(nodeData, variables);
-      case 'return':
-        let returnVar = parseVariable(
+      case 'return': {
+        const returnVar = parseVariable(
           nodeData.variableSelected,
           variables,
           this.structList,
@@ -166,20 +168,22 @@ export class NodeParser {
         );
         this.returnVar = returnVar.type;
         return `return ${returnVar.name};`;
+      }
       case 'conditional':
         return this.parseCompareNode(nodeData, variables);
+      default:
+        return '';
     }
-    return '';
   }
 
   parseAssignmentNode(data, memoryVarsDeclared, variables) {
-    let parsedLhs = parseVariable(
+    const parsedLhs = parseVariable(
       data.variableSelected,
       variables,
       this.structList,
       this.bitsMode
     );
-    let parsedRhs = parseVariable(
+    const parsedRhs = parseVariable(
       data.assignedVal,
       variables,
       this.structList,
@@ -190,6 +194,14 @@ export class NodeParser {
     }
     if ('mapName' in parsedLhs) {
       this.updateVariablesForMap(parsedLhs, parsedRhs);
+    } else if (
+      parsedLhs.type !== 'var' &&
+      parsedRhs.type !== 'var' &&
+      parsedLhs.type !== parsedRhs.type
+    ) {
+      this.updateBuildError(
+        `Invalid assignment at node ${data.variableSelected} ${data.assignment} ${data.assignedVal}`
+      );
     } else if (
       !parsedLhs.name.includes('.') &&
       (parsedLhs.type === 'var' ||
@@ -203,10 +215,6 @@ export class NodeParser {
       } else {
         this.variables[parsedLhs.name] = parsedRhs.type;
       }
-    } else if (parsedLhs.type !== parsedRhs.type) {
-      console.log(
-        `invalid assignment at node ${data.variableSelected} ${data.assignment} ${data.assignedVal}`
-      );
     }
     if (
       data.isMemory &&
@@ -214,7 +222,7 @@ export class NodeParser {
       !('mapName' in parsedLhs) &&
       !memoryVarsDeclared[parsedLhs.name]
     ) {
-      memoryVarsDeclared[parsedLhs.name] = true;
+      memoryVarsDeclared[parsedLhs.name] = true; // eslint-disable-line no-param-reassign
       return `${parsedRhs.type}${
         parsedRhs.type === 'string' ? ' memory ' : ' '
       }${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
@@ -223,7 +231,7 @@ export class NodeParser {
   }
 
   parseEventNode(data, variables) {
-    let params = data.params
+    const params = data.params
       .map(
         param =>
           parseVariable(param, variables, this.structList, this.bitsMode).name
@@ -233,13 +241,13 @@ export class NodeParser {
   }
 
   parseEntityNode(data, variables) {
-    let parsedLhs = parseVariable(
+    const parsedLhs = parseVariable(
       data.assignVar,
       variables,
       this.structList,
       this.bitsMode
     );
-    let params = data.params
+    const params = data.params
       .map(
         param =>
           parseVariable(param, variables, this.structList, this.bitsMode).name
@@ -256,44 +264,44 @@ export class NodeParser {
   }
 
   parseTransferNode(data, variables) {
-    let parsedLhs = parseVariable(
+    const parsedLhs = parseVariable(
       data.value,
       variables,
       this.structList,
       this.bitsMode
     );
-    let parsedRhs = parseVariable(
+    const parsedRhs = parseVariable(
       data.variableSelected,
       variables,
       this.structList,
       this.bitsMode
     );
     if (parsedLhs.type !== 'uint') {
-      console.log(`value should be an integer at transfer node`);
+      this.updateBuildError(`Value should be an integer at transfer node`);
     }
     if (parsedRhs.type !== 'address payable') {
-      console.log(
-        `transfer target should be a payable address at transfer node`
+      this.updateBuildError(
+        `Transfer target should be a payable address at transfer node`
       );
     }
     return `${parsedRhs.name}.transfer(${parsedLhs.name});`;
   }
 
   parseCompareNode(data, variables) {
-    let parsedLhs = parseVariable(
+    const parsedLhs = parseVariable(
       data.var1,
       variables,
       this.structList,
       this.bitsMode
     );
-    let parsedRhs = parseVariable(
+    const parsedRhs = parseVariable(
       data.var2,
       variables,
       this.structList,
       this.bitsMode
     );
     if (parsedLhs.type !== parsedRhs.type) {
-      let mismatch = checkIntUintMismatch(
+      const mismatch = checkIntUintMismatch(
         parsedLhs,
         parsedRhs,
         `${parsedLhs.name} ${data.comp} int(${parsedRhs.name})`,

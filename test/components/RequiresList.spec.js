@@ -1,16 +1,12 @@
-import { spy } from 'sinon';
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
-import RequiresList from '../../app/components/build/build_components/RequiresList';
-import { BuildParser } from '../../app/components/build/parsers/BuildParser';
 import { createMount } from '@material-ui/core/test-utils';
-import RequireRow from '../../app/components/build/build_components/RequireRow';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import RequiresList from '../../app/components/build/build_components/RequiresList';
+import RequireRow from '../../app/components/build/build_components/RequireRow';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -28,7 +24,7 @@ function singleRowSetup() {
   );
   const rows = component.find(RequireRow);
   const button = component.find(Button);
-  let emptyRequire = {
+  const emptyRequire = {
     var1: '',
     displayVar1: '',
     comp: '==',
@@ -40,7 +36,7 @@ function singleRowSetup() {
 }
 
 function threeRowSetup() {
-  let oldRequire = {
+  const oldRequire = {
     var1: 'original',
     displayVar1: 'original',
     comp: '==',
@@ -48,7 +44,7 @@ function threeRowSetup() {
     displayVar2: 'oldVal',
     requireMessage: 'oldMsg'
   };
-  let newRequire = {
+  const newRequire = {
     var1: 'new',
     displayVar1: 'new',
     comp: '!=',

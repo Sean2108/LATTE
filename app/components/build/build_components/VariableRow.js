@@ -22,7 +22,7 @@ const styles = theme => ({
 
 class VariableRow extends React.Component {
   render() {
-    const { classes, theme, updateVariables, val, bitsMode } = this.props;
+    const { classes, updateVariables, val, bitsMode } = this.props;
     return (
       <div>
         <FormControl className={classes.formControl}>
@@ -115,7 +115,6 @@ class VariableRow extends React.Component {
 
 VariableRow.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   updateVariables: PropTypes.func.isRequired,
   val: PropTypes.object.isRequired,
   bitsMode: PropTypes.bool.isRequired

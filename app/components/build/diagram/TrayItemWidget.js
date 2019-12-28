@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export class TrayItemWidget extends React.Component<
+export default class TrayItemWidget extends React.Component<
   TrayItemWidgetProps,
   TrayItemWidgetState
 > {
@@ -11,9 +11,10 @@ export class TrayItemWidget extends React.Component<
 
   render() {
     return (
-      <div {...this.props}
+      <div
+        {...this.props}
         style={{ borderColor: this.props.color }}
-        draggable={true}
+        draggable
         onDragStart={event => {
           event.dataTransfer.setData(
             'storm-diagram-node',

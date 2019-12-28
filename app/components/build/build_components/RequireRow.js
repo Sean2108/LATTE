@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
@@ -24,28 +22,29 @@ const styles = theme => ({
 
 class RequireRow extends React.Component {
   handleChange = name => event => {
-    let state = { ...this.props.require, [name]: event.target.value };
+    const { require, variables, structList, updateRequire } = this.props;
+    const state = { ...require, [name]: event.target.value };
     try {
-      if (this.props.variables && this.props.structList) {
+      if (variables && structList) {
         state.var1 = parseVariable(
           state.displayVar1,
-          this.props.variables,
-          this.props.structList
+          variables,
+          structList
         ).name;
         state.var2 = parseVariable(
           state.displayVar2,
-          this.props.variables,
-          this.props.structList
+          variables,
+          structList
         ).name;
       }
     } catch (err) {
       console.log(err);
     }
-    this.props.updateRequire(state);
+    updateRequire(state);
   };
 
   render() {
-    const { classes, theme, key, showMessage, submit, require } = this.props;
+    const { classes, showMessage, require } = this.props;
     return (
       <div>
         <FormControl className={classes.formControl}>
@@ -114,8 +113,6 @@ class RequireRow extends React.Component {
 
 RequireRow.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-  key: PropTypes.any,
   showMessage: PropTypes.bool,
   updateRequire: PropTypes.func.isRequired,
   variables: PropTypes.object,

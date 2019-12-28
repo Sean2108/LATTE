@@ -1,2 +1,3 @@
-import lodash from 'lodash'
+import lodash from 'lodash';
+
 global._ = lodash;

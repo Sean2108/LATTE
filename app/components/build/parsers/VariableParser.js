@@ -1,23 +1,23 @@
 export function parseVariable(
-  variable,
+  rawVariable,
   variables,
   structList,
   bitsMode = false
 ) {
-  variable = variable.trim();
+  const variable = rawVariable.trim();
   if (
     (variable[0] === '"' && variable[variable.length - 1] === '"') ||
     (variable[0] === "'" && variable[variable.length - 1] === "'")
   ) {
     return { name: variable, type: 'string' };
   }
-  if (!isNaN(variable) && variable.slice(0, 2) !== '0x') {
-    if (parseInt(variable) < 0) {
+  if (!Number.isNaN(Number(variable)) && variable.slice(0, 2) !== '0x') {
+    if (parseInt(variable, 10) < 0) {
       return { name: variable, type: 'int' };
     }
     return { name: variable, type: 'uint' };
   }
-  let varName = variable.toLowerCase().replace(/\s/g, '_');
+  const varName = variable.toLowerCase().replace(/\s/g, '_');
   return (
     parseOperator(variable, variables, structList, bitsMode) ||
     parseStruct(variable, variables, structList, bitsMode) ||
@@ -28,15 +28,14 @@ export function parseVariable(
 }
 
 function parseOperator(variable, variables, structList, bitsMode) {
-  for (let operator of ['*', '/', '+', '- ']) {
+  for (const operator of ['*', '/', '+', '- ']) {
     if (variable.indexOf(operator) > 0) {
-      let lhs, rhs;
-      [lhs, rhs] = variable.split(operator);
-      let parsedLhs = parseVariable(lhs, variables, structList, bitsMode);
-      let parsedRhs = parseVariable(rhs, variables, structList, bitsMode);
+      const [lhs, rhs] = variable.split(operator);
+      const parsedLhs = parseVariable(lhs, variables, structList, bitsMode);
+      const parsedRhs = parseVariable(rhs, variables, structList, bitsMode);
       if (parsedLhs.type !== parsedRhs.type) {
         // one of them is a uint
-        let mismatch = checkIntUintMismatch(
+        const mismatch = checkIntUintMismatch(
           parsedLhs,
           parsedRhs,
           {
@@ -63,7 +62,7 @@ function parseOperator(variable, variables, structList, bitsMode) {
         };
       }
       if (parsedLhs === 'string' && operator !== '+') {
-        let varName = `${parsedLhs.name}_${parsedRhs.name}`;
+        const varName = `${parsedLhs.name}_${parsedRhs.name}`;
         if (!(varName in variables)) {
           return { name: varName, type: 'var' };
         }
@@ -80,11 +79,10 @@ function parseOperator(variable, variables, structList, bitsMode) {
 
 function parseStruct(variable, variables, structList, bitsMode) {
   if (/('s )/.test(variable)) {
-    let struct, attr;
-    [struct, attr] = variable.split("'s ");
-    let parsedStruct = parseVariable(struct, variables, structList, bitsMode);
-    let parsedAttr = parseVariable(attr, variables, structList, bitsMode);
-    for (let attribute of structList[parsedStruct.type]) {
+    const [struct, attr] = variable.split("'s ");
+    const parsedStruct = parseVariable(struct, variables, structList, bitsMode);
+    const parsedAttr = parseVariable(attr, variables, structList, bitsMode);
+    for (const attribute of structList[parsedStruct.type]) {
       if (
         attribute.name === parsedAttr.name ||
         attribute.displayName === parsedAttr.name
@@ -105,42 +103,40 @@ function parseStruct(variable, variables, structList, bitsMode) {
 
 function parseMap(variable, variables, structList, bitsMode) {
   if (/( for | of )/.test(variable)) {
-    let map, key, innerKey;
-    if (variable.indexOf(' of ') > 0) {
-      [map, key, innerKey] = variable.split(' of ');
-    } else {
-      [map, key, innerKey] = variable.split(' for ');
-    }
+    const [map, key, innerKey] =
+      variable.indexOf(' of ') > 0
+        ? variable.split(' of ')
+        : variable.split(' for ');
     if (innerKey) {
-      let parsedMap = parseVariable(map, variables, structList, bitsMode);
-      let parsedKey = parseVariable(key, variables, structList, bitsMode);
-      let parsedInnerKey = parseVariable(
+      const parsedMap = parseVariable(map, variables, structList, bitsMode);
+      const parsedKey = parseVariable(key, variables, structList, bitsMode);
+      const parsedInnerKey = parseVariable(
         innerKey,
         variables,
         structList,
         bitsMode
       );
-      let type = variables[parsedMap.name]
-        ? variables[parsedMap.name]['to']
+      const type = variables[parsedMap.name]
+        ? variables[parsedMap.name].to
         : 'map';
       return {
         name: `${parsedMap.name}[${parsedKey.name}][${parsedInnerKey.name}]`,
         mapName: parsedMap.name,
         keyType: parsedKey.type,
         innerKeyType: parsedInnerKey.type,
-        type: type
+        type
       };
     }
-    let parsedMap = parseVariable(map, variables, structList, bitsMode);
-    let parsedKey = parseVariable(key, variables, structList, bitsMode);
-    let type = variables[parsedMap.name]
-      ? variables[parsedMap.name]['to']
+    const parsedMap = parseVariable(map, variables, structList, bitsMode);
+    const parsedKey = parseVariable(key, variables, structList, bitsMode);
+    const type = variables[parsedMap.name]
+      ? variables[parsedMap.name].to
       : 'map';
     return {
       name: `${parsedMap.name}[${parsedKey.name}]`,
       mapName: parsedMap.name,
       keyType: parsedKey.type,
-      type: type
+      type
     };
   }
   return null;
@@ -216,6 +212,6 @@ export function checkIntUintMismatch(
 
 function bitsModeGetType(info) {
   return `${info.type === 'string' && info.bits ? 'bytes' : info.type}${
-    info['bits']
+    info.bits
   }`;
 }

@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import VariableRow from './VariableRow';
 import Tooltip from '@material-ui/core/Tooltip';
+import VariableRow from './VariableRow';
 
 const styles = theme => ({
   paper: {
@@ -26,7 +25,7 @@ const styles = theme => ({
 
 class VariableList extends React.Component {
   render() {
-    const { classes, theme, header, updateVariables, vars, tooltipText, bitsMode } = this.props;
+    const { classes, header, updateVariables, vars, tooltipText, bitsMode } = this.props;
 
     if (vars.length === 0) {
       vars.push({ name: '', displayName: '', type: 'uint', bits: '' });
@@ -44,7 +43,7 @@ class VariableList extends React.Component {
             val={element}
             key={index}
             updateVariables={val => {
-              let variables = [...vars];
+              const variables = [...vars];
               variables[index] = val;
               updateVariables(variables);
             }}
@@ -72,7 +71,6 @@ class VariableList extends React.Component {
 
 VariableList.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   header: PropTypes.string.isRequired,
   updateVariables: PropTypes.func.isRequired,
   vars: PropTypes.array.isRequired,

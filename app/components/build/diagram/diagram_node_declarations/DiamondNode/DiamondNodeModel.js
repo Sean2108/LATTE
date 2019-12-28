@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { NodeModel, DiagramEngine } from 'storm-react-diagrams';
-import { DiamondPortModel } from './DiamondPortModel';
+import DiamondPortModel from './DiamondPortModel';
 
-export class DiamondNodeModel extends NodeModel {
+export default class DiamondNodeModel extends NodeModel {
   outPortTrue;
+
   outPortFalse;
+
   name;
+  
   data;
 
   constructor(message, data = {}) {

@@ -17,10 +17,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import WifiIcon from '@material-ui/icons/Wifi';
 import SettingsIcon from '@material-ui/icons/Settings';
+import { existsSync, readFile, writeFile } from 'fs';
 import Connect from './Connect';
 import Settings from './Settings';
 import Build from './build/Build';
-import { existsSync, readFile, writeFile } from 'fs';
 
 const drawerWidth = 240;
 
@@ -101,6 +101,18 @@ class MiniDrawer extends React.Component {
     bitsMode: false
   };
 
+  componentWillMount() {
+    if (existsSync(settingsFile)) {
+      readFile(settingsFile, (err, data) => {
+        if (err) throw err;
+        const parsedData = JSON.parse(data);
+        if ('bitsMode' in parsedData) {
+          this.setState({ bitsMode: parsedData.bitsMode });
+        }
+      });
+    }
+  }
+
   handleDrawerOpen = () => {
     this.setState({
       open: true
@@ -116,7 +128,7 @@ class MiniDrawer extends React.Component {
   goToBuild = connection =>
     this.setState({
       selected: selection.BUILD,
-      connection: connection
+      connection
     });
 
   goToConnect = () =>
@@ -125,23 +137,20 @@ class MiniDrawer extends React.Component {
     });
 
   selectShown = selected => {
+    const { bitsMode, connection } = this.state;
     switch (selected) {
       case selection.CONNECT:
         return <Connect onclick={this.goToBuild} />;
       case selection.SETTINGS:
         return (
           <Settings
-            bitsMode={this.state.bitsMode}
+            bitsMode={bitsMode}
             changeBitsMode={newVal => {
-              let newData = {bitsMode: newVal};
+              const newData = { bitsMode: newVal };
               this.setState(newData);
-              writeFile(
-                settingsFile,
-                JSON.stringify(newData),
-                err => {
-                  if (err) throw err;
-                }
-              );
+              writeFile(settingsFile, JSON.stringify(newData), err => {
+                if (err) throw err;
+              });
             }}
           />
         );
@@ -149,8 +158,8 @@ class MiniDrawer extends React.Component {
         return (
           <Build
             onback={this.goToConnect}
-            connection={this.state.connection}
-            bitsMode={this.state.bitsMode}
+            connection={connection}
+            bitsMode={bitsMode}
           />
         );
       default:
@@ -158,39 +167,22 @@ class MiniDrawer extends React.Component {
     }
   };
 
-  componentWillMount() {
-    if (existsSync(settingsFile)) {
-      readFile(settingsFile, (err, data) => {
-        if (err) throw err;
-        let parsedData = JSON.parse(data);
-        if ('bitsMode' in parsedData) {
-          this.setState({ bitsMode: parsedData.bitsMode });
-        }
-      });
-    }
-  }
-
   render() {
     const { classes, theme } = this.props;
+    const { open, selected } = this.state;
 
     return (
       <div className={classes.root}>
         <AppBar
           position="absolute"
-          className={classNames(
-            classes.appBar,
-            this.state.open && classes.appBarShift
-          )}
+          className={classNames(classes.appBar, open && classes.appBarShift)}
         >
-          <Toolbar disableGutters={!this.state.open}>
+          <Toolbar disableGutters={!open}>
             <IconButton
               color="inherit"
               aria-label="Open drawer"
               onClick={this.handleDrawerOpen}
-              className={classNames(
-                classes.menuButton,
-                this.state.open && classes.hide
-              )}
+              className={classNames(classes.menuButton, open && classes.hide)}
             >
               <MenuIcon />
             </IconButton>
@@ -204,10 +196,10 @@ class MiniDrawer extends React.Component {
           classes={{
             paper: classNames(
               classes.drawerPaper,
-              !this.state.open && classes.drawerPaperClose
+              !open && classes.drawerPaperClose
             )
           }}
-          open={this.state.open}
+          open={open}
         >
           <div className={classes.toolbar}>
             <IconButton onClick={this.handleDrawerClose}>
@@ -223,7 +215,7 @@ class MiniDrawer extends React.Component {
             <div>
               <ListItem
                 button
-                onClick={_ => {
+                onClick={() => {
                   this.setState({
                     selected: selection.CONNECT
                   });
@@ -241,7 +233,7 @@ class MiniDrawer extends React.Component {
             <div>
               <ListItem
                 button
-                onClick={_ => {
+                onClick={() => {
                   this.setState({
                     selected: selection.SETTINGS
                   });
@@ -255,7 +247,7 @@ class MiniDrawer extends React.Component {
             </div>
           </List>
         </Drawer>
-        {this.selectShown(this.state.selected)}
+        {this.selectShown(selected)}
       </div>
     );
   }

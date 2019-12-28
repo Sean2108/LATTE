@@ -23,7 +23,7 @@ const styles = theme => ({
 
 class Settings extends React.Component {
   render() {
-    const { classes, theme, bitsMode, changeBitsMode } = this.props;
+    const { classes, bitsMode, changeBitsMode } = this.props;
 
     return (
       <main align="center" className={classes.content}>
@@ -51,7 +51,6 @@ class Settings extends React.Component {
 
 Settings.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   bitsMode: PropTypes.bool.isRequired,
   changeBitsMode: PropTypes.func.isRequired
 };

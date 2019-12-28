@@ -12,8 +12,8 @@
  */
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { platform } from 'os';
-import MenuBuilder from './menu';
 import { compile } from 'solc';
+import MenuBuilder from './menu';
 
 let mainWindow = null;
 
@@ -98,7 +98,7 @@ if (platform() === 'linux') {
 
 ipcMain.on('request-compile', (event, arg) => {
   if (mainWindow) {
-    let input = {
+    const input = {
       language: 'Solidity',
       sources: {
         'code.sol': {

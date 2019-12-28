@@ -122,7 +122,6 @@ describe('EventNode component', () => {
 
   it('should not submit when event is not populated', () => {
     const {
-      component,
       event,
       close,
       onchange,

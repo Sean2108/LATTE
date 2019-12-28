@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import BuildOptions from './BuildOptions';
 import BuildTabs from './BuildTabs';
-
-var Web3 = require('web3');
 
 const styles = theme => ({
   toolbar: {
@@ -32,24 +28,25 @@ const styles = theme => ({
 
 class Build extends React.Component {
   state = {
-    tabs: ['Global State', 'Initial State'],
-    tabsCode: [''],
+    tabs: ['Global State', 'Initial State'], // eslint-disable-line react/no-unused-state
+    tabsCode: [''], // eslint-disable-line react/no-unused-state
     variables: {},
-    tabsParams: [[]],
-    tabsReturn: [null],
-    tabsRequire: [[]],
-    constructorParams: [],
-    events: {},
-    entities: {},
-    isView: [false],
-    diagrams: [{}],
-    gasHistory: [0]
+    tabsParams: [[]], // eslint-disable-line react/no-unused-state
+    tabsReturn: [null], // eslint-disable-line react/no-unused-state
+    tabsRequire: [[]], // eslint-disable-line react/no-unused-state
+    constructorParams: [], // eslint-disable-line react/no-unused-state
+    events: {}, // eslint-disable-line react/no-unused-state
+    entities: {}, // eslint-disable-line react/no-unused-state
+    isView: [false], // eslint-disable-line react/no-unused-state
+    diagrams: [{}], // eslint-disable-line react/no-unused-state
+    gasHistory: [0], // eslint-disable-line react/no-unused-state
+    buildError: '' // eslint-disable-line react/no-unused-state
   };
 
   render() {
-    const { classes, theme, onback, connection, bitsMode } = this.props;
+    const { classes, onback, connection, bitsMode } = this.props;
 
-    const { tabs, tabsCode, variables } = this.state;
+    const { variables } = this.state;
 
     return (
       <main align="center" className={classes.content}>
@@ -79,7 +76,6 @@ class Build extends React.Component {
 
 Build.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   onback: PropTypes.func.isRequired,
   connection: PropTypes.object.isRequired,
   bitsMode: PropTypes.bool.isRequired

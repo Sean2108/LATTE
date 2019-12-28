@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
@@ -45,6 +44,12 @@ const styles = theme => ({
 });
 
 class Connect extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.promiseTimeout = this.promiseTimeout.bind(this);
+    this.login = this.login.bind(this);
+  }
+
   state = {
     connectionFailed: false,
     protocol: 'http',
@@ -52,17 +57,12 @@ class Connect extends React.Component {
     port: '',
     submitted: false
   };
-  id;
 
-  constructor(...args) {
-    super(...args);
-    this.promiseTimeout = this.promiseTimeout.bind(this);
-    this.login = this.login.bind(this);
-  }
+  id;
 
   promiseTimeout(ms, promise) {
     // Create a promise that rejects in <ms> milliseconds
-    let timeout = new Promise((resolve, reject) => {
+    const timeout = new Promise(() => {
       this.id = setTimeout(() => {
         clearTimeout(this.id);
         this.setState({
@@ -75,12 +75,13 @@ class Connect extends React.Component {
   }
 
   login() {
-    this.setState({ submitted: true });
+    const { onclick } = this.props;
     const { protocol, address, port } = this.state;
+    this.setState({ submitted: true });
     if (!address || !port) {
       return;
     }
-    let web3 = new Web3(
+    const web3 = new Web3(
       new Web3.providers.HttpProvider(`${protocol}://${address}:${port}`)
     );
     this.promiseTimeout(
@@ -90,12 +91,13 @@ class Connect extends React.Component {
           connectionFailed: !res
         });
         clearTimeout(this.id);
-        this.props.onclick(web3);
+        onclick(web3);
+        return null;
       })
     );
   }
 
-  _handleKeyDown = e => {
+  handleKeyDown = e => {
     if (e.key === 'Enter') {
       this.login();
     }
@@ -108,7 +110,8 @@ class Connect extends React.Component {
   };
 
   render() {
-    const { classes, theme } = this.props;
+    const { classes } = this.props;
+    const { connectionFailed, protocol, address, submitted, port } = this.state;
 
     return (
       <main align="center" className={classes.content}>
@@ -125,12 +128,12 @@ class Connect extends React.Component {
           <br />
           <div className={classes.connectionLine}>
             <FormControl
-              error={this.state.connectionFailed}
+              error={connectionFailed}
               className={classes.formControl}
             >
               <InputLabel htmlFor="protocol"> Protocol </InputLabel>
               <Select
-                value={this.state.protocol}
+                value={protocol}
                 onChange={this.changeProtocol}
                 inputProps={{
                   name: 'Protocol',
@@ -140,7 +143,7 @@ class Connect extends React.Component {
                 <MenuItem value="http"> HTTP </MenuItem>
                 <MenuItem value="https"> HTTPS </MenuItem>
               </Select>
-              {this.state.connectionFailed ? (
+              {connectionFailed ? (
                 <FormHelperText> URL not found! </FormHelperText>
               ) : null}
             </FormControl>
@@ -152,13 +155,11 @@ class Connect extends React.Component {
               label="Blockchain Address"
               className={classes.formControl}
               onChange={event => this.setState({ address: event.target.value })}
-              value={this.state.address}
+              value={address}
               margin="normal"
-              onKeyDown={this._handleKeyDown}
+              onKeyDown={this.handleKeyDown}
               helperText={
-                this.state.submitted && !this.state.address
-                  ? 'Address cannot be empty!'
-                  : ''
+                submitted && !address ? 'Address cannot be empty!' : ''
               }
             />
             <Typography variant="title" noWrap>
@@ -169,14 +170,10 @@ class Connect extends React.Component {
               label="Blockchain Port"
               className={classes.formControl}
               onChange={event => this.setState({ port: event.target.value })}
-              value={this.state.port}
+              value={port}
               margin="normal"
-              onKeyDown={this._handleKeyDown}
-              helperText={
-                this.state.submitted && !this.state.port
-                  ? 'Port cannot be empty!'
-                  : ''
-              }
+              onKeyDown={this.handleKeyDown}
+              helperText={submitted && !port ? 'Port cannot be empty!' : ''}
             />
           </div>
           <br />
@@ -196,7 +193,6 @@ class Connect extends React.Component {
 
 Connect.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
   onclick: PropTypes.func.isRequired
 };
 
