@@ -73,6 +73,52 @@ function expectFunctionCalledWithTimes(fn, expectedValArr, times, offset = 0) {
   });
 }
 
+describe('BuildParser getters', () => {
+  it('should work correctly', () => {
+    const buildParser = new BuildParser();
+    buildParser.nodeParser.returnVar = 'string';
+    buildParser.nodeParser.isView = true;
+    expect(buildParser.getReturnVar()).toEqual('string');
+    expect(buildParser.getView()).toEqual(true);
+  });
+});
+
+describe('BuildParser parse', () => {
+  beforeEach(() => {
+    NodeParser.mockClear();
+  });
+
+  it('should return empty code when only start node exists', () => {
+    const onVariableChange = jest.fn();
+    const buildParser = new BuildParser(onVariableChange);
+    const startNode = new DefaultDataNodeModel('Start');
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    const code = buildParser.parse(startNode);
+    expect(mockNodeParserInstance.parseNodeForVariables).not.toHaveBeenCalled();
+    expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
+    expect(onVariableChange).toHaveBeenCalledTimes(1);
+    expect(code).toEqual('');
+  });
+
+  it('should return correct code for diagram with 1 data node', () => {
+    const onVariableChange = jest.fn();
+    const buildParser = new BuildParser(onVariableChange);
+    const startNode = new DefaultDataNodeModel('Start', { start: 1 });
+    addNodeToDataNode(startNode, 'first', { first: 2 });
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    mockNodeParserInstance.parseNode.mockReturnValueOnce('code');
+    const code = buildParser.parse(startNode);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNodeForVariables,
+      [{ first: 2 }],
+      2
+    );
+    expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
+    expect(onVariableChange).toHaveBeenCalledTimes(1);
+    expect(code).toEqual('code\n');
+  });
+});
+
 // parseNodeForVariables is called twice for each default node and parseNode is called once for each diamond node
 describe('BuildParser findVariables', () => {
   beforeEach(() => {

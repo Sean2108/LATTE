@@ -35,10 +35,6 @@ export default class BuildParser {
     return this.nodeParser.isView;
   }
 
-  getBuildError() {
-    return this.buildError;
-  }
-
   parse(start) {
     this.findVariables(start);
     const code = this.traverseNextNode(start);

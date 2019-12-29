@@ -10,7 +10,7 @@ import BuildDiagram from '../../app/components/build/BuildDiagram';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-function setup(createComponentMount=true) {
+function setup(createComponentMount = true) {
   const createComponentFn = createComponentMount ? createMount : createShallow;
   const component = createComponentFn()(
     <DefaultBuildTab
@@ -36,9 +36,9 @@ function setup(createComponentMount=true) {
   const input = [
     { name: '', type: 'uint' },
     { name: 'some_uint', type: 'uint' },
-    { name: 'some_uint_bits', type: 'uint', bits: '8'},
+    { name: 'some_uint_bits', type: 'uint', bits: '8' },
     { name: 'some_str', type: 'string' },
-    { name: 'some_str_bits', type: 'string' , bits: '16'},
+    { name: 'some_str_bits', type: 'string', bits: '16' },
     { name: 'some_addr', type: 'address' },
     { name: 'some_bool', type: 'bool' }
   ];
@@ -102,7 +102,13 @@ describe('DefaultBuildTab flattenParamsToObject function', () => {
       some_addr: 'address',
       some_bool: 'bool'
     };
-    expect(component.dive().instance().flattenParamsToObject(input, true)).toEqual(expected);});
+    expect(
+      component
+        .dive()
+        .instance()
+        .flattenParamsToObject(input, true)
+    ).toEqual(expected);
+  });
 
   it('should work with bitsMode off', () => {
     const { component, input } = setup(false);
@@ -114,6 +120,11 @@ describe('DefaultBuildTab flattenParamsToObject function', () => {
       some_addr: 'address',
       some_bool: 'bool'
     };
-    expect(component.dive().instance().flattenParamsToObject(input, false)).toEqual(expected);
+    expect(
+      component
+        .dive()
+        .instance()
+        .flattenParamsToObject(input, false)
+    ).toEqual(expected);
   });
 });

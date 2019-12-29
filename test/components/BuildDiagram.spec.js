@@ -1,15 +1,18 @@
 import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { createMount } from '@material-ui/core/test-utils';
+import { createMount, createShallow } from '@material-ui/core/test-utils';
 import Button from '@material-ui/core/Button';
 import { DiagramModel } from 'storm-react-diagrams';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
+import BuildParser from '../../app/components/build/parsers/BuildParser';
+
+jest.mock('../../app/components/build/parsers/BuildParser');
 
 Enzyme.configure({ adapter: new Adapter() });
 
-function setup(emptyDiagram = true) {
+function setup(emptyDiagram = true, useCreateMount = true) {
   window.focus = () => {};
   const diagram = emptyDiagram
     ? {}
@@ -116,7 +119,7 @@ function setup(emptyDiagram = true) {
           }
         ]
       };
-  const component = createMount()(
+  const component = (useCreateMount ? createMount() : createShallow())(
     <BuildDiagram
       varList={{}}
       functionParams={{}}
@@ -145,6 +148,62 @@ function setup(emptyDiagram = true) {
 }
 
 describe('BuildDiagram component', () => {
+  beforeEach(() => {
+    BuildParser.mockClear();
+  });
+
+  it('resetListener should remove and add listeners', () => {
+    const { component } = setup(false, false);
+    const instance = component.dive().instance();
+    // test if clearListener is being called
+    instance.model.addListener({ a: jest.fn() });
+    expect(Object.keys(instance.model.listeners).length).toEqual(2);
+    instance.resetListener();
+    expect(Object.keys(instance.model.listeners).length).toEqual(1);
+  });
+
+  it('parseNodes should reset buildParser and call update functions', () => {
+    const { component } = setup(false, false);
+    const {
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    } = component.props();
+    const instance = component.dive().instance();
+    const mockBuildParserInstance = BuildParser.mock.instances[0];
+    mockBuildParserInstance.parse.mockReturnValueOnce('the code');
+    mockBuildParserInstance.getReturnVar.mockReturnValueOnce('return var');
+    mockBuildParserInstance.getView.mockReturnValueOnce(true);
+    instance.parseNodes(
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+      { d: 4 },
+      true,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    );
+    expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+      { d: 4 },
+      true
+    );
+    expect(onChangeLogic).toHaveBeenCalledWith('the code');
+    expect(onChangeReturn).toHaveBeenCalledWith('return var');
+    expect(onChangeView).toHaveBeenCalledWith(true);
+    expect(updateDiagram).toHaveBeenCalledWith(
+      instance.model.serializeDiagram()
+    );
+    expect(updateGasHistory).toHaveBeenCalledTimes(1);
+  });
+
   it('should be able to setup diagram successfully', () => {
     expect(() => setup(false)).not.toThrow();
     expect(() => setup(true)).not.toThrow();

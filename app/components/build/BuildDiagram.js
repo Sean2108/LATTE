@@ -130,22 +130,42 @@ class BuildDiagram extends React.Component {
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
-          this.buildParser.reset(
+          this.parseNodes(
             varList,
             functionParams,
             events,
             entities,
-            bitsMode
+            bitsMode,
+            onChangeLogic,
+            onChangeReturn,
+            onChangeView,
+            updateDiagram,
+            updateGasHistory
           );
-          const code = this.buildParser.parse(this.start);
-          onChangeLogic(code);
-          onChangeReturn(this.buildParser.getReturnVar());
-          onChangeView(this.buildParser.getView());
-          updateDiagram(this.model.serializeDiagram());
-          updateGasHistory();
         }, 5000);
       }
     });
+  }
+
+  parseNodes(
+    varList,
+    functionParams,
+    events,
+    entities,
+    bitsMode,
+    onChangeLogic,
+    onChangeReturn,
+    onChangeView,
+    updateDiagram,
+    updateGasHistory
+  ) {
+    this.buildParser.reset(varList, functionParams, events, entities, bitsMode);
+    const code = this.buildParser.parse(this.start);
+    onChangeLogic(code);
+    onChangeReturn(this.buildParser.getReturnVar());
+    onChangeView(this.buildParser.getView());
+    updateDiagram(this.model.serializeDiagram());
+    updateGasHistory();
   }
 
   findStart() {
