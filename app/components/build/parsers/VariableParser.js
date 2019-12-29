@@ -63,13 +63,6 @@ function parseOperator(variable, variables, structList, bitsMode) {
           type: 'var'
         };
       }
-      if (parsedLhs === 'string' && operator !== '+') {
-        const varName = `${parsedLhs.name}_${parsedRhs.name}`;
-        if (!(varName in variables)) {
-          return { name: varName, type: 'var' };
-        }
-        return { name: varName, type: variables[varName] };
-      }
       return {
         name: `${parsedLhs.name} ${operator} ${parsedRhs.name}`,
         type: parsedLhs.type

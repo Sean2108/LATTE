@@ -154,12 +154,36 @@ describe('BuildDiagram component', () => {
 
   it('resetListener should remove and add listeners', () => {
     const { component } = setup(false, false);
+    const {
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    } = component.props();
     const instance = component.dive().instance();
     // test if clearListener is being called
     instance.model.addListener({ a: jest.fn() });
     expect(Object.keys(instance.model.listeners).length).toEqual(2);
-    instance.resetListener();
+    expect(
+      'linksUpdated' in Object.values(instance.model.listeners)[0]
+    ).toEqual(true);
+    instance.resetListener(
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+      { d: 4 },
+      true,
+      onChangeLogic,
+      onChangeReturn,
+      onChangeView,
+      updateDiagram,
+      updateGasHistory
+    );
     expect(Object.keys(instance.model.listeners).length).toEqual(1);
+    expect(
+      'linksUpdated' in Object.values(instance.model.listeners)[0]
+    ).toEqual(true);
   });
 
   it('parseNodes should reset buildParser and call update functions', () => {
@@ -202,6 +226,18 @@ describe('BuildDiagram component', () => {
       instance.model.serializeDiagram()
     );
     expect(updateGasHistory).toHaveBeenCalledTimes(1);
+  });
+
+  it('parseNodes should pass correct callback to diamond port factory', () => {
+    const { component } = setup(false, false);
+    const instance = component.dive().instance();
+    const { cb } = instance.engine.getPortFactory('diamond');
+    expect(cb()).toEqual(
+      expect.objectContaining({
+        maximumLinks: 1,
+        type: 'diamond'
+      })
+    );
   });
 
   it('should be able to setup diagram successfully', () => {
@@ -399,5 +435,14 @@ describe('BuildDiagram component', () => {
     component.update();
     modal = component.find(DiagramModal);
     expect(modal.props().open).toEqual(false);
+  });
+
+  it('should call prevent default for ondragover', () => {
+    const { diagramLayer } = setup();
+    const preventDefault = jest.fn();
+    diagramLayer.props().onDragOver({
+      preventDefault
+    });
+    expect(preventDefault).toHaveBeenCalledTimes(1);
   });
 });

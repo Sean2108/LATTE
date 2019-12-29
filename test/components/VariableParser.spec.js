@@ -41,6 +41,13 @@ describe('VariableParser parseVariable function', () => {
     });
   });
 
+  it('should return the correct expression for string + string', () => {
+    expect(parseVariable('"a" + "b"', {}, {})).toEqual({
+      name: '"a" + "b"',
+      type: 'string'
+    });
+  });
+
   it('should return correct int type for map on lhs with positive number', () => {
     expect(parseVariable('test map of test str + 5', {}, {})).toEqual({
       name: 'test_map[test_str] + 5',
@@ -76,12 +83,26 @@ describe('VariableParser parseVariable function', () => {
     });
   });
 
-  it('parseStruct should work with bitsMode on', () => {
+  it('parseStruct should work with bitsMode on for name', () => {
     expect(
       parseVariable(
         "a's b",
         { a: 'A' },
         { A: [{ name: 'b', type: 'string', bits: 8 }] },
+        true
+      )
+    ).toEqual({
+      name: 'a.b',
+      type: 'bytes8'
+    });
+  });
+
+  it('parseStruct should work with bitsMode on for displayName', () => {
+    expect(
+      parseVariable(
+        "a's b",
+        { a: 'A' },
+        { A: [{ displayName: 'b', type: 'string', bits: 8 }] },
         true
       )
     ).toEqual({

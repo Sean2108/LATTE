@@ -146,6 +146,7 @@ export default class BuildParser {
       if (node === start) {
         return code;
       }
+      // unable to handle multiple diamond nodes in the same cycle
       if (node instanceof DiamondNodeModel) {
         this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
         return null;
