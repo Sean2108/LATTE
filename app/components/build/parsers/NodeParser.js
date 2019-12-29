@@ -152,14 +152,13 @@ export default class NodeParser {
     return true;
   }
 
-  parseNode(nodeData, memoryVarsDeclared = this.memoryVarsDeclared) {
+  parseNode(nodeData) {
     const variables = this.getAllVariables();
     switch (nodeData.type) {
       case 'assignment':
         this.isView = false;
         return this.parseAssignmentNode(
           nodeData,
-          memoryVarsDeclared,
           variables
         );
       case 'event':
@@ -188,7 +187,7 @@ export default class NodeParser {
     }
   }
 
-  parseAssignmentNode(data, memoryVarsDeclared, variables) {
+  parseAssignmentNode(data, variables) {
     const parsedLhs = parseVariable(
       data.variableSelected,
       variables,
@@ -233,9 +232,9 @@ export default class NodeParser {
       data.isMemory &&
       !parsedLhs.name.includes('.') &&
       !('mapName' in parsedLhs) &&
-      !memoryVarsDeclared[parsedLhs.name]
+      !this.memoryVarsDeclared[parsedLhs.name]
     ) {
-      memoryVarsDeclared[parsedLhs.name] = true; // eslint-disable-line no-param-reassign
+      this.memoryVarsDeclared[parsedLhs.name] = true;
       return `${parsedRhs.type}${
         !isPrimitiveType(parsedRhs.type) ? ' memory ' : ' '
       }${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;

@@ -143,6 +143,7 @@ export default class BuildParser {
 
   generateCodeForCycle(start, isTrue) {
     const outPort = isTrue ? start.outPortTrue : start.outPortFalse;
+    const nodeParserMemoryVarsRollback = {...this.nodeParser.memoryVarsDeclared};
     let node = this.getNextNode(outPort);
     let code = '';
     while (node) {
@@ -150,13 +151,13 @@ export default class BuildParser {
         return code;
       }
       if (node instanceof DiamondNodeModel) {
+        this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
         return null;
       }
-      code += `${this.nodeParser.parseNode(node.data, {
-        ...this.memoryVarsDeclared
-      })}\n`;
+      code += `${this.nodeParser.parseNode(node.data)}\n`;
       node = this.getNextNodeForDefaultNode(node);
     }
+    this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
     return null;
   }
 

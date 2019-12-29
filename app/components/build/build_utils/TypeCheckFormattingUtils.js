@@ -31,9 +31,9 @@ export function isSameBaseType(lhs, rhs, bitsMode) {
   return (
     (lhs.startsWith('uint') && rhs.startsWith('uint')) ||
     (lhs.startsWith('int') && rhs.startsWith('int')) ||
-    (lhs.startsWith('uint') && rhs.startsWith('uint')) ||
     (lhs.startsWith('bytes') && rhs === 'string') ||
-    (lhs.startsWith('string') && rhs.startsWith('bytes'))
+    (lhs.startsWith('string') && rhs.startsWith('bytes')) ||
+    (lhs.startsWith('bytes') && rhs.startsWith('bytes'))
   );
 }
 
@@ -42,6 +42,7 @@ export function isPrimitiveType(type) {
     type.startsWith('uint') ||
     type.startsWith('int') ||
     type.startsWith('address') ||
+    type.startsWith('bytes') ||
     type === 'bool'
   );
 }

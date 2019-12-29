@@ -15,3 +15,5 @@ Uses electron, react, solc and web3. Material-UI is used to style the applicatio
 - yarn test - runs tests and generates test coverage report
 - yarn package - package application for current environment into the release directory
 - yarn package-all - package application for Windows, Linux and MacOS into the release directory
+
+Ganache-cli can be used to setup a local blockchain environment to test the application. Run: 'ganache-cli -l 80000000000' (or any sufficiently large gas limit) and enter localhost:8545 on the first page to connect to it.
