@@ -6,8 +6,9 @@ import {
 } from '../build_utils/TypeCheckFormattingUtils';
 
 export default class NodeParser {
-  constructor(updateBuildError) {
+  constructor(updateBuildError, indentation = '') {
     this.reset({}, {});
+    this.indentation = indentation;
     this.updateBuildError = updateBuildError;
   }
 
@@ -152,24 +153,21 @@ export default class NodeParser {
     return true;
   }
 
-  parseNode(nodeData) {
+  parseNode(nodeData, indentation = '') {
     const variables = this.getAllVariables();
     switch (nodeData.type) {
       case 'assignment':
         this.isView = false;
-        return this.parseAssignmentNode(
-          nodeData,
-          variables
-        );
+        return indentation + this.parseAssignmentNode(nodeData, variables);
       case 'event':
         this.isView = false;
-        return this.parseEventNode(nodeData, variables);
+        return indentation + this.parseEventNode(nodeData, variables);
       case 'entity':
         this.isView = false;
-        return this.parseEntityNode(nodeData, variables);
+        return indentation + this.parseEntityNode(nodeData, variables);
       case 'transfer':
         this.isView = false;
-        return this.parseTransferNode(nodeData, variables);
+        return indentation + this.parseTransferNode(nodeData, variables);
       case 'return': {
         const returnVar = parseVariable(
           nodeData.variableSelected,
@@ -178,7 +176,7 @@ export default class NodeParser {
           this.bitsMode
         );
         this.returnVar = returnVar.type;
-        return `return ${returnVar.name};`;
+        return `${indentation}return ${returnVar.name};`;
       }
       case 'conditional':
         return this.parseCompareNode(nodeData, variables);
@@ -205,8 +203,7 @@ export default class NodeParser {
     }
     if ('mapName' in parsedLhs) {
       this.updateVariablesForMap(parsedLhs, parsedRhs, variables);
-    }
-    else if (
+    } else if (
       parsedLhs.type !== 'var' &&
       parsedRhs.type !== 'var' &&
       !isSameBaseType(parsedLhs.type, parsedRhs.type, this.bitsMode)

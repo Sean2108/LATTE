@@ -93,10 +93,15 @@ export default class Web3Utils {
     );
   };
 
-  requestCompile = (updateCompileError, logCode, buildState, bitsMode, callback) => {
+  requestCompile = (
+    updateCompileError,
+    logCode,
+    buildState,
+    bitsMode,
+    callback
+  ) => {
     this.web3.eth.getAccounts((err, accs) => {
       if (err) {
-        updateCompileError('There was an error fetching your accounts.');
         return;
       }
       if (accs.length === 0) {

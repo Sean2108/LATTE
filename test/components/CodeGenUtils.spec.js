@@ -1,5 +1,7 @@
 import CodeGenUtils from '../../app/components/build/build_utils/CodeGenUtils';
 
+const INDENTATION = '    ';
+
 function setup() {
   const codeGen = new CodeGenUtils();
   const entities = {
@@ -517,7 +519,7 @@ describe('codeGenUtils class formRequires function', () => {
     ];
     const vars = { x: 'string', y: 'string' };
     expect(codeGen.formRequires(input, vars)).toEqual(
-      'require(keccak256(x) == keccak256(y), "this should use keccak");\nrequire(a > b, "this should not use keccak");\n'
+      `${INDENTATION}require(keccak256(x) == keccak256(y), "this should use keccak");\n${INDENTATION}require(a > b, "this should not use keccak");\n`
     );
   });
 });
@@ -556,17 +558,16 @@ describe('codeGenUtils class formFunctionBody function', () => {
   it('should work correctly', () => {
     const { codeGen, buildState } = setup();
     expect(codeGen.formFunctionBody(buildState, 1, false)).toEqual(
-      `function testFunc(uint test_int) public payable returns (uint) {
-      require(test_int > 0, "test int must be greater than 0");
-      if (test_int < 10) {
-      return test_int;
-      } else {
-      uint res = 20;
-      return res;
-      }
-      }
-      `.replace(/  +/g, '')
-      // 'function testFunc(uint test_int) public payable returns (uint) {\nrequire(test_int > 0, "test int must be greater than 0");\nif (test_int < 10) {\nreturn test_int;\n} else {\nuint res = 20;\nreturn res;\n}\n}\n'
+`function testFunc(uint test_int) public payable returns (uint) {
+    require(test_int > 0, "test int must be greater than 0");
+if (test_int < 10) {
+return test_int;
+} else {
+uint res = 20;
+return res;
+}
+}
+`
     );
   });
 });
@@ -575,20 +576,20 @@ describe('codeGenUtils class formCode function', () => {
   it('should work correctly', () => {
     const { codeGen, buildState } = setup();
     expect(codeGen.formCode(buildState, 1, false)).toEqual(
-      `pragma solidity ^0.5.4;
-      contract Code {
-      constructor() public payable {
-      }
-      function testFunc(uint test_int) public payable returns (uint) {
-      require(test_int > 0, "test int must be greater than 0");
-      if (test_int < 10) {
-      return test_int;
-      } else {
-      uint res = 20;
-      return res;
-      }
-      }
-      }`.replace(/  +/g, '')
+`pragma solidity ^0.5.4;
+contract Code {
+constructor() public payable {
+}
+function testFunc(uint test_int) public payable returns (uint) {
+    require(test_int > 0, "test int must be greater than 0");
+if (test_int < 10) {
+return test_int;
+} else {
+uint res = 20;
+return res;
+}
+}
+}`
     );
   });
 });

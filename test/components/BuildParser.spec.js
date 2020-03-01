@@ -5,6 +5,8 @@ import DiamondNodeModel from '../../app/components/build/diagram/diagram_node_de
 
 jest.mock('../../app/components/build/parsers/NodeParser');
 
+const INDENTATION = '    ';
+
 function addNodeToDataNode(
   sourceNode,
   targetNodeName,
@@ -89,7 +91,7 @@ function expectFunctionCalledWithTimes(fn, expectedValArr, times, offset = 0) {
   expect(fn).toHaveBeenCalledTimes(expectedValArr.length * times + offset);
   expectedValArr.forEach(val => {
     for (let i = 0; i < times; i += 1) {
-      expect(fn).toHaveBeenCalledWith(val);
+      expect(fn).toHaveBeenCalledWith(...val);
     }
   });
 }
@@ -123,7 +125,7 @@ describe('BuildParser parse', () => {
 
   it('should return correct code for diagram with 1 data node', () => {
     const onVariableChange = jest.fn();
-    const buildParser = new BuildParser(onVariableChange);
+    const buildParser = new BuildParser(onVariableChange, 1);
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
@@ -131,7 +133,7 @@ describe('BuildParser parse', () => {
     const code = buildParser.parse(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
-      [{ first: 2 }],
+      [[{ first: 2 }]],
       2
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
@@ -163,7 +165,7 @@ describe('BuildParser findVariables', () => {
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
-      [{ first: 2 }],
+      [[{ first: 2 }]],
       2
     );
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
@@ -191,7 +193,7 @@ describe('BuildParser findVariables', () => {
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
-      [{ t1: 3 }, { f1: 4 }, { t2: 5 }, { f2: 6 }],
+      [[{ t1: 3 }], [{ f1: 4 }], [{ t2: 5 }], [{ f2: 6 }]],
       2
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
@@ -221,7 +223,7 @@ describe('BuildParser findVariables', () => {
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
-      [{ t1: 3 }, { f1: 4 }, { t2: 5 }, { f2: 6 }],
+      [[{ t1: 3 }], [{ f1: 4 }], [{ t2: 5 }], [{ f2: 6 }]],
       2
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
@@ -238,7 +240,7 @@ describe('BuildParser traverseNextNode', () => {
     const buildParser = new BuildParser();
     const startNode = new DefaultDataNodeModel('Start');
     const mockNodeParserInstance = NodeParser.mock.instances[0];
-    const code = buildParser.traverseNextNode(startNode);
+    const code = buildParser.traverseNextNode(startNode, 1);
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
     expect(code).toEqual('');
   });
@@ -249,13 +251,13 @@ describe('BuildParser traverseNextNode', () => {
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode.mockReturnValueOnce('first');
-    const code = buildParser.traverseNextNode(startNode);
+    const code = buildParser.traverseNextNode(startNode, 1);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNode,
-      [{ first: 2 }],
+      [[{ first: 2 }, INDENTATION]],
       1
     );
-    expect(code).toEqual('first\n');
+    expect(code).toEqual(`first\n`);
   });
 
   it('should output correct code for diagram with conditional node and 4 data nodes in 2 branches', () => {
@@ -283,18 +285,21 @@ describe('BuildParser traverseNextNode', () => {
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
-      .mockReturnValueOnce('f1')
-      .mockReturnValueOnce('f2')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('t2');
-    const code = buildParser.traverseNextNode(startNode);
-    expectFunctionCalledWithTimes(
-      mockNodeParserInstance.parseNode,
-      [{ c: 2 }, { t1: 3 }, { f1: 4 }, { t2: 5 }, { f2: 6 }],
-      1,
-      4 // offset is 4 because generateCodeForCycle is called 2 times for each branch
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f2`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}if (c) {
+${INDENTATION.repeat(2)}t1
+${INDENTATION.repeat(2)}t2
+${INDENTATION}} else {
+${INDENTATION.repeat(2)}f1
+${INDENTATION.repeat(2)}f2
+${INDENTATION}}
+`
     );
-    expect(code).toEqual('if (c) {\nt1\nt2\n} else {\nf1\nf2\n}\n');
   });
 
   it('should output correct code for diagram with conditional node and 2 data nodes in 1 branch', () => {
@@ -306,28 +311,25 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const targetTrueNode = addBranchToDiamondNode(
-      compareNode,
-      true,
-      't1',
-      { t1: 3 }
-    );
+    const targetTrueNode = addBranchToDiamondNode(compareNode, true, 't1', {
+      t1: 3
+    });
     addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('t2');
-    const code = buildParser.traverseNextNode(startNode);
-    expectFunctionCalledWithTimes(
-      mockNodeParserInstance.parseNode,
-      [{ c: 2 }, { t1: 3 }, { t2: 5 }],
-      1,
-      2
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}if (c) {
+${INDENTATION.repeat(2)}t1
+${INDENTATION.repeat(2)}t2
+${INDENTATION}}
+`
     );
-    expect(code).toEqual('if (c) {\nt1\nt2\n}\n');
   });
 
   it('should use true while loop if true branch has a cycle', () => {
@@ -352,12 +354,20 @@ describe('BuildParser traverseNextNode', () => {
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('t2')
-      .mockReturnValueOnce('f1')
-      .mockReturnValueOnce('f2');
-    const code = buildParser.traverseNextNode(startNode);
-    expect(code).toEqual('while (c) {\nt1\nt2\n}\nf1\nf2\n');
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`)
+      .mockReturnValueOnce(`${INDENTATION}f1`)
+      .mockReturnValueOnce(`${INDENTATION}f2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}while (c) {
+${INDENTATION.repeat(2)}t1
+${INDENTATION.repeat(2)}t2
+${INDENTATION}}
+${INDENTATION}f1
+${INDENTATION}f2
+`
+    );
   });
 
   it('should use false while loop if false branch has a cycle', () => {
@@ -384,12 +394,20 @@ describe('BuildParser traverseNextNode', () => {
       .mockReturnValueOnce('c')
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
-      .mockReturnValueOnce('f1')
-      .mockReturnValueOnce('f2')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('t2');
-    const code = buildParser.traverseNextNode(startNode);
-    expect(code).toEqual('while (!(c)) {\nf1\nf2\n}\nt1\nt2\n');
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f2`)
+      .mockReturnValueOnce(`${INDENTATION}t1`)
+      .mockReturnValueOnce(`${INDENTATION}t2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}while (!(c)) {
+${INDENTATION.repeat(2)}f1
+${INDENTATION.repeat(2)}f2
+${INDENTATION}}
+${INDENTATION}t1
+${INDENTATION}t2
+`
+    );
   });
 
   it('should output correct code for diagram with intersection and same length branches', () => {
@@ -420,12 +438,21 @@ describe('BuildParser traverseNextNode', () => {
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
-      .mockReturnValueOnce('f1')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('i1')
-      .mockReturnValueOnce('i2');
-    const code = buildParser.traverseNextNode(startNode);
-    expect(code).toEqual('if (c) {\nt1\n} else {\nf1\n}\ni1\ni2\n');
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
+      .mockReturnValueOnce(`${INDENTATION}i1`)
+      .mockReturnValueOnce(`${INDENTATION}i2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}if (c) {
+${INDENTATION.repeat(2)}t1
+${INDENTATION}} else {
+${INDENTATION.repeat(2)}f1
+${INDENTATION}}
+${INDENTATION}i1
+${INDENTATION}i2
+`
+    );
   });
 
   it('should output correct code for diagram with intersection and different length branches', () => {
@@ -458,12 +485,22 @@ describe('BuildParser traverseNextNode', () => {
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
       .mockReturnValueOnce('_')
-      .mockReturnValueOnce('f1')
-      .mockReturnValueOnce('t1')
-      .mockReturnValueOnce('t2')
-      .mockReturnValueOnce('i1')
-      .mockReturnValueOnce('i2');
-    const code = buildParser.traverseNextNode(startNode);
-    expect(code).toEqual('if (c) {\nt1\nt2\n} else {\nf1\n}\ni1\ni2\n');
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}f1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
+      .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`)
+      .mockReturnValueOnce(`${INDENTATION}i1`)
+      .mockReturnValueOnce(`${INDENTATION}i2`);
+    const code = buildParser.traverseNextNode(startNode, 1);
+    expect(code).toEqual(
+      `${INDENTATION}if (c) {
+${INDENTATION.repeat(2)}t1
+${INDENTATION.repeat(2)}t2
+${INDENTATION}} else {
+${INDENTATION.repeat(2)}f1
+${INDENTATION}}
+${INDENTATION}i1
+${INDENTATION}i2
+`
+    );
   });
 });

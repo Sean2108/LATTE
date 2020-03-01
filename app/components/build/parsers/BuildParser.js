@@ -1,6 +1,8 @@
 import DiamondNodeModel from '../diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import NodeParser from './NodeParser';
 
+const INDENTATION = '    ';
+
 export default class BuildParser {
   constructor(onVariablesChange, updateBuildError = () => {}) {
     this.nodeParser = new NodeParser(updateBuildError);
@@ -37,7 +39,7 @@ export default class BuildParser {
 
   parse(start) {
     this.findVariables(start);
-    const code = this.traverseNextNode(start);
+    const code = this.traverseNextNode(start, 1);
     this.onVariablesChange({
       ...this.nodeParser.variables,
       ...this.nodeParser.varList
@@ -86,60 +88,95 @@ export default class BuildParser {
     this.traverseForVariables(nextNode, unparsedStatements, visitedNodes);
   }
 
-  traverseDiamondNode(node, stopNode) {
+  traverseDiamondNode(node, indentationDepth, stopNode) {
     const falseNextNode = this.getNextNode(node.outPortFalse);
     const trueNextNode = this.getNextNode(node.outPortTrue);
     const conditionCode = this.nodeParser.parseNode(node.data);
-    const trueWhileCode = this.generateCodeForCycle(node, true);
+    const indentation = INDENTATION.repeat(indentationDepth);
+    const trueWhileCode = this.generateCodeForCycle(
+      node,
+      indentationDepth + 1,
+      true
+    );
     if (trueWhileCode) {
-      return `while (${conditionCode}) {\n${trueWhileCode}}\n${this.traverseNextNode(
+      return `${indentation}while (${conditionCode}) {\n${trueWhileCode}${indentation}}\n${this.traverseNextNode(
         falseNextNode,
+        indentationDepth,
         stopNode
       )}`;
     }
-    const falseWhileCode = this.generateCodeForCycle(node, false);
+    const falseWhileCode = this.generateCodeForCycle(
+      node,
+      indentationDepth + 1,
+      false
+    );
     if (falseWhileCode) {
-      return `while (!(${conditionCode})) {\n${falseWhileCode}}\n${this.traverseNextNode(
+      return `${indentation}while (!(${conditionCode})) {\n${falseWhileCode}${indentation}}\n${this.traverseNextNode(
         trueNextNode,
+        indentationDepth,
         stopNode
       )}`;
     }
     const intersection = this.getIntersection(trueNextNode, falseNextNode);
     if (intersection) {
-      const elseCode = this.traverseNextNode(falseNextNode, intersection);
-      return `if (${conditionCode}) {\n${this.traverseNextNode(
-        trueNextNode,
+      const elseCode = this.traverseNextNode(
+        falseNextNode,
+        indentationDepth + 1,
         intersection
-      )}}${
-        elseCode !== '' ? ` else {\n${elseCode}}` : ''
-      }\n${this.traverseNextNode(intersection, stopNode)}`;
+      );
+      return `${indentation}if (${conditionCode}) {\n${this.traverseNextNode(
+        trueNextNode,
+        indentationDepth + 1,
+        intersection
+      )}${indentation}}${
+        elseCode !== '' ? ` else {\n${elseCode}${indentation}}` : ''
+      }\n${this.traverseNextNode(
+        intersection,
+        indentationDepth,
+        stopNode
+      )}`;
     }
-    const elseCode = this.traverseNextNode(falseNextNode, stopNode);
-    return `if (${conditionCode}) {\n${this.traverseNextNode(
-      trueNextNode,
+    const elseCode = this.traverseNextNode(
+      falseNextNode,
+      indentationDepth + 1,
       stopNode
-    )}}${elseCode !== '' ? ` else {\n${elseCode}}` : ''}\n`;
+    );
+    return `${indentation}if (${conditionCode}) {\n${this.traverseNextNode(
+      trueNextNode,
+      indentationDepth + 1,
+      stopNode
+    )}${indentation}}${elseCode !== '' ? ` else {\n${elseCode}${indentation}}` : ''}\n`;
   }
 
-  traverseNextNode(node, stopNode = null) {
+  traverseNextNode(node, indentationDepth, stopNode = null) {
     if (!node || (stopNode && node === stopNode)) {
       return '';
     }
     if (node instanceof DiamondNodeModel) {
-      return this.traverseDiamondNode(node, stopNode);
+      return this.traverseDiamondNode(node, indentationDepth, stopNode);
     }
     const curNodeCode =
-      node.name === 'Start' ? '' : `${this.nodeParser.parseNode(node.data)}\n`;
+      node.name === 'Start'
+        ? ''
+        : `${this.nodeParser.parseNode(
+            node.data,
+            INDENTATION.repeat(indentationDepth)
+          )}\n`;
     const nextNode = this.getNextNodeForDefaultNode(node);
     if (!nextNode) {
       return curNodeCode;
     }
-    return curNodeCode + this.traverseNextNode(nextNode, stopNode);
+    return (
+      curNodeCode +
+      this.traverseNextNode(nextNode, indentationDepth, stopNode)
+    );
   }
 
-  generateCodeForCycle(start, isTrue) {
+  generateCodeForCycle(start, indentationDepth, isTrue) {
     const outPort = isTrue ? start.outPortTrue : start.outPortFalse;
-    const nodeParserMemoryVarsRollback = {...this.nodeParser.memoryVarsDeclared};
+    const nodeParserMemoryVarsRollback = {
+      ...this.nodeParser.memoryVarsDeclared
+    };
     let node = this.getNextNode(outPort);
     let code = '';
     while (node) {
@@ -151,7 +188,7 @@ export default class BuildParser {
         this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
         return null;
       }
-      code += `${this.nodeParser.parseNode(node.data)}\n`;
+      code += `${this.nodeParser.parseNode(node.data, INDENTATION.repeat(indentationDepth))}\n`;
       node = this.getNextNodeForDefaultNode(node);
     }
     this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;

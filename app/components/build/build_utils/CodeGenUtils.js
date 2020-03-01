@@ -1,5 +1,7 @@
 import { toLowerCamelCase, isString } from './TypeCheckFormattingUtils';
 
+const INDENTATION = '    ';
+
 export default class CodeGenUtils {
   formCode(buildState, bitsMode) {
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
@@ -50,9 +52,9 @@ export default class CodeGenUtils {
           isString(req.var2, variables) &&
           req.comp === '=='
         ) {
-          return `require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
+          return `${INDENTATION}require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
         }
-        return `require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
+        return `${INDENTATION}require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
       })
       .join('');
   }
