@@ -110,15 +110,15 @@ export default class BuildParser {
       return `if (${conditionCode}) {\n${this.traverseNextNode(
         trueNextNode,
         intersection
-      )}} ${
-        elseCode !== '' ? `else {\n${elseCode}}` : ''
+      )}}${
+        elseCode !== '' ? ` else {\n${elseCode}}` : ''
       }\n${this.traverseNextNode(intersection, stopNode)}`;
     }
     const elseCode = this.traverseNextNode(falseNextNode, stopNode);
     return `if (${conditionCode}) {\n${this.traverseNextNode(
       trueNextNode,
       stopNode
-    )}} ${elseCode !== '' ? `else {\n${elseCode}}` : ''}\n`;
+    )}}${elseCode !== '' ? ` else {\n${elseCode}}` : ''}\n`;
   }
 
   traverseNextNode(node, stopNode = null) {

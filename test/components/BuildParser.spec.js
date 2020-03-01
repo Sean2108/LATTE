@@ -21,7 +21,7 @@ function addNodeToDataNode(
   return targetNode;
 }
 
-function addNodeToDiamondNode(
+function addBranchesToDiamondNode(
   sourceNode,
   targetNodeNameTrue,
   targetNodeNameFalse,
@@ -30,19 +30,40 @@ function addNodeToDiamondNode(
   isTargetTrueDataNode = true,
   isTargetFalseDataNode = true
 ) {
-  const [targetTrueNode, targetTruePort] = createTargetNode(
-    isTargetTrueDataNode,
+  const targetTrueNode = addBranchToDiamondNode(
+    sourceNode,
+    true,
     targetNodeNameTrue,
-    targetNodeDataTrue
+    targetNodeDataTrue,
+    isTargetTrueDataNode
   );
-  const [targetFalseNode, targetFalsePort] = createTargetNode(
-    isTargetFalseDataNode,
+  const targetFalseNode = addBranchToDiamondNode(
+    sourceNode,
+    false,
     targetNodeNameFalse,
-    targetNodeDataFalse
+    targetNodeDataFalse,
+    isTargetFalseDataNode
   );
-  addLink(sourceNode.outPortTrue, targetTruePort);
-  addLink(sourceNode.outPortFalse, targetFalsePort);
   return [targetTrueNode, targetFalseNode];
+}
+
+function addBranchToDiamondNode(
+  sourceNode,
+  isTrueBranch,
+  targetNodeName,
+  targetNodeData,
+  isTargetDataNode = true
+) {
+  const [targetNode, targetPort] = createTargetNode(
+    isTargetDataNode,
+    targetNodeName,
+    targetNodeData
+  );
+  addLink(
+    isTrueBranch ? sourceNode.outPortTrue : sourceNode.outPortFalse,
+    targetPort
+  );
+  return targetNode;
 }
 
 function createTargetNode(isTargetDataNode, targetNodeName, targetNodeData) {
@@ -157,7 +178,7 @@ describe('BuildParser findVariables', () => {
       { c: 2 },
       false
     );
-    const [targetTrueNode, targetFalseNode] = addNodeToDiamondNode(
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -186,7 +207,7 @@ describe('BuildParser findVariables', () => {
       { c: 2 },
       false
     );
-    const [targetTrueNode, targetFalseNode] = addNodeToDiamondNode(
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -237,7 +258,7 @@ describe('BuildParser traverseNextNode', () => {
     expect(code).toEqual('first\n');
   });
 
-  it('should output correct code for diagram with conditional node and 4 data nodes', () => {
+  it('should output correct code for diagram with conditional node and 4 data nodes in 2 branches', () => {
     const buildParser = new BuildParser();
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     const compareNode = addNodeToDataNode(
@@ -246,7 +267,7 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const [targetTrueNode, targetFalseNode] = addNodeToDiamondNode(
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -276,6 +297,39 @@ describe('BuildParser traverseNextNode', () => {
     expect(code).toEqual('if (c) {\nt1\nt2\n} else {\nf1\nf2\n}\n');
   });
 
+  it('should output correct code for diagram with conditional node and 2 data nodes in 1 branch', () => {
+    const buildParser = new BuildParser();
+    const startNode = new DefaultDataNodeModel('Start', { start: 1 });
+    const compareNode = addNodeToDataNode(
+      startNode,
+      'compare',
+      { c: 2 },
+      false
+    );
+    const targetTrueNode = addBranchToDiamondNode(
+      compareNode,
+      true,
+      't1',
+      { t1: 3 }
+    );
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    mockNodeParserInstance.parseNode
+      .mockReturnValueOnce('c')
+      .mockReturnValueOnce('_')
+      .mockReturnValueOnce('_')
+      .mockReturnValueOnce('t1')
+      .mockReturnValueOnce('t2');
+    const code = buildParser.traverseNextNode(startNode);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [{ c: 2 }, { t1: 3 }, { t2: 5 }],
+      1,
+      2
+    );
+    expect(code).toEqual('if (c) {\nt1\nt2\n}\n');
+  });
+
   it('should use true while loop if true branch has a cycle', () => {
     const buildParser = new BuildParser();
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
@@ -285,7 +339,7 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const [targetTrueNode, targetFalseNode] = addNodeToDiamondNode(
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -315,7 +369,7 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const [targetTrueNode, targetFalseNode] = addNodeToDiamondNode(
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -347,7 +401,7 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const [t1Node, f1Node] = addNodeToDiamondNode(
+    const [t1Node, f1Node] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
@@ -383,7 +437,7 @@ describe('BuildParser traverseNextNode', () => {
       { c: 2 },
       false
     );
-    const [t1Node, f1Node] = addNodeToDiamondNode(
+    const [t1Node, f1Node] = addBranchesToDiamondNode(
       compareNode,
       't1',
       'f1',
