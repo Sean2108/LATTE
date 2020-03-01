@@ -91,7 +91,7 @@ export default class BuildParser {
   traverseDiamondNode(node, indentationDepth, stopNode) {
     const falseNextNode = this.getNextNode(node.outPortFalse);
     const trueNextNode = this.getNextNode(node.outPortTrue);
-    const conditionCode = this.nodeParser.parseNode(node.data);
+    const conditionCode = this.nodeParser.parseNode(node.data, '');
     const indentation = INDENTATION.repeat(indentationDepth);
     const trueWhileCode = this.generateCodeForCycle(
       node,
@@ -130,11 +130,7 @@ export default class BuildParser {
         intersection
       )}${indentation}}${
         elseCode !== '' ? ` else {\n${elseCode}${indentation}}` : ''
-      }\n${this.traverseNextNode(
-        intersection,
-        indentationDepth,
-        stopNode
-      )}`;
+      }\n${this.traverseNextNode(intersection, indentationDepth, stopNode)}`;
     }
     const elseCode = this.traverseNextNode(
       falseNextNode,
@@ -145,7 +141,9 @@ export default class BuildParser {
       trueNextNode,
       indentationDepth + 1,
       stopNode
-    )}${indentation}}${elseCode !== '' ? ` else {\n${elseCode}${indentation}}` : ''}\n`;
+    )}${indentation}}${
+      elseCode !== '' ? ` else {\n${elseCode}${indentation}}` : ''
+    }\n`;
   }
 
   traverseNextNode(node, indentationDepth, stopNode = null) {
@@ -167,8 +165,7 @@ export default class BuildParser {
       return curNodeCode;
     }
     return (
-      curNodeCode +
-      this.traverseNextNode(nextNode, indentationDepth, stopNode)
+      curNodeCode + this.traverseNextNode(nextNode, indentationDepth, stopNode)
     );
   }
 
@@ -188,7 +185,10 @@ export default class BuildParser {
         this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
         return null;
       }
-      code += `${this.nodeParser.parseNode(node.data, INDENTATION.repeat(indentationDepth))}\n`;
+      code += `${this.nodeParser.parseNode(
+        node.data,
+        INDENTATION.repeat(indentationDepth)
+      )}\n`;
       node = this.getNextNodeForDefaultNode(node);
     }
     this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;

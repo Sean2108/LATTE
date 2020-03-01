@@ -6,9 +6,8 @@ import {
 } from '../build_utils/TypeCheckFormattingUtils';
 
 export default class NodeParser {
-  constructor(updateBuildError, indentation = '') {
+  constructor(updateBuildError) {
     this.reset({}, {});
-    this.indentation = indentation;
     this.updateBuildError = updateBuildError;
   }
 

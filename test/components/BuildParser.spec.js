@@ -125,7 +125,7 @@ describe('BuildParser parse', () => {
 
   it('should return correct code for diagram with 1 data node', () => {
     const onVariableChange = jest.fn();
-    const buildParser = new BuildParser(onVariableChange, 1);
+    const buildParser = new BuildParser(onVariableChange);
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
@@ -290,6 +290,18 @@ describe('BuildParser traverseNextNode', () => {
       .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
       .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION.repeat(2)],
+        [{ f1: 4 }, INDENTATION.repeat(2)],
+        [{ t2: 5 }, INDENTATION.repeat(2)],
+        [{ f2: 6 }, INDENTATION.repeat(2)]
+      ],
+      1,
+      4 // offset is 4 because generateCodeForCycle is called 2 times for each branch
+    );
     expect(code).toEqual(
       `${INDENTATION}if (c) {
 ${INDENTATION.repeat(2)}t1
@@ -323,6 +335,16 @@ ${INDENTATION}}
       .mockReturnValueOnce(`${INDENTATION.repeat(2)}t1`)
       .mockReturnValueOnce(`${INDENTATION.repeat(2)}t2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION.repeat(2)],
+        [{ t2: 5 }, INDENTATION.repeat(2)]
+      ],
+      1,
+      2
+    );
     expect(code).toEqual(
       `${INDENTATION}if (c) {
 ${INDENTATION.repeat(2)}t1
@@ -359,6 +381,18 @@ ${INDENTATION}}
       .mockReturnValueOnce(`${INDENTATION}f1`)
       .mockReturnValueOnce(`${INDENTATION}f2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION.repeat(2)],
+        [{ f1: 4 }, INDENTATION],
+        [{ t2: 5 }, INDENTATION.repeat(2)],
+        [{ f2: 6 }, INDENTATION]
+      ],
+      1,
+      0
+    );
     expect(code).toEqual(
       `${INDENTATION}while (c) {
 ${INDENTATION.repeat(2)}t1
@@ -399,6 +433,18 @@ ${INDENTATION}f2
       .mockReturnValueOnce(`${INDENTATION}t1`)
       .mockReturnValueOnce(`${INDENTATION}t2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION],
+        [{ f1: 4 }, INDENTATION.repeat(2)],
+        [{ t2: 5 }, INDENTATION],
+        [{ f2: 6 }, INDENTATION.repeat(2)]
+      ],
+      1,
+      2
+    );
     expect(code).toEqual(
       `${INDENTATION}while (!(c)) {
 ${INDENTATION.repeat(2)}f1
@@ -443,6 +489,18 @@ ${INDENTATION}t2
       .mockReturnValueOnce(`${INDENTATION}i1`)
       .mockReturnValueOnce(`${INDENTATION}i2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION.repeat(2)],
+        [{ f1: 4 }, INDENTATION.repeat(2)],
+        [{ i1: 5 }, INDENTATION],
+        [{ i2: 6 }, INDENTATION]
+      ],
+      1,
+      6
+    );
     expect(code).toEqual(
       `${INDENTATION}if (c) {
 ${INDENTATION.repeat(2)}t1
@@ -472,9 +530,9 @@ ${INDENTATION}i2
       { f1: 4 }
     );
     const t2Node = addNodeToDataNode(t1Node, 't2', { t2: 5 });
-    const i1Node = addNodeToDataNode(t2Node, 'i1', { i1: 5 });
+    const i1Node = addNodeToDataNode(t2Node, 'i1', { i1: 6 });
     addLink(f1Node.addOutPort('f1'), i1Node.getInPorts()[0]);
-    addNodeToDataNode(i1Node, 'i2', { i2: 6 });
+    addNodeToDataNode(i1Node, 'i2', { i2: 7 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
       .mockReturnValueOnce('c')
@@ -491,6 +549,19 @@ ${INDENTATION}i2
       .mockReturnValueOnce(`${INDENTATION}i1`)
       .mockReturnValueOnce(`${INDENTATION}i2`);
     const code = buildParser.traverseNextNode(startNode, 1);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNode,
+      [
+        [{ c: 2 }, ''],
+        [{ t1: 3 }, INDENTATION.repeat(2)],
+        [{ f1: 4 }, INDENTATION.repeat(2)],
+        [{ t2: 5 }, INDENTATION.repeat(2)],
+        [{ i1: 6 }, INDENTATION],
+        [{ i2: 7 }, INDENTATION]
+      ],
+      1,
+      7
+    );
     expect(code).toEqual(
       `${INDENTATION}if (c) {
 ${INDENTATION.repeat(2)}t1
