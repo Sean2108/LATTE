@@ -66,3 +66,7 @@ export function isString(rawVariable, vars) {
 export function deepClone(toClone) {
   return JSON.parse(JSON.stringify(toClone));
 }
+
+export function objectEquals(objectA, objectB) {
+  return JSON.stringify(objectA) === JSON.stringify(objectB);
+}

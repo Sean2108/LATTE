@@ -5,7 +5,8 @@ import {
   isPrimitiveType,
   toLowerCamelCase,
   isString,
-  deepClone
+  deepClone,
+  objectEquals
 } from '../../app/components/build/build_utils/TypeCheckFormattingUtils';
 
 describe('TypeCheckFormattingUtils utility functions', () => {
@@ -111,5 +112,27 @@ describe('TypeCheckFormattingUtils utility functions', () => {
     expect(input).toEqual({ x: { y: { z: ['c'] } } });
     expect(shallowCopy).toEqual({ x: { y: { z: ['c'] } } });
     expect(output).toEqual({ x: { y: { z: ['b'] } } });
+  });
+
+  it('objectEquals should work correctly', () => {
+    expect(
+      objectEquals({ a: { b: 2 }, c: { d: 3 } }, { a: { b: 2 }, c: { d: 3 } })
+    ).toEqual(true);
+    expect(
+      objectEquals({ a: { b: 2 }, c: { d: 3 } }, { a: { b: 2 }, c: { d: 4 } })
+    ).toEqual(false);
+    expect(
+      objectEquals(
+        { a: { b: 2 }, c: { d: 3 }, e: { f: 4 } },
+        { a: { b: 2 }, c: { d: 4 } }
+      )
+    ).toEqual(false);
+    expect(
+      objectEquals(
+        { a: { b: 2 }, c: { d: 3, e: { f: 4 } } },
+        { a: { b: 2 }, c: { d: 4 } }
+      )
+    ).toEqual(false);
+    expect(objectEquals({}, {})).toEqual(true);
   });
 });

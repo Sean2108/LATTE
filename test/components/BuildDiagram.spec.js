@@ -168,18 +168,18 @@ describe('BuildDiagram component', () => {
     expect(
       'linksUpdated' in Object.values(instance.model.listeners)[0]
     ).toEqual(true);
-    instance.resetListener(
-      { a: 1 },
-      { b: 2 },
-      { c: 3 },
-      { d: 4 },
-      true,
+    instance.resetListener({
+      varList: { a: 1 },
+      functionParams: { b: 2 },
+      events: { c: 3 },
+      entities: { d: 4 },
+      settings: { bitsMode: true, indentation: '    ' },
       onChangeLogic,
       onChangeReturn,
       onChangeView,
       updateDiagram,
       updateGasHistory
-    );
+    });
     expect(Object.keys(instance.model.listeners).length).toEqual(1);
     expect(
       'linksUpdated' in Object.values(instance.model.listeners)[0]
@@ -200,24 +200,24 @@ describe('BuildDiagram component', () => {
     mockBuildParserInstance.parse.mockReturnValueOnce('the code');
     mockBuildParserInstance.getReturnVar.mockReturnValueOnce('return var');
     mockBuildParserInstance.getView.mockReturnValueOnce(true);
-    instance.parseNodes(
-      { a: 1 },
-      { b: 2 },
-      { c: 3 },
-      { d: 4 },
-      true,
+    instance.parseNodes({
+      varList: { a: 1 },
+      functionParams: { b: 2 },
+      events: { c: 3 },
+      entities: { d: 4 },
+      settings: { bitsMode: true, indentation: '    ' },
       onChangeLogic,
       onChangeReturn,
       onChangeView,
       updateDiagram,
       updateGasHistory
-    );
+    });
     expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
       { a: 1 },
       { b: 2 },
       { c: 3 },
       { d: 4 },
-      true
+      { bitsMode: true, indentation: '    ' }
     );
     expect(onChangeLogic).toHaveBeenCalledWith('the code');
     expect(onChangeReturn).toHaveBeenCalledWith('return var');

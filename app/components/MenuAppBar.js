@@ -105,7 +105,6 @@ class MiniDrawer extends React.Component {
   };
 
   componentWillMount() {
-    console.log(this.state);
     if (existsSync(settingsFile)) {
       readFile(settingsFile, (err, data) => {
         if (err) throw err;
@@ -174,7 +173,7 @@ class MiniDrawer extends React.Component {
 
   render() {
     const { classes, theme } = this.props;
-    const { open, selected, settings } = this.state;
+    const { open, selected } = this.state;
 
     return (
       <div className={classes.root}>

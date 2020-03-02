@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { Radio, FormLabel, RadioGroup, FormControl } from '@material-ui/core';
+import { Radio, FormLabel, RadioGroup } from '@material-ui/core';
 
 const styles = theme => ({
   toolbar: {
@@ -39,7 +39,9 @@ class Settings extends React.Component {
         <Typography variant="title" noWrap>
           Settings
         </Typography>
-        <FormLabel className={classes.formLabel} component="legend">Indentation Settings</FormLabel>
+        <FormLabel className={classes.formLabel} component="legend">
+          Indentation Settings
+        </FormLabel>
         <RadioGroup
           className={classes.radioGroup}
           value={settings.indentation}
@@ -66,7 +68,9 @@ class Settings extends React.Component {
             label="Tabs"
           />
         </RadioGroup>
-        <FormLabel className={classes.formLabel} component="legend">Advanced Settings</FormLabel>
+        <FormLabel className={classes.formLabel} component="legend">
+          Advanced Settings
+        </FormLabel>
         <FormControlLabel
           control={
             <Switch

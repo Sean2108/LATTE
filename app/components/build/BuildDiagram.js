@@ -21,6 +21,7 @@ import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDat
 import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
 import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
+import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 
 const styles = theme => ({
   paper: {
@@ -54,21 +55,6 @@ class BuildDiagram extends React.Component {
   };
 
   componentWillMount() {
-    const {
-      diagram,
-      onVariablesChange,
-      varList,
-      functionParams,
-      events,
-      entities,
-      settings,
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
-      updateGasHistory,
-      updateBuildError
-    } = this.props;
     this.engine = new DiagramEngine();
     this.engine.installDefaultFactories();
     this.engine.registerPortFactory(
@@ -76,7 +62,17 @@ class BuildDiagram extends React.Component {
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());
     this.engine.registerNodeFactory(new DefaultDataNodeFactory());
+    this.renderDiagram();
+  }
 
+  componentDidUpdate(prevProps) {
+    if (!objectEquals(this.props.diagram, prevProps.diagram)) {
+      this.renderDiagram();
+    }
+  }
+
+  renderDiagram() {
+    const { diagram, onVariablesChange, updateBuildError } = this.props;
     this.model = new DiagramModel();
     if (Object.entries(diagram).length > 0) {
       this.model.deSerializeDiagram(diagram, this.engine);
@@ -90,18 +86,7 @@ class BuildDiagram extends React.Component {
       this.model.addAll(this.start);
     }
     this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
-    this.resetListener(
-      varList,
-      functionParams,
-      events,
-      entities,
-      settings,
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
-      updateGasHistory
-    );
+    this.resetListener(this.props);
 
     this.engine.setDiagramModel(this.model);
   }
@@ -114,40 +99,18 @@ class BuildDiagram extends React.Component {
 
   buildParser;
 
-  resetListener(
-    varList,
-    functionParams,
-    events,
-    entities,
-    settings,
-    onChangeLogic,
-    onChangeReturn,
-    onChangeView,
-    updateDiagram,
-    updateGasHistory
-  ) {
+  resetListener(props) {
     this.model.clearListeners();
     this.model.addListener({
       linksUpdated: () => {
         setTimeout(() => {
-          this.parseNodes(
-            varList,
-            functionParams,
-            events,
-            entities,
-            settings,
-            onChangeLogic,
-            onChangeReturn,
-            onChangeView,
-            updateDiagram,
-            updateGasHistory
-          );
+          this.parseNodes(props);
         }, 5000);
       }
     });
   }
 
-  parseNodes(
+  parseNodes({
     varList,
     functionParams,
     events,
@@ -158,7 +121,7 @@ class BuildDiagram extends React.Component {
     onChangeView,
     updateDiagram,
     updateGasHistory
-  ) {
+  }) {
     this.buildParser.reset(varList, functionParams, events, entities, settings);
     const code = this.buildParser.parse(this.start);
     onChangeLogic(code);
