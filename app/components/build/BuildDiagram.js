@@ -207,31 +207,15 @@ class BuildDiagram extends React.Component {
     const {
       classes,
       varList,
-      functionParams,
       events,
       entities,
       settings,
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
-      updateGasHistory,
-      openDrawer
+      openDrawer,
+      isConstructor
     } = this.props;
 
     const { open, type } = this.state;
-    this.resetListener(
-      varList,
-      functionParams,
-      events,
-      entities,
-      settings,
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
-      updateGasHistory
-    );
+    this.resetListener(this.props);
 
     const tooltips = {
       assignment:
@@ -340,18 +324,20 @@ class BuildDiagram extends React.Component {
                   color="rgb(255,100,0)"
                 />
               </Tooltip>
-              <Tooltip
-                title={tooltips.return}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'return'
-                  }}
-                  name="Return Node"
-                  color="rgb(192,255,0)"
-                />
-              </Tooltip>
+              {!isConstructor && (
+                <Tooltip
+                  title={tooltips.return}
+                  classes={{ tooltip: classes.tooltipFont }}
+                >
+                  <TrayItemWidget
+                    model={{
+                      type: 'return'
+                    }}
+                    name="Return Node"
+                    color="rgb(192,255,0)"
+                  />
+                </Tooltip>
+              )}
               <Tooltip
                 title={tooltips.conditional}
                 classes={{ tooltip: classes.tooltipFont }}
@@ -395,22 +381,24 @@ class BuildDiagram extends React.Component {
   }
 }
 
+// eslint is unable to detect the destructured props in parseNodes
 BuildDiagram.propTypes = {
   classes: PropTypes.object.isRequired,
   varList: PropTypes.object.isRequired,
-  functionParams: PropTypes.object.isRequired,
+  functionParams: PropTypes.object.isRequired, // eslint-disable-line react/no-unused-prop-types
   events: PropTypes.object.isRequired,
   entities: PropTypes.object.isRequired,
-  onChangeLogic: PropTypes.func.isRequired,
+  onChangeLogic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   onVariablesChange: PropTypes.func.isRequired,
-  onChangeReturn: PropTypes.func.isRequired,
+  onChangeReturn: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   diagram: PropTypes.object.isRequired,
-  onChangeView: PropTypes.func,
-  updateDiagram: PropTypes.func.isRequired,
+  onChangeView: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  updateDiagram: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   settings: PropTypes.object.isRequired,
   openDrawer: PropTypes.func.isRequired,
-  updateGasHistory: PropTypes.func.isRequired,
-  updateBuildError: PropTypes.func.isRequired
+  updateGasHistory: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
+  updateBuildError: PropTypes.func.isRequired,
+  isConstructor: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);

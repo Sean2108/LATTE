@@ -136,6 +136,7 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       gasHistory={[]}
       updateGasHistory={jest.fn()}
       updateBuildError={jest.fn()}
+      isConstructor={false}
     />
   );
   const buttons = component.find(Button);

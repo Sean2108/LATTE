@@ -31,6 +31,7 @@ function setup(createComponentMount = true) {
       gasHistory={[]}
       updateGasHistory={jest.fn()}
       updateBuildError={jest.fn()}
+      isConstructor={false}
     />
   );
   const input = [

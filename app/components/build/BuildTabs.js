@@ -195,6 +195,7 @@ class BuildTabs extends React.Component {
                     onTabsChange({ gasHistory: history });
                   }}
                   updateBuildError={updateBuildError}
+                  isConstructor={i === 0}
                 />
               </TabContainer>
             )
