@@ -98,17 +98,22 @@ class MiniDrawer extends React.Component {
     open: false,
     selected: selection.CONNECT,
     connection: null,
-    bitsMode: false
+    settings: {
+      bitsMode: false,
+      indentation: '    '
+    }
   };
 
   componentWillMount() {
+    console.log(this.state);
     if (existsSync(settingsFile)) {
       readFile(settingsFile, (err, data) => {
         if (err) throw err;
         const parsedData = JSON.parse(data);
-        if ('bitsMode' in parsedData) {
-          this.setState({ bitsMode: parsedData.bitsMode });
-        }
+        this.setState({settings: {
+          bitsMode: parsedData.bitsMode,
+          indentation: parsedData.indentation || '    '
+        }});
       });
     }
   }
@@ -137,18 +142,18 @@ class MiniDrawer extends React.Component {
     });
 
   selectShown = selected => {
-    const { bitsMode, connection } = this.state;
+    const { settings, connection } = this.state;
     switch (selected) {
       case selection.CONNECT:
         return <Connect onclick={this.goToBuild} />;
       case selection.SETTINGS:
         return (
           <Settings
-            bitsMode={bitsMode}
-            changeBitsMode={newVal => {
-              const newData = { bitsMode: newVal };
-              this.setState(newData);
-              writeFile(settingsFile, JSON.stringify(newData), err => {
+            settings={settings}
+            changeSettings={newVal => {
+              const newSettings = {...settings, ...newVal};
+              writeFile(settingsFile, JSON.stringify(newSettings), err => {
+                this.setState({settings: newSettings});
                 if (err) throw err;
               });
             }}
@@ -159,7 +164,7 @@ class MiniDrawer extends React.Component {
           <Build
             onback={this.goToConnect}
             connection={connection}
-            bitsMode={bitsMode}
+            settings={settings}
           />
         );
       default:
@@ -169,7 +174,7 @@ class MiniDrawer extends React.Component {
 
   render() {
     const { classes, theme } = this.props;
-    const { open, selected } = this.state;
+    const { open, selected, settings } = this.state;
 
     return (
       <div className={classes.root}>

@@ -1,20 +1,18 @@
 import { toLowerCamelCase, isString } from './TypeCheckFormattingUtils';
 
-const INDENTATION = '    ';
-
 export default class CodeGenUtils {
-  formCode(buildState, bitsMode) {
+  formCode(buildState, settings) {
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
-    code += this.formStructsEvents(buildState.entities, bitsMode, false);
+    code += this.formStructsEvents(buildState.entities, settings.bitsMode, false);
     code += this.formVars(buildState.variables);
-    code += this.formStructsEvents(buildState.events, bitsMode, true);
+    code += this.formStructsEvents(buildState.events, settings.bitsMode, true);
     for (let i = 0; i < buildState.tabsCode.length; i += 1) {
-      code += this.formFunctionBody(buildState, i, bitsMode);
+      code += this.formFunctionBody(buildState, i, settings);
     }
     return `${code}}`;
   }
 
-  formFunctionBody(buildState, i, bitsMode) {
+  formFunctionBody(buildState, i, settings) {
     const functionName =
       buildState.tabs[i + 1] === 'Initial State'
         ? 'constructor'
@@ -22,9 +20,10 @@ export default class CodeGenUtils {
     const returnCode = this.formReturnCode(buildState.tabsReturn[i]);
     const requires = this.formRequires(
       buildState.tabsRequire[i],
-      buildState.variables
+      buildState.variables,
+      settings.indentation
     );
-    const params = this.formParams(buildState.tabsParams[i], bitsMode);
+    const params = this.formParams(buildState.tabsParams[i], settings.bitsMode);
     return `${functionName}(${params}) public ${
       buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
         ? 'view'
@@ -43,7 +42,7 @@ export default class CodeGenUtils {
       : `returns (${returnType} memory) `;
   }
 
-  formRequires(requires, variables) {
+  formRequires(requires, variables, indentation) {
     return requires
       .filter(req => req.var1 && req.var2 && req.comp)
       .map(req => {
@@ -52,9 +51,9 @@ export default class CodeGenUtils {
           isString(req.var2, variables) &&
           req.comp === '=='
         ) {
-          return `${INDENTATION}require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
+          return `${indentation}require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
         }
-        return `${INDENTATION}require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
+        return `${indentation}require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
       })
       .join('');
   }

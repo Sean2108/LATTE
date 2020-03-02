@@ -7,12 +7,12 @@ export default class Web3Utils {
     this.codeGen = new CodeGenUtils();
   }
 
-  getGasUsage(buildState, bitsMode, history, updateCompileError) {
+  getGasUsage(buildState, settings, history, updateCompileError) {
     this.requestCompile(
       updateCompileError,
       false,
       buildState,
-      bitsMode,
+      settings,
       (accs, deploymentJsonParam, contract) => {
         const deploymentJson = deploymentJsonParam;
         if (buildState.constructorParams.length) {
@@ -44,12 +44,12 @@ export default class Web3Utils {
     );
   }
 
-  deploySmartContract = (buildState, bitsMode, updateCompileError) => {
+  deploySmartContract = (buildState, settings, updateCompileError) => {
     this.requestCompile(
       updateCompileError,
       true,
       buildState,
-      bitsMode,
+      settings,
       (accs, deploymentJsonParam, contract) => {
         const deploymentJson = deploymentJsonParam;
         if (buildState.constructorParams.length) {
@@ -97,7 +97,7 @@ export default class Web3Utils {
     updateCompileError,
     logCode,
     buildState,
-    bitsMode,
+    settings,
     callback
   ) => {
     this.web3.eth.getAccounts((err, accs) => {
@@ -112,7 +112,7 @@ export default class Web3Utils {
       }
       const account = accs[0];
       this.web3.eth.defaultAccount = account;
-      const code = this.codeGen.formCode(buildState, bitsMode);
+      const code = this.codeGen.formCode(buildState, settings);
       if (logCode) {
         console.log(code);
       }

@@ -27,7 +27,7 @@ function setup(createComponentMount = true) {
       diagram={{}}
       onChangeView={jest.fn()}
       updateDiagram={jest.fn()}
-      bitsMode
+      settings={{ bitsMode: false, indentation: '    ' }}
       gasHistory={[]}
       updateGasHistory={jest.fn()}
       updateBuildError={jest.fn()}

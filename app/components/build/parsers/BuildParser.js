@@ -1,13 +1,12 @@
 import DiamondNodeModel from '../diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import NodeParser from './NodeParser';
 
-const INDENTATION = '    ';
-
 export default class BuildParser {
   constructor(onVariablesChange, updateBuildError = () => {}) {
     this.nodeParser = new NodeParser(updateBuildError);
     this.reset({}, {});
     this.onVariablesChange = onVariablesChange;
+    this.indentation = '    ';
   }
 
   reset(
@@ -15,15 +14,19 @@ export default class BuildParser {
     functionParams,
     eventList = null,
     structList = null,
-    bitsMode = false
+    settings = {
+      bitsMode: false,
+      indentation: '    '
+    }
   ) {
     this.nodeParser.reset(
       varList,
       functionParams,
       eventList,
       structList,
-      bitsMode
+      settings.bitsMode
     );
+    this.indentation = settings.indentation;
     if (this.nodeParser.updateBuildError) {
       this.nodeParser.updateBuildError('');
     }
@@ -92,7 +95,7 @@ export default class BuildParser {
     const falseNextNode = this.getNextNode(node.outPortFalse);
     const trueNextNode = this.getNextNode(node.outPortTrue);
     const conditionCode = this.nodeParser.parseNode(node.data, '');
-    const indentation = INDENTATION.repeat(indentationDepth);
+    const indentation = this.indentation.repeat(indentationDepth);
     const trueWhileCode = this.generateCodeForCycle(
       node,
       indentationDepth + 1,
@@ -158,7 +161,7 @@ export default class BuildParser {
         ? ''
         : `${this.nodeParser.parseNode(
             node.data,
-            INDENTATION.repeat(indentationDepth)
+            this.indentation.repeat(indentationDepth)
           )}\n`;
     const nextNode = this.getNextNodeForDefaultNode(node);
     if (!nextNode) {
@@ -187,7 +190,7 @@ export default class BuildParser {
       }
       code += `${this.nodeParser.parseNode(
         node.data,
-        INDENTATION.repeat(indentationDepth)
+        this.indentation.repeat(indentationDepth)
       )}\n`;
       node = this.getNextNodeForDefaultNode(node);
     }

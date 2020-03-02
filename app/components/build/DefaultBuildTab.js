@@ -63,13 +63,13 @@ class DefaultBuildTab extends React.Component {
       diagram,
       onChangeView,
       updateDiagram,
-      bitsMode,
+      settings,
       gasHistory,
       updateGasHistory,
       updateBuildError
     } = this.props;
     const { drawerOpen } = this.state;
-    const variables = this.flattenParamsToObject(params, bitsMode);
+    const variables = this.flattenParamsToObject(params, settings.bitsMode);
     return (
       <div>
         <VariableList
@@ -77,7 +77,7 @@ class DefaultBuildTab extends React.Component {
           updateVariables={vars => onChangeParams(vars)}
           vars={params}
           tooltipText="These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below."
-          bitsMode={bitsMode}
+          bitsMode={settings.bitsMode}
         />
         <br />
         <RequiresList
@@ -100,7 +100,7 @@ class DefaultBuildTab extends React.Component {
           diagram={diagram}
           onChangeView={onChangeView}
           updateDiagram={updateDiagram}
-          bitsMode={bitsMode}
+          settings={settings}
           openDrawer={() => this.setState({ drawerOpen: true })}
           gasHistory={gasHistory}
           updateGasHistory={updateGasHistory}
@@ -139,7 +139,7 @@ DefaultBuildTab.propTypes = {
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func.isRequired,
   updateDiagram: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired,
+  settings: PropTypes.object.isRequired,
   gasHistory: PropTypes.array.isRequired,
   updateGasHistory: PropTypes.func.isRequired,
   updateBuildError: PropTypes.func.isRequired

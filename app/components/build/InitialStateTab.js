@@ -12,7 +12,7 @@ class InitialStateTab extends React.Component {
       updateEvents,
       params,
       updateParams,
-      bitsMode
+      settings
     } = this.props;
     return (
       <div>
@@ -22,7 +22,7 @@ class InitialStateTab extends React.Component {
           updateVariables={updateEvents}
           initialVars={events}
           varListTooltipText="The names and types of information that will be announced with the event."
-          bitsMode={bitsMode}
+          bitsMode={settings.bitsMode}
         />
         <br />
         <StructList
@@ -31,7 +31,7 @@ class InitialStateTab extends React.Component {
           updateVariables={updateEntities}
           initialVars={entities}
           varListTooltipText="The names and types of information that the entity will contain."
-          bitsMode={bitsMode}
+          bitsMode={settings.bitsMode}
         />
         <br />
         {params && params.filter(param => param.name).length > 0 && (
@@ -53,7 +53,8 @@ InitialStateTab.propTypes = {
   updateEntities: PropTypes.func.isRequired,
   updateEvents: PropTypes.func.isRequired,
   params: PropTypes.array.isRequired,
-  updateParams: PropTypes.func.isRequired
+  updateParams: PropTypes.func.isRequired,
+  settings: PropTypes.object.isRequired
 };
 
 export default InitialStateTab;

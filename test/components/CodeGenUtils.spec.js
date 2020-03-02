@@ -1,7 +1,5 @@
 import CodeGenUtils from '../../app/components/build/build_utils/CodeGenUtils';
 
-const INDENTATION = '    ';
-
 function setup() {
   const codeGen = new CodeGenUtils();
   const entities = {
@@ -495,7 +493,9 @@ describe('codeGenUtils class formReturnCode function', () => {
     expect(codeGen.formReturnCode('bytes16')).toEqual('returns (bytes16) ');
     expect(codeGen.formReturnCode('uint8')).toEqual('returns (uint8) ');
     expect(codeGen.formReturnCode('uint')).toEqual('returns (uint) ');
-    expect(codeGen.formReturnCode('string')).toEqual('returns (string memory) ');
+    expect(codeGen.formReturnCode('string')).toEqual(
+      'returns (string memory) '
+    );
   });
 });
 
@@ -518,8 +518,8 @@ describe('codeGenUtils class formRequires function', () => {
       }
     ];
     const vars = { x: 'string', y: 'string' };
-    expect(codeGen.formRequires(input, vars)).toEqual(
-      `${INDENTATION}require(keccak256(x) == keccak256(y), "this should use keccak");\n${INDENTATION}require(a > b, "this should not use keccak");\n`
+    expect(codeGen.formRequires(input, vars, '    ')).toEqual(
+      `    require(keccak256(x) == keccak256(y), "this should use keccak");\n    require(a > b, "this should not use keccak");\n`
     );
   });
 });
@@ -557,8 +557,13 @@ describe('codeGenUtils class formParams function', () => {
 describe('codeGenUtils class formFunctionBody function', () => {
   it('should work correctly', () => {
     const { codeGen, buildState } = setup();
-    expect(codeGen.formFunctionBody(buildState, 1, false)).toEqual(
-`function testFunc(uint test_int) public payable returns (uint) {
+    expect(
+      codeGen.formFunctionBody(buildState, 1, {
+        bitsMode: false,
+        indentation: '    '
+      })
+    ).toEqual(
+      `function testFunc(uint test_int) public payable returns (uint) {
     require(test_int > 0, "test int must be greater than 0");
 if (test_int < 10) {
 return test_int;
@@ -575,8 +580,10 @@ return res;
 describe('codeGenUtils class formCode function', () => {
   it('should work correctly', () => {
     const { codeGen, buildState } = setup();
-    expect(codeGen.formCode(buildState, 1, false)).toEqual(
-`pragma solidity ^0.5.4;
+    expect(
+      codeGen.formCode(buildState, { bitsMode: false, indentation: '    ' })
+    ).toEqual(
+      `pragma solidity ^0.5.4;
 contract Code {
 constructor() public payable {
 }

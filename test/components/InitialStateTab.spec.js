@@ -20,7 +20,7 @@ function setup(emptyParamsList) {
       updateEntities={updateEntities}
       updateEvents={updateEvents}
       updateParams={updateParams}
-      bitsMode
+      settings={{ bitsMode: false, indentation: '    ' }}
     />
   );
   const structLists = component.find(StructList);

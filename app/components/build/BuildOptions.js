@@ -64,7 +64,7 @@ class BuildOptions extends React.Component {
       onback,
       buildState,
       loadState,
-      bitsMode,
+      settings,
       connection
     } = this.props;
     const { anchorEl, dataOp, fileName, files, compileError } = this.state;
@@ -105,7 +105,7 @@ class BuildOptions extends React.Component {
             })
           }
           saveContract={() => {
-            const code = this.codeGenUtils.formCode(buildState, bitsMode);
+            const code = this.codeGenUtils.formCode(buildState, settings);
             const filename = `${fileName.replace(/\s+/g, '_')}.sol`;
             writeFile(join('saved_contracts', filename), code, err => {
               if (err) throw err;
@@ -192,7 +192,7 @@ class BuildOptions extends React.Component {
             onClick={() =>
               this.web3Utils.deploySmartContract(
                 buildState,
-                bitsMode,
+                settings,
                 compileErrorParam => {
                   this.setState({ compileError: compileErrorParam });
                 }
@@ -213,7 +213,7 @@ BuildOptions.propTypes = {
   connection: PropTypes.object.isRequired,
   buildState: PropTypes.object.isRequired,
   loadState: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired
+  settings: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, {

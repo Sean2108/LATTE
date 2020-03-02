@@ -131,7 +131,7 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       diagram={diagram}
       onChangeView={jest.fn()}
       updateDiagram={jest.fn()}
-      bitsMode
+      settings={{ bitsMode: false, indentation: '    ' }}
       openDrawer={jest.fn()}
       gasHistory={[]}
       updateGasHistory={jest.fn()}

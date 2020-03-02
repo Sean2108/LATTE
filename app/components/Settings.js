@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import { Radio, FormLabel, RadioGroup, FormControl } from '@material-ui/core';
 
 const styles = theme => ({
   toolbar: {
@@ -18,12 +19,19 @@ const styles = theme => ({
     backgroundColor: 'white',
     padding: theme.spacing.unit * 3,
     margin: theme.spacing.unit * 3
+  },
+  radioGroup: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  formLabel: {
+    paddingTop: theme.spacing.unit * 3
   }
 });
 
 class Settings extends React.Component {
   render() {
-    const { classes, bitsMode, changeBitsMode } = this.props;
+    const { classes, settings, changeSettings } = this.props;
 
     return (
       <main align="center" className={classes.content}>
@@ -31,19 +39,47 @@ class Settings extends React.Component {
         <Typography variant="title" noWrap>
           Settings
         </Typography>
-        <FormControlLabel
-            control={
-              <Switch
-                checked={bitsMode}
-                onChange={event =>
-                  changeBitsMode(event.target.checked)
-                }
-                value="bitsMode"
-                color="primary"
-              />
-            }
-            label="Advanced Feature: Gas Reduction Mode"
+        <FormLabel className={classes.formLabel} component="legend">Indentation Settings</FormLabel>
+        <RadioGroup
+          className={classes.radioGroup}
+          value={settings.indentation}
+          aria-label="indent"
+          name="indent"
+          row
+          onChange={event =>
+            changeSettings({ indentation: event.target.value })
+          }
+        >
+          <FormControlLabel
+            value="    "
+            control={<Radio color="primary" />}
+            label="4 Spaces"
           />
+          <FormControlLabel
+            value="  "
+            control={<Radio color="primary" />}
+            label="2 Spaces"
+          />
+          <FormControlLabel
+            value="	"
+            control={<Radio color="primary" />}
+            label="Tabs"
+          />
+        </RadioGroup>
+        <FormLabel className={classes.formLabel} component="legend">Advanced Settings</FormLabel>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={settings.bitsMode}
+              onChange={event =>
+                changeSettings({ bitsMode: event.target.checked })
+              }
+              value="bitsMode"
+              color="primary"
+            />
+          }
+          label="Gas Reduction Mode"
+        />
       </main>
     );
   }
@@ -51,8 +87,8 @@ class Settings extends React.Component {
 
 Settings.propTypes = {
   classes: PropTypes.object.isRequired,
-  bitsMode: PropTypes.bool.isRequired,
-  changeBitsMode: PropTypes.func.isRequired
+  settings: PropTypes.object.isRequired,
+  changeSettings: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, {

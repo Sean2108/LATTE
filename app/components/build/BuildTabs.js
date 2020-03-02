@@ -97,7 +97,7 @@ class BuildTabs extends React.Component {
       variables,
       onTabsChange,
       buildState,
-      bitsMode
+      settings
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
     const updateBuildError = buildError => {
@@ -146,7 +146,7 @@ class BuildTabs extends React.Component {
                   constructorParams: params
                 });
               }}
-              bitsMode={bitsMode}
+              settings={settings}
             />
           </TabContainer>
         )}
@@ -182,14 +182,13 @@ class BuildTabs extends React.Component {
                   updateDiagram={diagram =>
                     this.handleOnChange(diagram, i, 'diagrams')
                   }
-                  bitsMode={bitsMode}
-                  // gasHistory={this.state.gasHistory[i]}
+                  settings={settings}
                   gasHistory={buildState.gasHistory}
                   updateGasHistory={() => {
                     const history = buildState.gasHistory;
                     this.web3Utils.getGasUsage(
                       buildState,
-                      bitsMode,
+                      settings,
                       history,
                       updateBuildError
                     );
@@ -265,7 +264,7 @@ BuildTabs.propTypes = {
   variables: PropTypes.object.isRequired,
   onTabsChange: PropTypes.func.isRequired,
   buildState: PropTypes.object.isRequired,
-  bitsMode: PropTypes.bool.isRequired,
+  settings: PropTypes.object.isRequired,
   connection: PropTypes.object.isRequired
 };
 

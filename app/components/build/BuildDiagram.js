@@ -61,7 +61,7 @@ class BuildDiagram extends React.Component {
       functionParams,
       events,
       entities,
-      bitsMode,
+      settings,
       onChangeLogic,
       onChangeReturn,
       onChangeView,
@@ -95,7 +95,7 @@ class BuildDiagram extends React.Component {
       functionParams,
       events,
       entities,
-      bitsMode,
+      settings,
       onChangeLogic,
       onChangeReturn,
       onChangeView,
@@ -119,7 +119,7 @@ class BuildDiagram extends React.Component {
     functionParams,
     events,
     entities,
-    bitsMode,
+    settings,
     onChangeLogic,
     onChangeReturn,
     onChangeView,
@@ -135,7 +135,7 @@ class BuildDiagram extends React.Component {
             functionParams,
             events,
             entities,
-            bitsMode,
+            settings,
             onChangeLogic,
             onChangeReturn,
             onChangeView,
@@ -152,14 +152,14 @@ class BuildDiagram extends React.Component {
     functionParams,
     events,
     entities,
-    bitsMode,
+    settings,
     onChangeLogic,
     onChangeReturn,
     onChangeView,
     updateDiagram,
     updateGasHistory
   ) {
-    this.buildParser.reset(varList, functionParams, events, entities, bitsMode);
+    this.buildParser.reset(varList, functionParams, events, entities, settings);
     const code = this.buildParser.parse(this.start);
     onChangeLogic(code);
     onChangeReturn(this.buildParser.getReturnVar());
@@ -247,7 +247,7 @@ class BuildDiagram extends React.Component {
       functionParams,
       events,
       entities,
-      bitsMode,
+      settings,
       onChangeLogic,
       onChangeReturn,
       onChangeView,
@@ -262,7 +262,7 @@ class BuildDiagram extends React.Component {
       functionParams,
       events,
       entities,
-      bitsMode,
+      settings,
       onChangeLogic,
       onChangeReturn,
       onChangeView,
@@ -321,7 +321,7 @@ class BuildDiagram extends React.Component {
           entities={entities}
           addNode={this.addNode}
           tooltipText={tooltips[type] || ''}
-          bitsMode={bitsMode}
+          bitsMode={settings.bitsMode}
         />
         <div className="body">
           <div className="header">
@@ -444,7 +444,7 @@ BuildDiagram.propTypes = {
   diagram: PropTypes.object.isRequired,
   onChangeView: PropTypes.func,
   updateDiagram: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired,
+  settings: PropTypes.object.isRequired,
   openDrawer: PropTypes.func.isRequired,
   updateGasHistory: PropTypes.func.isRequired,
   updateBuildError: PropTypes.func.isRequired
