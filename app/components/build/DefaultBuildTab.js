@@ -53,21 +53,19 @@ class DefaultBuildTab extends React.Component {
       varList,
       events,
       entities,
-      onChangeLogic,
+      onParse,
       onChangeParams,
       onChangeRequire,
       onVariablesChange,
-      onChangeReturn,
       params,
       requires,
       diagram,
-      onChangeView,
-      updateDiagram,
       settings,
       gasHistory,
       updateGasHistory,
       updateBuildError,
-      isConstructor
+      isConstructor,
+      editHistory
     } = this.props;
     const { drawerOpen } = this.state;
     const variables = this.flattenParamsToObject(params, settings.bitsMode);
@@ -95,18 +93,16 @@ class DefaultBuildTab extends React.Component {
           functionParams={variables}
           events={events}
           entities={entities}
-          onChangeLogic={onChangeLogic}
+          onParse={onParse}
           onVariablesChange={onVariablesChange}
-          onChangeReturn={onChangeReturn}
           diagram={diagram}
-          onChangeView={onChangeView}
-          updateDiagram={updateDiagram}
           settings={settings}
           openDrawer={() => this.setState({ drawerOpen: true })}
           gasHistory={gasHistory}
           updateGasHistory={updateGasHistory}
           updateBuildError={updateBuildError}
           isConstructor={isConstructor}
+          editHistory={editHistory}
         />
 
         <Drawer
@@ -131,21 +127,19 @@ DefaultBuildTab.propTypes = {
   varList: PropTypes.object.isRequired,
   events: PropTypes.object.isRequired,
   entities: PropTypes.object.isRequired,
-  onChangeLogic: PropTypes.func.isRequired,
+  onParse: PropTypes.func.isRequired,
   onChangeParams: PropTypes.func.isRequired,
   onChangeRequire: PropTypes.func.isRequired,
   onVariablesChange: PropTypes.func.isRequired,
-  onChangeReturn: PropTypes.func.isRequired,
   params: PropTypes.array.isRequired,
   requires: PropTypes.array.isRequired,
   diagram: PropTypes.object.isRequired,
-  onChangeView: PropTypes.func.isRequired,
-  updateDiagram: PropTypes.func.isRequired,
   settings: PropTypes.object.isRequired,
   gasHistory: PropTypes.array.isRequired,
   updateGasHistory: PropTypes.func.isRequired,
   updateBuildError: PropTypes.func.isRequired,
-  isConstructor: PropTypes.bool.isRequired
+  isConstructor: PropTypes.bool.isRequired,
+  editHistory: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(DefaultBuildTab);

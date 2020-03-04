@@ -12,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import InitialStateTab from './InitialStateTab';
 import Web3Utils from './build_utils/Web3Utils';
 import DefaultBuildTab from './DefaultBuildTab';
+import EditHistory from './build_utils/EditHistory';
 
 function TabContainer(props) {
   const { children } = props;
@@ -65,8 +66,9 @@ class BuildTabs extends React.Component {
   };
 
   componentWillMount() {
-    const { connection } = this.props;
+    const { buildState, connection, onTabsChange } = this.props;
     this.web3Utils = new Web3Utils(connection);
+    this.editHistory = new EditHistory(buildState, onTabsChange);
   }
 
   handleChange = (event, value) => {
@@ -97,7 +99,7 @@ class BuildTabs extends React.Component {
       variables,
       onTabsChange,
       buildState,
-      settings
+      settings,
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
     const updateBuildError = buildError => {
@@ -158,14 +160,15 @@ class BuildTabs extends React.Component {
                   varList={variables}
                   events={buildState.events}
                   entities={buildState.entities}
-                  onChangeLogic={newCode =>
-                    this.handleOnChange(newCode, i, 'tabsCode')
-                  }
+                  onParse={newState => {
+                    const newBuildState = {...buildState};
+                    for (const key of ['tabsCode', 'tabsReturn', 'isView', 'diagrams']) {
+                      newBuildState[key][i] = newState[key];
+                    }
+                    onTabsChange(newBuildState, (state) => this.editHistory.addNode(state));
+                  }}
                   onChangeParams={newParams =>
                     this.handleChangeParams(newParams, i)
-                  }
-                  onChangeReturn={newReturn =>
-                    this.handleOnChange(newReturn, i, 'tabsReturn')
                   }
                   onChangeRequire={newRequire =>
                     this.handleOnChange(newRequire, i, 'tabsRequire')
@@ -176,12 +179,6 @@ class BuildTabs extends React.Component {
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
                   diagram={buildState.diagrams[i]}
-                  onChangeView={newView =>
-                    this.handleOnChange(newView, i, 'isView')
-                  }
-                  updateDiagram={diagram =>
-                    this.handleOnChange(diagram, i, 'diagrams')
-                  }
                   settings={settings}
                   gasHistory={buildState.gasHistory}
                   updateGasHistory={() => {
@@ -196,6 +193,7 @@ class BuildTabs extends React.Component {
                   }}
                   updateBuildError={updateBuildError}
                   isConstructor={i === 0}
+                  editHistory={this.editHistory}
                 />
               </TabContainer>
             )

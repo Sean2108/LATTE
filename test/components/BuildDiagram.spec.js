@@ -7,6 +7,7 @@ import { DiagramModel } from 'storm-react-diagrams';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
 import BuildParser from '../../app/components/build/parsers/BuildParser';
+import EditHistory from '../../app/components/build/build_utils/EditHistory';
 
 jest.mock('../../app/components/build/parsers/BuildParser');
 
@@ -125,18 +126,16 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       functionParams={{}}
       events={{}}
       entities={{}}
-      onChangeLogic={jest.fn()}
+      onParse={jest.fn()}
       onVariablesChange={jest.fn()}
-      onChangeReturn={jest.fn()}
       diagram={diagram}
-      onChangeView={jest.fn()}
-      updateDiagram={jest.fn()}
       settings={{ bitsMode: false, indentation: '    ' }}
       openDrawer={jest.fn()}
       gasHistory={[]}
       updateGasHistory={jest.fn()}
       updateBuildError={jest.fn()}
       isConstructor={false}
+      editHistory={new EditHistory(1, jest.fn())}
     />
   );
   const buttons = component.find(Button);
@@ -156,10 +155,7 @@ describe('BuildDiagram component', () => {
   it('resetListener should remove and add listeners', () => {
     const { component } = setup(false, false);
     const {
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
+      onParse,
       updateGasHistory
     } = component.props();
     const instance = component.dive().instance();
@@ -175,10 +171,7 @@ describe('BuildDiagram component', () => {
       events: { c: 3 },
       entities: { d: 4 },
       settings: { bitsMode: true, indentation: '    ' },
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
+      onParse,
       updateGasHistory
     });
     expect(Object.keys(instance.model.listeners).length).toEqual(1);
@@ -190,10 +183,7 @@ describe('BuildDiagram component', () => {
   it('parseNodes should reset buildParser and call update functions', () => {
     const { component } = setup(false, false);
     const {
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
+      onParse,
       updateGasHistory
     } = component.props();
     const instance = component.dive().instance();
@@ -207,10 +197,7 @@ describe('BuildDiagram component', () => {
       events: { c: 3 },
       entities: { d: 4 },
       settings: { bitsMode: true, indentation: '    ' },
-      onChangeLogic,
-      onChangeReturn,
-      onChangeView,
-      updateDiagram,
+      onParse,
       updateGasHistory
     });
     expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
@@ -220,12 +207,12 @@ describe('BuildDiagram component', () => {
       { d: 4 },
       { bitsMode: true, indentation: '    ' }
     );
-    expect(onChangeLogic).toHaveBeenCalledWith('the code');
-    expect(onChangeReturn).toHaveBeenCalledWith('return var');
-    expect(onChangeView).toHaveBeenCalledWith(true);
-    expect(updateDiagram).toHaveBeenCalledWith(
-      instance.model.serializeDiagram()
-    );
+    expect(onParse).toHaveBeenCalledWith({
+      tabsCode: 'the code',
+      tabsReturn: 'return var',
+      isView: true,
+      diagrams: instance.model.serializeDiagram()
+    });
     expect(updateGasHistory).toHaveBeenCalledTimes(1);
   });
 

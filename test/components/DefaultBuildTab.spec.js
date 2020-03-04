@@ -7,6 +7,7 @@ import DefaultBuildTab from '../../app/components/build/DefaultBuildTab';
 import VariableList from '../../app/components/build/build_components/VariableList';
 import RequiresList from '../../app/components/build/build_components/RequiresList';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
+import EditHistory from '../../app/components/build/build_utils/EditHistory';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -17,21 +18,19 @@ function setup(createComponentMount = true) {
       varList={{}}
       events={{}}
       entities={{}}
-      onChangeLogic={jest.fn()}
+      onParse={jest.fn()}
       onChangeParams={jest.fn()}
-      onChangeReturn={jest.fn()}
       onChangeRequire={jest.fn()}
       onVariablesChange={jest.fn()}
       params={[]}
       requires={[]}
       diagram={{}}
-      onChangeView={jest.fn()}
-      updateDiagram={jest.fn()}
       settings={{ bitsMode: false, indentation: '    ' }}
       gasHistory={[]}
       updateGasHistory={jest.fn()}
       updateBuildError={jest.fn()}
       isConstructor={false}
+      editHistory={new EditHistory(1)}
     />
   );
   const input = [

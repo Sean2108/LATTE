@@ -4,8 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Button } from '@material-ui/core';
+import { Button, IconButton } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import UndoIcon from '@material-ui/icons/Undo';
+import RedoIcon from '@material-ui/icons/Redo';
 import {
   DiagramEngine,
   DiagramModel,
@@ -74,6 +76,7 @@ class BuildDiagram extends React.Component {
   renderDiagram() {
     const { diagram, onVariablesChange, updateBuildError } = this.props;
     this.model = new DiagramModel();
+    this.start = null;
     if (Object.entries(diagram).length > 0) {
       this.model.deSerializeDiagram(diagram, this.engine);
       this.start = this.findStart();
@@ -116,18 +119,17 @@ class BuildDiagram extends React.Component {
     events,
     entities,
     settings,
-    onChangeLogic,
-    onChangeReturn,
-    onChangeView,
-    updateDiagram,
+    onParse,
     updateGasHistory
   }) {
     this.buildParser.reset(varList, functionParams, events, entities, settings);
     const code = this.buildParser.parse(this.start);
-    onChangeLogic(code);
-    onChangeReturn(this.buildParser.getReturnVar());
-    onChangeView(this.buildParser.getView());
-    updateDiagram(this.model.serializeDiagram());
+    onParse({
+      tabsCode: code,
+      tabsReturn: this.buildParser.getReturnVar(),
+      isView: this.buildParser.getView(),
+      diagrams: this.model.serializeDiagram()
+    });
     updateGasHistory();
   }
 
@@ -152,13 +154,6 @@ class BuildDiagram extends React.Component {
 
   selectNode(type, desc, data) {
     switch (type) {
-      case 'assignment':
-        return this.createDefaultNode(
-          `Assignment: ${desc}`,
-          'rgb(192,0,0)',
-          data,
-          false
-        );
       case 'event':
         return this.createDefaultNode(
           `Emit Event: ${desc}`,
@@ -189,8 +184,14 @@ class BuildDiagram extends React.Component {
         );
       case 'conditional':
         return new DiamondNodeModel(`${desc}`, data);
+      case 'assignment':
       default:
-        return null;
+        return this.createDefaultNode(
+          `Assignment: ${desc}`,
+          'rgb(192,0,0)',
+          data,
+          false
+        );
     }
   }
 
@@ -211,7 +212,8 @@ class BuildDiagram extends React.Component {
       entities,
       settings,
       openDrawer,
-      isConstructor
+      isConstructor,
+      editHistory
     } = this.props;
 
     const { open, type } = this.state;
@@ -238,15 +240,22 @@ class BuildDiagram extends React.Component {
           classes={{ tooltip: classes.tooltipFont }}
         >
           <div className={classes.titleDiv}>
-            <Button
-              onClick={openDrawer}
-              variant="contained"
+            <IconButton
+              onClick={() => editHistory.undo()}
+              aria-label="undo"
               color="primary"
-              className={classes.leftInvis}
+              disabled={!editHistory.canUndo()}
             >
-              View Gas Usage
-              <TrendingUpIcon className={classes.rightIcon} />
-            </Button>
+              <UndoIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => editHistory.redo()}
+              aria-label="redo"
+              color="primary"
+              disabled={!editHistory.canRedo()}
+            >
+              <RedoIcon />
+            </IconButton>
             <Typography variant="title" noWrap>
               Action Phase
             </Typography>
@@ -388,17 +397,15 @@ BuildDiagram.propTypes = {
   functionParams: PropTypes.object.isRequired, // eslint-disable-line react/no-unused-prop-types
   events: PropTypes.object.isRequired,
   entities: PropTypes.object.isRequired,
-  onChangeLogic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
+  onParse: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   onVariablesChange: PropTypes.func.isRequired,
-  onChangeReturn: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   diagram: PropTypes.object.isRequired,
-  onChangeView: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
-  updateDiagram: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   settings: PropTypes.object.isRequired,
   openDrawer: PropTypes.func.isRequired,
   updateGasHistory: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   updateBuildError: PropTypes.func.isRequired,
-  isConstructor: PropTypes.bool.isRequired
+  isConstructor: PropTypes.bool.isRequired,
+  editHistory: PropTypes.object.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);
