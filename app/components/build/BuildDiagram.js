@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Button, IconButton } from '@material-ui/core';
+import { Button, IconButton, CircularProgress } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
@@ -41,11 +41,16 @@ const styles = theme => ({
     'justify-content': 'space-between',
     'align-items': 'center'
   },
-  leftInvis: {
+  invis: {
     visibility: 'hidden'
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
+  },
+  flexChild: {
+    display: 'flex',
+    'justify-content': 'space-between',
+    'flex-basis': '200px'
   }
 });
 
@@ -53,7 +58,8 @@ class BuildDiagram extends React.Component {
   state = {
     open: false,
     type: '',
-    points: null
+    points: null,
+    isProcessing: false
   };
 
   componentWillMount() {
@@ -106,6 +112,7 @@ class BuildDiagram extends React.Component {
     this.model.clearListeners();
     this.model.addListener({
       linksUpdated: () => {
+        this.setState({ isProcessing: true });
         setTimeout(() => {
           this.parseNodes(props);
         }, 5000);
@@ -131,6 +138,7 @@ class BuildDiagram extends React.Component {
       diagrams: this.model.serializeDiagram()
     });
     updateGasHistory();
+    this.setState({ isProcessing: false });
   }
 
   findStart() {
@@ -235,36 +243,52 @@ class BuildDiagram extends React.Component {
 
     return (
       <Paper className={classes.paper}>
-        <Tooltip
-          title="This is the main logic of the function, which will be executed when the checking phase has been successfully passed. Drag nodes from the left panel onto the diagram and connect them to create your logic for the function."
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <div className={classes.titleDiv}>
-            <IconButton
-              onClick={() => editHistory.undo()}
-              aria-label="undo"
-              color="primary"
-              disabled={!editHistory.canUndo()}
-            >
-              <UndoIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => editHistory.redo()}
-              aria-label="redo"
-              color="primary"
-              disabled={!editHistory.canRedo()}
-            >
-              <RedoIcon />
-            </IconButton>
+        <div className={classes.titleDiv}>
+          <div className={classes.flexChild}>
+            <div>
+              <Tooltip title="Undo" classes={{ tooltip: classes.tooltipFont }}>
+                <IconButton
+                  onClick={() => editHistory.undo()}
+                  aria-label="undo"
+                  color="primary"
+                  disabled={!editHistory.canUndo()}
+                >
+                  <UndoIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Redo" classes={{ tooltip: classes.tooltipFont }}>
+                <IconButton
+                  onClick={() => editHistory.redo()}
+                  aria-label="redo"
+                  color="primary"
+                  disabled={!editHistory.canRedo()}
+                >
+                  <RedoIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <CircularProgress
+              className={this.state.isProcessing ? null : classes.invis}
+            />
+          </div>
+          <Tooltip
+            title="This is the main logic of the function, which will be executed when the checking phase has been successfully passed. Drag nodes from the left panel onto the diagram and connect them to create your logic for the function."
+            classes={{ tooltip: classes.tooltipFont }}
+          >
             <Typography variant="title" noWrap>
               Action Phase
             </Typography>
-            <Button onClick={openDrawer} variant="outlined" color="primary">
-              View Gas Usage
-              <TrendingUpIcon className={classes.rightIcon} />
-            </Button>
-          </div>
-        </Tooltip>
+          </Tooltip>
+          <Button
+            onClick={openDrawer}
+            className={classes.flexChild}
+            variant="outlined"
+            color="primary"
+          >
+            View Gas Usage
+            <TrendingUpIcon className={classes.rightIcon} />
+          </Button>
+        </div>
         <DiagramModal
           open={open}
           close={() => {
