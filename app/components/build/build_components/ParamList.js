@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -9,6 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import type { Param } from '../../../types';
 
 const styles = theme => ({
   textField: {
@@ -32,21 +34,24 @@ const styles = theme => ({
   }
 });
 
-class ParamList extends React.Component {
-  handleChange = index => event => {
+type Props = {
+  classes: { [key: string]: string },
+  header: string,
+  params: Array<Param>,
+  updateParams: (Array<Param>) => void,
+  tooltipText: string
+};
+
+class ParamList extends React.Component<Props> {
+  handleChange = (index: number) => (event: SyntheticInputEvent<HTMLInputElement>) => {
     const { params, updateParams } = this.props;
-    const newParams = params.filter(param => param.name && param.displayName);
-    newParams[index].value = event.target.value;
+    const newParams: Array<Param> = params.filter(param => param.name && param.displayName);
+    newParams[index].value = event.currentTarget.value;
     updateParams(newParams);
   };
 
-  render() {
-    const {
-      classes,
-      header,
-      params,
-      tooltipText
-    } = this.props;
+  render(): React.Node {
+    const { classes, header, params, tooltipText } = this.props;
 
     return (
       <Paper className={classes.paper}>
@@ -57,8 +62,8 @@ class ParamList extends React.Component {
         </Tooltip>
         <br />
         {params
-          .filter(param => param.name && param.displayName)
-          .map((param, index) => (
+          .filter((param: Param): boolean => param.name && param.displayName)
+          .map((param: Param, index: number): React.Node => (
             <div key={index}>
               {param.type === 'bool' ? (
                 <FormControl className={classes.formControl}>
@@ -94,14 +99,6 @@ class ParamList extends React.Component {
     );
   }
 }
-
-ParamList.propTypes = {
-  classes: PropTypes.object.isRequired,
-  header: PropTypes.string.isRequired,
-  params: PropTypes.array.isRequired,
-  updateParams: PropTypes.func.isRequired,
-  tooltipText: PropTypes.string.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true
