@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -61,7 +61,7 @@ const styles = theme => ({
   }
 });
 
-const tooltips = {
+const tooltips: { [key: string]: string } = {
   assignment:
     'The Assignment Node assigns and stores values to a new variable that you can later in the diagram.',
   event:
@@ -270,7 +270,7 @@ class BuildDiagram extends React.Component<Props, State> {
     }
   }
 
-  addNode(info: string, data: {}) {
+  addNode(info: string, data: {}): void {
     const { type, points } = this.state;
     const node = this.selectNode(type, info, data);
     node.x = points.x;
@@ -279,7 +279,7 @@ class BuildDiagram extends React.Component<Props, State> {
     this.forceUpdate();
   }
 
-  render() {
+  render(): React.Node {
     const {
       classes,
       varList,

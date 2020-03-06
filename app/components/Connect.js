@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -10,8 +11,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
-
-const Web3 = require('web3');
+import Web3 from 'web3';
 
 const styles = theme => ({
   toolbar: {
@@ -43,7 +43,22 @@ const styles = theme => ({
   }
 });
 
-class Connect extends React.Component {
+type Props = {
+  classes: { [key: string]: string },
+  onclick: (Web3) => void
+};
+
+type State = {
+  connectionFailed: boolean,
+  protocol: string,
+  address: string,
+  port: string,
+  submitted: boolean
+};
+
+class Connect extends React.Component<Props, State> {
+  id: TimeoutID;
+
   constructor(...args) {
     super(...args);
     this.promiseTimeout = this.promiseTimeout.bind(this);
@@ -58,11 +73,9 @@ class Connect extends React.Component {
     submitted: false
   };
 
-  id;
-
-  promiseTimeout(ms, promise) {
+  promiseTimeout = (ms: number, promise: Promise<void>): Promise<?boolean> => {
     // Create a promise that rejects in <ms> milliseconds
-    const timeout = new Promise(() => {
+    const timeout: Promise<void> = new Promise((): void => {
       this.id = setTimeout(() => {
         clearTimeout(this.id);
         this.setState({
@@ -72,21 +85,21 @@ class Connect extends React.Component {
     });
     // Returns a race between our timeout and the passed in promise
     return Promise.race([promise, timeout]);
-  }
+  };
 
-  login() {
+  login = (): void => {
     const { onclick } = this.props;
     const { protocol, address, port } = this.state;
     this.setState({ submitted: true });
     if (!address || !port) {
       return;
     }
-    const web3 = new Web3(
+    const web3: Web3 = new Web3(
       new Web3.providers.HttpProvider(`${protocol}://${address}:${port}`)
     );
     this.promiseTimeout(
       1000,
-      web3.eth.net.isListening().then(res => {
+      web3.eth.net.isListening().then((res: boolean): null => {
         this.setState({
           connectionFailed: !res
         });
@@ -95,21 +108,21 @@ class Connect extends React.Component {
         return null;
       })
     );
-  }
+  };
 
-  handleKeyDown = e => {
+  handleKeyDown = (e: SyntheticKeyboardEvent<>): void => {
     if (e.key === 'Enter') {
       this.login();
     }
   };
 
-  changeProtocol = event => {
+  changeProtocol = (event: SyntheticInputEvent<HTMLInputElement>): void => {
     this.setState({
-      protocol: event.target.value
+      protocol: event.currentTarget.value
     });
   };
 
-  render() {
+  render(): React.Node {
     const { classes } = this.props;
     const { connectionFailed, protocol, address, submitted, port } = this.state;
 
@@ -154,7 +167,9 @@ class Connect extends React.Component {
               id="address"
               label="Blockchain Address"
               className={classes.formControl}
-              onChange={event => this.setState({ address: event.target.value })}
+              onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+                this.setState({ address: event.currentTarget.value })
+              }
               value={address}
               margin="normal"
               onKeyDown={this.handleKeyDown}
@@ -169,7 +184,9 @@ class Connect extends React.Component {
               id="port"
               label="Blockchain Port"
               className={classes.formControl}
-              onChange={event => this.setState({ port: event.target.value })}
+              onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+                this.setState({ port: event.target.value })
+              }
               value={port}
               margin="normal"
               onKeyDown={this.handleKeyDown}
@@ -190,11 +207,6 @@ class Connect extends React.Component {
     );
   }
 }
-
-Connect.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onclick: PropTypes.func.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

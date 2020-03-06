@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -18,11 +19,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import WifiIcon from '@material-ui/icons/Wifi';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { existsSync, readFile, writeFile } from 'fs';
+import Web3 from 'web3';
 import Connect from './Connect';
 import Settings from './Settings';
 import Build from './build/Build';
 
-const drawerWidth = 240;
+const drawerWidth: number = 240;
 
 const styles = theme => ({
   root: {
@@ -85,15 +87,32 @@ const styles = theme => ({
   }
 });
 
-const selection = {
-  CONNECT: 'connect',
-  SETTINGS: 'settings',
-  BUILD: 'build'
+const selection: { [key: string]: number } = {
+  CONNECT: 1,
+  SETTINGS: 2,
+  BUILD: 3
 };
 
-const settingsFile = './settings.json';
+const settingsFile: string = './settings.json';
 
-class MiniDrawer extends React.Component {
+type SettingsObj = {
+  bitsMode?: boolean,
+  indentation?: string
+};
+
+type Props = {
+  classes: { [key: string]: string },
+  theme: { direction: string }
+};
+
+type State = {
+  open: boolean,
+  selected: number,
+  connection: ?Web3,
+  settings: SettingsObj
+};
+
+class MiniDrawer extends React.Component<Props, State> {
   state = {
     open: false,
     selected: selection.CONNECT,
@@ -104,43 +123,48 @@ class MiniDrawer extends React.Component {
     }
   };
 
-  componentWillMount() {
+  componentWillMount(): void {
     if (existsSync(settingsFile)) {
-      readFile(settingsFile, (err, data) => {
+      readFile(settingsFile, (err: ?Error, data: Buffer) => {
         if (err) throw err;
-        const parsedData = JSON.parse(data);
-        this.setState({settings: {
-          bitsMode: parsedData.bitsMode,
-          indentation: parsedData.indentation || '    '
-        }});
+        if (!data) {
+          return;
+        }
+        const parsedData: SettingsObj = JSON.parse(data.toString());
+        this.setState({
+          settings: {
+            bitsMode: parsedData.bitsMode || false,
+            indentation: parsedData.indentation || '    '
+          }
+        });
       });
     }
   }
 
-  handleDrawerOpen = () => {
+  handleDrawerOpen = (): void => {
     this.setState({
       open: true
     });
   };
 
-  handleDrawerClose = () => {
+  handleDrawerClose = (): void => {
     this.setState({
       open: false
     });
   };
 
-  goToBuild = connection =>
+  goToBuild = (connection: Web3): void =>
     this.setState({
       selected: selection.BUILD,
       connection
     });
 
-  goToConnect = () =>
+  goToConnect = (): void =>
     this.setState({
       selected: selection.CONNECT
     });
 
-  selectShown = selected => {
+  selectShown = (selected: number): React.Node => {
     const { settings, connection } = this.state;
     switch (selected) {
       case selection.CONNECT:
@@ -149,12 +173,16 @@ class MiniDrawer extends React.Component {
         return (
           <Settings
             settings={settings}
-            changeSettings={newVal => {
-              const newSettings = {...settings, ...newVal};
-              writeFile(settingsFile, JSON.stringify(newSettings), err => {
-                this.setState({settings: newSettings});
-                if (err) throw err;
-              });
+            changeSettings={(newVal: SettingsObj) => {
+              const newSettings: SettingsObj = { ...settings, ...newVal };
+              writeFile(
+                settingsFile,
+                JSON.stringify(newSettings),
+                (err: ?Error): void => {
+                  this.setState({ settings: newSettings });
+                  if (err) throw err;
+                }
+              );
             }}
           />
         );
@@ -219,7 +247,7 @@ class MiniDrawer extends React.Component {
             <div>
               <ListItem
                 button
-                onClick={() => {
+                onClick={(): void => {
                   this.setState({
                     selected: selection.CONNECT
                   });
@@ -237,7 +265,7 @@ class MiniDrawer extends React.Component {
             <div>
               <ListItem
                 button
-                onClick={() => {
+                onClick={(): void => {
                   this.setState({
                     selected: selection.SETTINGS
                   });
@@ -256,11 +284,6 @@ class MiniDrawer extends React.Component {
     );
   }
 }
-
-MiniDrawer.propTypes = {
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true
