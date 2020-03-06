@@ -48,8 +48,8 @@ class Settings extends React.Component {
           aria-label="indent"
           name="indent"
           row
-          onChange={event =>
-            changeSettings({ indentation: event.target.value })
+          onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+            changeSettings({ indentation: event.currentTarget.value })
           }
         >
           <FormControlLabel
@@ -75,8 +75,8 @@ class Settings extends React.Component {
           control={
             <Switch
               checked={settings.bitsMode}
-              onChange={event =>
-                changeSettings({ bitsMode: event.target.checked })
+              onChange={(event: SyntheticInputEvent<HTMLInputElement>) =>
+                changeSettings({ bitsMode: event.currentTarget.checked })
               }
               value="bitsMode"
               color="primary"

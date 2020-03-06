@@ -62,7 +62,7 @@ class ParamList extends React.Component<Props> {
         </Tooltip>
         <br />
         {params
-          .filter((param: Param): boolean => param.name && param.displayName)
+          .filter((param: Param) => param.name && param.displayName)
           .map((param: Param, index: number): React.Node => (
             <div key={index}>
               {param.type === 'bool' ? (

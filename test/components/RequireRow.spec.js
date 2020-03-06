@@ -46,7 +46,7 @@ describe('RequireRow component', () => {
   it('should have correct onchange call on var1 change', () => {
     const { var1, onchange } = setup();
     var1.props().onChange({
-      target: {
+      currentTarget: {
         value: 'Test Int'
       }
     });
@@ -63,7 +63,7 @@ describe('RequireRow component', () => {
   it('should have correct onchange call on var2 change', () => {
     const { var2, onchange } = setup();
     var2.props().onChange({
-      target: {
+      currentTarget: {
         value: '100'
       }
     });
@@ -80,7 +80,7 @@ describe('RequireRow component', () => {
   it('should have correct onchange call on operator change', () => {
     const { operator, onchange } = setup();
     operator.props().onChange({
-      target: {
+      currentTarget: {
         value: '!='
       }
     });
@@ -97,7 +97,7 @@ describe('RequireRow component', () => {
   it('should have correct onchange call on msg change', () => {
     const { msg, onchange } = setup();
     msg.props().onChange({
-      target: {
+      currentTarget: {
         value: 'new msg'
       }
     });
