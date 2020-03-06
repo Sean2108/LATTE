@@ -23,6 +23,7 @@ import Web3 from 'web3';
 import Connect from './Connect';
 import Settings from './Settings';
 import Build from './build/Build';
+import type { SettingsObj } from '../types';
 
 const drawerWidth: number = 240;
 
@@ -94,11 +95,6 @@ const selection: { [key: string]: number } = {
 };
 
 const settingsFile: string = './settings.json';
-
-type SettingsObj = {
-  bitsMode?: boolean,
-  indentation?: string
-};
 
 type Props = {
   classes: { [key: string]: string },
