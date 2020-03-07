@@ -79,7 +79,7 @@ describe('VariableRow component', () => {
       const { intComponent, onchange } = intSetup();
       const variableName = intComponent.find(TextField);
       variableName.props().onChange({
-        target: {
+        currentTarget: {
           value: '   Test Test    '
         }
       });

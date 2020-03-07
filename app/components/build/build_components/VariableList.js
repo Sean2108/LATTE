@@ -1,11 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import VariableRow from './VariableRow';
+import type { VariableObj, Classes } from '../../../types';
 
 const styles = theme => ({
   paper: {
@@ -23,9 +23,25 @@ const styles = theme => ({
   }
 });
 
-class VariableList extends React.Component {
-  render() {
-    const { classes, header, updateVariables, vars, tooltipText, bitsMode } = this.props;
+type Props = {
+  classes: Classes,
+  header: string,
+  updateVariables: (Array<VariableObj>) => void,
+  vars: Array<VariableObj>,
+  tooltipText: string,
+  bitsMode: boolean
+};
+
+class VariableList extends React.Component<Props> {
+  render(): React.Node {
+    const {
+      classes,
+      header,
+      updateVariables,
+      vars,
+      tooltipText,
+      bitsMode
+    } = this.props;
 
     if (vars.length === 0) {
       vars.push({ name: '', displayName: '', type: 'uint', bits: '' });
@@ -33,17 +49,17 @@ class VariableList extends React.Component {
 
     return (
       <Paper className={classes.paper}>
-      <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
-        <Typography variant="title" noWrap>
-          {header}
-        </Typography>
-      </Tooltip>
-        {vars.map((element, index) => (
+        <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
+          <Typography variant="title" noWrap>
+            {header}
+          </Typography>
+        </Tooltip>
+        {vars.map((element: VariableObj, index: number): React.Node => (
           <VariableRow
             val={element}
             key={index}
-            updateVariables={val => {
-              const variables = [...vars];
+            updateVariables={(val: VariableObj) => {
+              const variables: Array<VariableObj> = [...vars];
               variables[index] = val;
               updateVariables(variables);
             }}
@@ -54,7 +70,7 @@ class VariableList extends React.Component {
           variant="contained"
           color="primary"
           className={classes.button}
-          onClick={() =>
+          onClick={(): void =>
             updateVariables([
               ...vars,
               { name: '', displayName: '', type: 'uint', bits: '' }
@@ -68,15 +84,6 @@ class VariableList extends React.Component {
     );
   }
 }
-
-VariableList.propTypes = {
-  classes: PropTypes.object.isRequired,
-  header: PropTypes.string.isRequired,
-  updateVariables: PropTypes.func.isRequired,
-  vars: PropTypes.array.isRequired,
-  tooltipText: PropTypes.string.isRequired,
-  bitsMode: PropTypes.bool.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

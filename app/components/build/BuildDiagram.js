@@ -28,7 +28,7 @@ import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
-import type { Classes } from '../../types';
+import type { StructLookupType, VariablesLookupType, Classes } from '../../types';
 
 const styles = theme => ({
   paper: {
@@ -87,12 +87,12 @@ type onParseFn = {
 
 type Props = {
   classes: Classes,
-  varList: {},
-  functionParams: {}, // eslint-disable-line react/no-unused-prop-types
-  events: {},
-  entities: {},
+  varList: VariablesLookupType,
+  functionParams: VariablesLookupType, // eslint-disable-line react/no-unused-prop-types
+  events: StructLookupType,
+  entities: StructLookupType,
   onParse: onParseFn => void, // eslint-disable-line react/no-unused-prop-types
-  onVariablesChange: ({}) => void,
+  onVariablesChange: (VariablesLookupType) => void,
   diagram: {},
   settings: { bitsMode: boolean, indentation: string },
   openDrawer: () => void,
@@ -152,7 +152,6 @@ class BuildDiagram extends React.Component<Props, State> {
 
   renderDiagram(): void {
     const { diagram, onVariablesChange, updateBuildError } = this.props;
-    // diagram: object, onVariablesChange: function, updateBuildError: function
     this.model = new DiagramModel();
     this.start = null;
     if (Object.entries(diagram).length > 0) {

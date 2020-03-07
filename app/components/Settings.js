@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { Radio, FormLabel, RadioGroup } from '@material-ui/core';
+import type {Classes, SettingsObj} from '../types';
 
 const styles = theme => ({
   toolbar: {
@@ -29,8 +29,14 @@ const styles = theme => ({
   }
 });
 
-class Settings extends React.Component {
-  render() {
+type Props = {
+  classes: Classes,
+  settings: SettingsObj,
+  changeSettings: (SettingsObj) => void
+};
+
+class Settings extends React.Component<Props> {
+  render(): React.Node {
     const { classes, settings, changeSettings } = this.props;
 
     return (
@@ -88,12 +94,6 @@ class Settings extends React.Component {
     );
   }
 }
-
-Settings.propTypes = {
-  classes: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired,
-  changeSettings: PropTypes.func.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

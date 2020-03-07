@@ -1,10 +1,17 @@
 // @flow
 
+export type Classes = { [key: string]: string };
+export type VariablesLookupType = { [key: string]: string };
+export type StructLookupType = { [key: string]: Array<VariableObj> };
+
+type VariableType = 'uint' | 'bool' | 'address payable' | 'string';
+
 export type Param = {
   name: ?string,
   displayName: ?string,
-  value: ?string,
-  type: string
+  value: string | void,
+  type: VariableType,
+  bits: ?(number | string)
 };
 
 export type SettingsObj = {
@@ -21,4 +28,9 @@ export type RequireObj = {
   requireMessage: string
 };
 
-export type Classes = { [key: string]: string };
+export type VariableObj = {
+  name: string,
+  displayName: string,
+  type: VariableType,
+  bits: ?(number | string)
+};
