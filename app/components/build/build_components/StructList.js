@@ -1,5 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -9,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import VariableList from './VariableList';
+import type { StructLookupType, VariableObj, Classes } from '../../../types';
 
 const styles = theme => ({
   container: {
@@ -44,16 +44,32 @@ const styles = theme => ({
   }
 });
 
-class StructList extends React.Component {
+type Props = {
+  classes: Classes,
+  header: 'Events' | 'Entities',
+  updateVariables: (StructLookupType) => void,
+  initialVars: StructLookupType,
+  tooltipText: string,
+  varListTooltipText: string,
+  bitsMode: boolean
+};
+
+type State = {
+  contents: string
+};
+
+class StructList extends React.Component<Props, State> {
   state = {
     contents: ''
   };
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value });
+  handleChange = (name: string) => (
+    event: SyntheticInputEvent<HTMLInputElement>
+  ): void => {
+    this.setState({ [name]: event.currentTarget.value });
   };
 
-  render() {
+  render(): React.Node {
     const {
       classes,
       header,
@@ -72,11 +88,11 @@ class StructList extends React.Component {
         </Tooltip>
         <br />
         <Grid container spacing={24}>
-          {Object.keys(initialVars).map(key => (
+          {Object.keys(initialVars).map((key: string): React.Node => (
             <Grid item xs={6} key={key}>
               <VariableList
                 header={key}
-                updateVariables={vars =>
+                updateVariables={(vars: Array<VariableObj>): void =>
                   updateVariables({ ...initialVars, [key]: vars })
                 }
                 vars={initialVars[key]}
@@ -100,8 +116,8 @@ class StructList extends React.Component {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => {
-              const contents = this.state.contents
+            onClick={(): void => {
+              const contents: string = this.state.contents
                 .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
                 .replace(/\s+/g, '');
               if (!contents || contents in initialVars) return;
@@ -120,16 +136,6 @@ class StructList extends React.Component {
     );
   }
 }
-
-StructList.propTypes = {
-  classes: PropTypes.object.isRequired,
-  header: PropTypes.string.isRequired,
-  updateVariables: PropTypes.func,
-  initialVars: PropTypes.object.isRequired,
-  tooltipText: PropTypes.string.isRequired,
-  varListTooltipText: PropTypes.string.isRequired,
-  bitsMode: PropTypes.bool.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

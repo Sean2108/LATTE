@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
@@ -7,6 +8,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import parseVariable from '../parsers/VariableParser';
+import type { RequireObj, Classes } from '../../../types';
 
 const styles = theme => ({
   formControl: {
@@ -20,10 +22,21 @@ const styles = theme => ({
   }
 });
 
-class RequireRow extends React.Component {
-  handleChange = name => event => {
+type Props = {
+  classes: Classes,
+  showMessage: boolean,
+  updateRequire: RequireObj => void,
+  variables: {},
+  structList: {},
+  require: RequireObj
+};
+
+class RequireRow extends React.Component<Props> {
+  handleChange = (name: string) => (
+    event: SyntheticInputEvent<HTMLInputElement>
+  ) => {
     const { require, variables, structList, updateRequire } = this.props;
-    const state = { ...require, [name]: event.target.value };
+    const state: RequireObj = { ...require, [name]: event.currentTarget.value };
     try {
       if (variables && structList) {
         state.var1 = parseVariable(
@@ -43,7 +56,7 @@ class RequireRow extends React.Component {
     updateRequire(state);
   };
 
-  render() {
+  render(): React.Node {
     const { classes, showMessage, require } = this.props;
     return (
       <div>
@@ -110,15 +123,6 @@ class RequireRow extends React.Component {
     );
   }
 }
-
-RequireRow.propTypes = {
-  classes: PropTypes.object.isRequired,
-  showMessage: PropTypes.bool,
-  updateRequire: PropTypes.func.isRequired,
-  variables: PropTypes.object,
-  structList: PropTypes.object,
-  require: PropTypes.object.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

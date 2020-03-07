@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -11,7 +12,9 @@ import RedoIcon from '@material-ui/icons/Redo';
 import {
   DiagramEngine,
   DiagramModel,
-  DiagramWidget
+  DiagramWidget,
+  DefaultPortModel,
+  NodeModel
 } from 'storm-react-diagrams';
 import TrayWidget from './diagram/TrayWidget';
 import TrayItemWidget from './diagram/TrayItemWidget';
@@ -24,6 +27,8 @@ import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultD
 import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
+import EditHistory from './build_utils/EditHistory';
+import type { StructLookupType, VariablesLookupType, Classes } from '../../types';
 
 const styles = theme => ({
   paper: {
@@ -51,35 +56,101 @@ const styles = theme => ({
     display: 'flex',
     'justify-content': 'space-between',
     'flex-basis': '200px'
+  },
+  inlineBlock: {
+    display: 'inline-block'
   }
 });
 
-class BuildDiagram extends React.Component {
+const tooltips: { [key: string]: string } = {
+  assignment:
+    'The Assignment Node assigns and stores values to a new variable that you can later in the diagram.',
+  event:
+    'The Event Node announces an event that has previously been defined in the Global State Tab.',
+  entity:
+    'The Entity Node creates a new entity based on the entity templates defined in the Global State Tab.',
+  transfer: 'The Transfer Node transfer Ether to an address.',
+  return:
+    'The Return Node returns a value to the external user and ends the function.',
+  conditional:
+    'The Conditional Node provides branching logic. Based on whether the defined condition is true or false, the execution of the function can take different paths.'
+};
+
+type NodeType = $Keys<typeof tooltips>;
+
+type onParseFn = {
+  tabsCode: string,
+  tabsReturn: string,
+  isView: string,
+  diagrams: {}
+};
+
+type Props = {
+  classes: Classes,
+  varList: VariablesLookupType,
+  functionParams: VariablesLookupType, // eslint-disable-line react/no-unused-prop-types
+  events: StructLookupType,
+  entities: StructLookupType,
+  onParse: onParseFn => void, // eslint-disable-line react/no-unused-prop-types
+  onVariablesChange: (VariablesLookupType) => void,
+  diagram: {},
+  settings: { bitsMode: boolean, indentation: string },
+  openDrawer: () => void,
+  updateGasHistory: () => void, // eslint-disable-line react/no-unused-prop-types
+  updateBuildError: () => void,
+  isConstructor: boolean,
+  editHistory: EditHistory
+};
+
+type Point = {
+  x: ?number,
+  y: ?number
+};
+
+type State = {
+  open: boolean,
+  type: NodeType,
+  points: Point,
+  isProcessing: boolean
+};
+
+class BuildDiagram extends React.Component<Props, State> {
+  engine: DiagramEngine;
+
+  start: NodeModel;
+
+  model: DiagramModel;
+
+  buildParser: BuildParser;
+
   state = {
     open: false,
-    type: '',
-    points: null,
+    type: 'assignment',
+    points: { x: null, y: null },
     isProcessing: false
   };
 
-  componentWillMount() {
+  componentWillMount(): void {
     this.engine = new DiagramEngine();
     this.engine.installDefaultFactories();
     this.engine.registerPortFactory(
-      new SimplePortFactory('diamond', () => new DiamondPortModel())
+      new SimplePortFactory(
+        'diamond',
+        (): DiamondPortModel => new DiamondPortModel()
+      )
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());
     this.engine.registerNodeFactory(new DefaultDataNodeFactory());
     this.renderDiagram();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props): void {
     if (!objectEquals(this.props.diagram, prevProps.diagram)) {
       this.renderDiagram();
     }
   }
 
-  renderDiagram() {
+  renderDiagram(): void {
     const { diagram, onVariablesChange, updateBuildError } = this.props;
     this.model = new DiagramModel();
     this.start = null;
@@ -89,7 +160,7 @@ class BuildDiagram extends React.Component {
     }
     if (!this.start) {
       this.start = new DefaultDataNodeModel('Start', 'rgb(0,192,255)');
-      const startOut = this.start.addOutPort(' ');
+      const startOut: DefaultPortModel = this.start.addOutPort(' ');
       startOut.setMaximumLinks(1);
       this.start.setPosition(100, 100);
       this.model.addAll(this.start);
@@ -100,20 +171,12 @@ class BuildDiagram extends React.Component {
     this.engine.setDiagramModel(this.model);
   }
 
-  engine;
-
-  start;
-
-  model;
-
-  buildParser;
-
-  resetListener(props) {
+  resetListener(props: Props) {
     this.model.clearListeners();
     this.model.addListener({
-      linksUpdated: () => {
+      linksUpdated: (): void => {
         this.setState({ isProcessing: true });
-        setTimeout(() => {
+        setTimeout((): void => {
           this.parseNodes(props);
         }, 5000);
       }
@@ -130,7 +193,7 @@ class BuildDiagram extends React.Component {
     updateGasHistory
   }) {
     this.buildParser.reset(varList, functionParams, events, entities, settings);
-    const code = this.buildParser.parse(this.start);
+    const code: string = this.buildParser.parse(this.start);
     onParse({
       tabsCode: code,
       tabsReturn: this.buildParser.getReturnVar(),
@@ -141,8 +204,8 @@ class BuildDiagram extends React.Component {
     this.setState({ isProcessing: false });
   }
 
-  findStart() {
-    for (const node of Object.values(this.model.getNodes())) {
+  findStart(): NodeModel {
+    for (const node: NodeModel of Object.values(this.model.getNodes())) {
       if (node.name === 'Start') {
         return node;
       }
@@ -150,17 +213,21 @@ class BuildDiagram extends React.Component {
     return null;
   }
 
-  createDefaultNode(label, color, data, isReturn) {
-    const node = new DefaultDataNodeModel(label, color, data);
+  createDefaultNode(label: string, color: string, data: {}, isReturn: boolean) {
+    const node: DefaultDataNodeModel = new DefaultDataNodeModel(
+      label,
+      color,
+      data
+    );
     node.addInPort(' ');
     if (!isReturn) {
-      const outPort = node.addOutPort(' ');
+      const outPort: DefaultPortModel = node.addOutPort(' ');
       outPort.setMaximumLinks(1);
     }
     return node;
   }
 
-  selectNode(type, desc, data) {
+  selectNode(type: NodeType, desc: string, data: {}) {
     switch (type) {
       case 'event':
         return this.createDefaultNode(
@@ -203,7 +270,7 @@ class BuildDiagram extends React.Component {
     }
   }
 
-  addNode(info, data) {
+  addNode(info: string, data: {}): void {
     const { type, points } = this.state;
     const node = this.selectNode(type, info, data);
     node.x = points.x;
@@ -212,7 +279,7 @@ class BuildDiagram extends React.Component {
     this.forceUpdate();
   }
 
-  render() {
+  render(): React.Node {
     const {
       classes,
       varList,
@@ -227,44 +294,34 @@ class BuildDiagram extends React.Component {
     const { open, type } = this.state;
     this.resetListener(this.props);
 
-    const tooltips = {
-      assignment:
-        'The Assignment Node assigns and stores values to a new variable that you can later in the diagram.',
-      event:
-        'The Event Node announces an event that has previously been defined in the Global State Tab.',
-      entity:
-        'The Entity Node creates a new entity based on the entity templates defined in the Global State Tab.',
-      transfer: 'The Transfer Node transfer Ether to an address.',
-      return:
-        'The Return Node returns a value to the external user and ends the function.',
-      conditional:
-        'The Conditional Node provides branching logic. Based on whether the defined condition is true or false, the execution of the function can take different paths.'
-    };
-
     return (
       <Paper className={classes.paper}>
         <div className={classes.titleDiv}>
           <div className={classes.flexChild}>
             <div>
               <Tooltip title="Undo" classes={{ tooltip: classes.tooltipFont }}>
-                <IconButton
-                  onClick={() => editHistory.undo()}
-                  aria-label="undo"
-                  color="primary"
-                  disabled={!editHistory.canUndo()}
-                >
-                  <UndoIcon />
-                </IconButton>
+                <div className={classes.inlineBlock}>
+                  <IconButton
+                    onClick={() => editHistory.undo()}
+                    aria-label="undo"
+                    color="primary"
+                    disabled={!editHistory.canUndo()}
+                  >
+                    <UndoIcon />
+                  </IconButton>
+                </div>
               </Tooltip>
               <Tooltip title="Redo" classes={{ tooltip: classes.tooltipFont }}>
-                <IconButton
-                  onClick={() => editHistory.redo()}
-                  aria-label="redo"
-                  color="primary"
-                  disabled={!editHistory.canRedo()}
-                >
-                  <RedoIcon />
-                </IconButton>
+                <div className={classes.inlineBlock}>
+                  <IconButton
+                    onClick={() => editHistory.redo()}
+                    aria-label="redo"
+                    color="primary"
+                    disabled={!editHistory.canRedo()}
+                  >
+                    <RedoIcon />
+                  </IconButton>
+                </div>
               </Tooltip>
             </div>
             <CircularProgress
@@ -413,23 +470,5 @@ class BuildDiagram extends React.Component {
     );
   }
 }
-
-// eslint is unable to detect the destructured props in parseNodes
-BuildDiagram.propTypes = {
-  classes: PropTypes.object.isRequired,
-  varList: PropTypes.object.isRequired,
-  functionParams: PropTypes.object.isRequired, // eslint-disable-line react/no-unused-prop-types
-  events: PropTypes.object.isRequired,
-  entities: PropTypes.object.isRequired,
-  onParse: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
-  onVariablesChange: PropTypes.func.isRequired,
-  diagram: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired,
-  openDrawer: PropTypes.func.isRequired,
-  updateGasHistory: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
-  updateBuildError: PropTypes.func.isRequired,
-  isConstructor: PropTypes.bool.isRequired,
-  editHistory: PropTypes.object.isRequired
-};
 
 export default withStyles(styles, { withTheme: true })(BuildDiagram);

@@ -87,7 +87,7 @@ describe('StructList component', () => {
   it('should add new row when button is clicked if textbox is not empty', () => {
     const { rows, button, onchange, nameInput } = noRowSetup();
     expect(rows).toHaveLength(0);
-    nameInput.props().onChange({ target: { value: 'test struct name' } });
+    nameInput.props().onChange({ currentTarget: { value: 'test struct name' } });
     button.props().onClick();
     expect(onchange).toHaveBeenCalledWith({ TestStructName: [] });
   });
@@ -95,7 +95,7 @@ describe('StructList component', () => {
   it('should not add row if struct with same name already exists', () => {
     const { rows, button, onchange, nameInput } = threeRowSetup();
     expect(rows).toHaveLength(3);
-    nameInput.props().onChange({ target: { value: 'struct a' } });
+    nameInput.props().onChange({ currentTarget: { value: 'struct a' } });
     button.props().onClick();
     expect(onchange).not.toHaveBeenCalled();
   });

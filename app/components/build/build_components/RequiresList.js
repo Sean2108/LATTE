@@ -1,5 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -7,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import RequireRow from './RequireRow';
 import BuildParser from '../parsers/BuildParser';
+import {RequireObj, Classes} from '../../../types';
 
 const styles = theme => ({
   paper: {
@@ -24,10 +24,20 @@ const styles = theme => ({
   }
 });
 
-class RequiresList extends React.Component {
-  buildParser = new BuildParser(null);
+type Props = {
+  classes: Classes,
+  header: string,
+  vars: {},
+  onChangeRequire: (Array<RequireObj>) => void,
+  requires: Array<RequireObj>,
+  tooltipText: string,
+  entities: {}
+};
 
-  render() {
+class RequiresList extends React.Component<Props> {
+  buildParser: BuildParser = new BuildParser(null);
+
+  render(): React.Node {
     const {
       classes,
       header,
@@ -61,10 +71,10 @@ class RequiresList extends React.Component {
             require={element}
             key={index}
             showMessage
-            updateRequire={val => {
-              const variables = [...requires];
-              variables[index] = val;
-              onChangeRequire(variables);
+            updateRequire={(val: RequireObj): void => {
+              const requiresCopy: Array<RequireObj> = [...requires];
+              requiresCopy[index] = val;
+              onChangeRequire(requiresCopy);
             }}
             variables={vars}
             structList={entities}
@@ -74,7 +84,7 @@ class RequiresList extends React.Component {
           variant="contained"
           color="primary"
           className={classes.button}
-          onClick={() =>
+          onClick={(): void =>
             onChangeRequire([
               ...requires,
               {
@@ -95,16 +105,6 @@ class RequiresList extends React.Component {
     );
   }
 }
-
-RequiresList.propTypes = {
-  classes: PropTypes.object.isRequired,
-  header: PropTypes.string.isRequired,
-  vars: PropTypes.object.isRequired,
-  onChangeRequire: PropTypes.func.isRequired,
-  requires: PropTypes.array.isRequired,
-  tooltipText: PropTypes.string.isRequired,
-  entities: PropTypes.object.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true

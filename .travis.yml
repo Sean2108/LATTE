@@ -68,6 +68,7 @@ before_script:
 script:
   - yarn package
   - yarn lint
+  - yarn flow
   - yarn test
   # - yarn test-e2e
 
