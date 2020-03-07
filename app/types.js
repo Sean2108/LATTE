@@ -20,3 +20,5 @@ export type RequireObj = {
   displayVar2: string,
   requireMessage: string
 };
+
+export type Classes = { [key: string]: string };

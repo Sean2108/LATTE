@@ -8,7 +8,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import parseVariable from '../parsers/VariableParser';
-import type { RequireObj } from '../../../types';
+import type { RequireObj, Classes } from '../../../types';
 
 const styles = theme => ({
   formControl: {
@@ -23,7 +23,7 @@ const styles = theme => ({
 });
 
 type Props = {
-  classes: { [key: string]: string },
+  classes: Classes,
   showMessage: boolean,
   updateRequire: RequireObj => void,
   variables: {},
@@ -56,7 +56,7 @@ class RequireRow extends React.Component<Props> {
     updateRequire(state);
   };
 
-  render() {
+  render(): React.Node {
     const { classes, showMessage, require } = this.props;
     return (
       <div>

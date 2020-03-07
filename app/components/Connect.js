@@ -12,6 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 import Web3 from 'web3';
+import type { Classes } from '../types';
 
 const styles = theme => ({
   toolbar: {
@@ -44,8 +45,8 @@ const styles = theme => ({
 });
 
 type Props = {
-  classes: { [key: string]: string },
-  onclick: (Web3) => void
+  classes: Classes,
+  onclick: Web3 => void
 };
 
 type State = {

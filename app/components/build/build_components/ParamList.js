@@ -10,7 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import type { Param } from '../../../types';
+import type { Param, Classes } from '../../../types';
 
 const styles = theme => ({
   textField: {
@@ -35,7 +35,7 @@ const styles = theme => ({
 });
 
 type Props = {
-  classes: { [key: string]: string },
+  classes: Classes,
   header: string,
   params: Array<Param>,
   updateParams: (Array<Param>) => void,

@@ -28,6 +28,7 @@ import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
+import type { Classes } from '../../types';
 
 const styles = theme => ({
   paper: {
@@ -85,7 +86,7 @@ type onParseFn = {
 };
 
 type Props = {
-  classes: { [key: string]: string },
+  classes: Classes,
   varList: {},
   functionParams: {}, // eslint-disable-line react/no-unused-prop-types
   events: {},
