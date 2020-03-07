@@ -8,6 +8,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Web3Utils from './build_utils/Web3Utils';
 import CodeGenUtils from './build_utils/CodeGenUtils';
 import BuildOptionsPopover from './BuildOptionsPopover';
+import AsyncStatusButton from './build_components/AsyncStatusButton';
 
 const styles = theme => ({
   button: {
@@ -65,7 +66,8 @@ class BuildOptions extends React.Component {
       buildState,
       loadState,
       settings,
-      connection
+      connection,
+      loading
     } = this.props;
     const { anchorEl, dataOp, fileName, files, compileError } = this.state;
 
@@ -185,10 +187,9 @@ class BuildOptions extends React.Component {
           }`}
           classes={{ tooltip: classes.tooltipFont }}
         >
-          <Button
-            variant="contained"
-            color={showError ? 'secondary' : 'primary'}
-            className={classes.button}
+          <AsyncStatusButton
+            loading={loading}
+            success={!showError}
             onClick={() =>
               this.web3Utils.deploySmartContract(
                 buildState,
@@ -200,7 +201,7 @@ class BuildOptions extends React.Component {
             }
           >
             Deploy
-          </Button>
+          </AsyncStatusButton>
         </Tooltip>
       </div>
     );
@@ -213,7 +214,8 @@ BuildOptions.propTypes = {
   connection: PropTypes.object.isRequired,
   buildState: PropTypes.object.isRequired,
   loadState: PropTypes.func.isRequired,
-  settings: PropTypes.object.isRequired
+  settings: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, {

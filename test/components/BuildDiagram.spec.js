@@ -136,6 +136,7 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       updateBuildError={jest.fn()}
       isConstructor={false}
       editHistory={new EditHistory(1, jest.fn())}
+      updateLoading={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -184,7 +185,8 @@ describe('BuildDiagram component', () => {
     const { component } = setup(false, false);
     const {
       onParse,
-      updateGasHistory
+      updateGasHistory,
+      updateLoading
     } = component.props();
     const instance = component.dive().instance();
     const mockBuildParserInstance = BuildParser.mock.instances[0];
@@ -198,7 +200,8 @@ describe('BuildDiagram component', () => {
       entities: { d: 4 },
       settings: { bitsMode: true, indentation: '    ' },
       onParse,
-      updateGasHistory
+      updateGasHistory,
+      updateLoading
     });
     expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
       { a: 1 },
@@ -214,6 +217,7 @@ describe('BuildDiagram component', () => {
       diagrams: instance.model.serializeDiagram()
     });
     expect(updateGasHistory).toHaveBeenCalledTimes(1);
+    expect(updateLoading).toHaveBeenCalledWith(false);
   });
 
   it('parseNodes should pass correct callback to diamond port factory', () => {

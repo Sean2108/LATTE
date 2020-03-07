@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Button, IconButton, CircularProgress } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
@@ -16,6 +15,7 @@ import {
   DefaultPortModel,
   NodeModel
 } from 'storm-react-diagrams';
+import { Button, IconButton } from '@material-ui/core';
 import TrayWidget from './diagram/TrayWidget';
 import TrayItemWidget from './diagram/TrayItemWidget';
 import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
@@ -28,7 +28,11 @@ import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
-import type { StructLookupType, VariablesLookupType, Classes } from '../../types';
+import type {
+  StructLookupType,
+  VariablesLookupType,
+  Classes
+} from '../../types';
 
 const styles = theme => ({
   paper: {
@@ -92,14 +96,15 @@ type Props = {
   events: StructLookupType,
   entities: StructLookupType,
   onParse: onParseFn => void, // eslint-disable-line react/no-unused-prop-types
-  onVariablesChange: (VariablesLookupType) => void,
+  onVariablesChange: VariablesLookupType => void,
   diagram: {},
   settings: { bitsMode: boolean, indentation: string },
   openDrawer: () => void,
   updateGasHistory: () => void, // eslint-disable-line react/no-unused-prop-types
   updateBuildError: () => void,
   isConstructor: boolean,
-  editHistory: EditHistory
+  editHistory: EditHistory,
+  updateLoading: boolean => void // eslint-disable-line react/no-unused-prop-types
 };
 
 type Point = {
@@ -110,8 +115,7 @@ type Point = {
 type State = {
   open: boolean,
   type: NodeType,
-  points: Point,
-  isProcessing: boolean
+  points: Point
 };
 
 class BuildDiagram extends React.Component<Props, State> {
@@ -126,8 +130,7 @@ class BuildDiagram extends React.Component<Props, State> {
   state = {
     open: false,
     type: 'assignment',
-    points: { x: null, y: null },
-    isProcessing: false
+    points: { x: null, y: null }
   };
 
   componentWillMount(): void {
@@ -175,7 +178,7 @@ class BuildDiagram extends React.Component<Props, State> {
     this.model.clearListeners();
     this.model.addListener({
       linksUpdated: (): void => {
-        this.setState({ isProcessing: true });
+        props.updateLoading(true);
         setTimeout((): void => {
           this.parseNodes(props);
         }, 5000);
@@ -190,8 +193,9 @@ class BuildDiagram extends React.Component<Props, State> {
     entities,
     settings,
     onParse,
-    updateGasHistory
-  }) {
+    updateGasHistory,
+    updateLoading
+  }): void {
     this.buildParser.reset(varList, functionParams, events, entities, settings);
     const code: string = this.buildParser.parse(this.start);
     onParse({
@@ -201,7 +205,7 @@ class BuildDiagram extends React.Component<Props, State> {
       diagrams: this.model.serializeDiagram()
     });
     updateGasHistory();
-    this.setState({ isProcessing: false });
+    updateLoading(false);
   }
 
   findStart(): NodeModel {
@@ -213,7 +217,12 @@ class BuildDiagram extends React.Component<Props, State> {
     return null;
   }
 
-  createDefaultNode(label: string, color: string, data: {}, isReturn: boolean) {
+  createDefaultNode(
+    label: string,
+    color: string,
+    data: {},
+    isReturn: boolean
+  ): DefaultDataNodeModel {
     const node: DefaultDataNodeModel = new DefaultDataNodeModel(
       label,
       color,
@@ -227,7 +236,7 @@ class BuildDiagram extends React.Component<Props, State> {
     return node;
   }
 
-  selectNode(type: NodeType, desc: string, data: {}) {
+  selectNode(type: NodeType, desc: string, data: {}): NodeModel {
     switch (type) {
       case 'event':
         return this.createDefaultNode(
@@ -324,9 +333,6 @@ class BuildDiagram extends React.Component<Props, State> {
                 </div>
               </Tooltip>
             </div>
-            <CircularProgress
-              className={this.state.isProcessing ? null : classes.invis}
-            />
           </div>
           <Tooltip
             title="This is the main logic of the function, which will be executed when the checking phase has been successfully passed. Drag nodes from the left panel onto the diagram and connect them to create your logic for the function."

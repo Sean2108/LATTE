@@ -100,6 +100,7 @@ class BuildTabs extends React.Component {
       onTabsChange,
       buildState,
       settings,
+      updateLoading
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
     const updateBuildError = buildError => {
@@ -194,6 +195,7 @@ class BuildTabs extends React.Component {
                   updateBuildError={updateBuildError}
                   isConstructor={i === 0}
                   editHistory={this.editHistory}
+                  updateLoading={updateLoading}
                 />
               </TabContainer>
             )
@@ -264,7 +266,8 @@ BuildTabs.propTypes = {
   onTabsChange: PropTypes.func.isRequired,
   buildState: PropTypes.object.isRequired,
   settings: PropTypes.object.isRequired,
-  connection: PropTypes.object.isRequired
+  connection: PropTypes.object.isRequired,
+  updateLoading: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(BuildTabs);

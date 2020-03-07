@@ -65,7 +65,8 @@ class DefaultBuildTab extends React.Component {
       updateGasHistory,
       updateBuildError,
       isConstructor,
-      editHistory
+      editHistory,
+      updateLoading
     } = this.props;
     const { drawerOpen } = this.state;
     const variables = this.flattenParamsToObject(params, settings.bitsMode);
@@ -103,6 +104,7 @@ class DefaultBuildTab extends React.Component {
           updateBuildError={updateBuildError}
           isConstructor={isConstructor}
           editHistory={editHistory}
+          updateLoading={updateLoading}
         />
 
         <Drawer
@@ -139,7 +141,8 @@ DefaultBuildTab.propTypes = {
   updateGasHistory: PropTypes.func.isRequired,
   updateBuildError: PropTypes.func.isRequired,
   isConstructor: PropTypes.bool.isRequired,
-  editHistory: PropTypes.object.isRequired
+  editHistory: PropTypes.object.isRequired,
+  updateLoading: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(DefaultBuildTab);

@@ -5,13 +5,13 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import Button from '@material-ui/core/Button';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 import Web3 from 'web3';
+import AsyncStatusButton from './build/build_components/AsyncStatusButton';
 import type { Classes } from '../types';
 
 const styles = theme => ({
@@ -54,7 +54,8 @@ type State = {
   protocol: string,
   address: string,
   port: string,
-  submitted: boolean
+  submitted: boolean,
+  loading: boolean
 };
 
 class Connect extends React.Component<Props, State> {
@@ -71,16 +72,23 @@ class Connect extends React.Component<Props, State> {
     protocol: 'http',
     address: '',
     port: '',
-    submitted: false
+    submitted: false,
+    loading: false
   };
+
+  componentWillUnmount() {
+    clearTimeout(this.id);
+  }
 
   promiseTimeout = (ms: number, promise: Promise<void>): Promise<?boolean> => {
     // Create a promise that rejects in <ms> milliseconds
+    this.setState({ loading: true });
     const timeout: Promise<void> = new Promise((): void => {
       this.id = setTimeout(() => {
         clearTimeout(this.id);
         this.setState({
-          connectionFailed: true
+          connectionFailed: true,
+          loading: false
         });
       }, ms);
     });
@@ -93,6 +101,7 @@ class Connect extends React.Component<Props, State> {
     const { protocol, address, port } = this.state;
     this.setState({ submitted: true });
     if (!address || !port) {
+      this.setState({ connectionFailed: true });
       return;
     }
     const web3: Web3 = new Web3(
@@ -102,7 +111,8 @@ class Connect extends React.Component<Props, State> {
       1000,
       web3.eth.net.isListening().then((res: boolean): null => {
         this.setState({
-          connectionFailed: !res
+          connectionFailed: !res,
+          loading: false
         });
         clearTimeout(this.id);
         onclick(web3);
@@ -125,7 +135,14 @@ class Connect extends React.Component<Props, State> {
 
   render(): React.Node {
     const { classes } = this.props;
-    const { connectionFailed, protocol, address, submitted, port } = this.state;
+    const {
+      connectionFailed,
+      protocol,
+      address,
+      submitted,
+      port,
+      loading
+    } = this.state;
 
     return (
       <main align="center" className={classes.content}>
@@ -195,14 +212,13 @@ class Connect extends React.Component<Props, State> {
             />
           </div>
           <br />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
+          <AsyncStatusButton
+            success={!connectionFailed}
+            loading={loading}
             onClick={this.login}
           >
             Connect
-          </Button>
+          </AsyncStatusButton>
         </div>
       </main>
     );

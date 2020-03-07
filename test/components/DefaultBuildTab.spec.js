@@ -31,6 +31,7 @@ function setup(createComponentMount = true) {
       updateBuildError={jest.fn()}
       isConstructor={false}
       editHistory={new EditHistory(1)}
+      updateLoading={jest.fn()}
     />
   );
   const input = [
