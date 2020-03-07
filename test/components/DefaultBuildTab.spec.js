@@ -2,7 +2,7 @@ import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { createMount, createShallow } from '@material-ui/core/test-utils';
-import { Drawer } from '@material-ui/core';
+import { Drawer, Snackbar } from '@material-ui/core';
 import DefaultBuildTab from '../../app/components/build/DefaultBuildTab';
 import VariableList from '../../app/components/build/build_components/VariableList';
 import RequiresList from '../../app/components/build/build_components/RequiresList';
@@ -48,6 +48,7 @@ function setup(createComponentMount = true) {
   const requiresList = component.find(RequiresList);
   const buildDiagram = component.find(BuildDiagram);
   const drawer = component.find(Drawer);
+  const snackbar = component.find(Snackbar);
   return {
     component,
     innerComponent,
@@ -55,6 +56,7 @@ function setup(createComponentMount = true) {
     requiresList,
     buildDiagram,
     drawer,
+    snackbar,
     input
   };
 }
@@ -74,12 +76,14 @@ describe('DefaultBuildTab component', () => {
       variableList,
       requiresList,
       buildDiagram,
-      drawer
+      drawer,
+      snackbar
     } = setup();
     expect(variableList).toHaveLength(1);
     expect(requiresList).toHaveLength(1);
     expect(buildDiagram).toHaveLength(1);
     expect(drawer).toHaveLength(1);
+    expect(snackbar).toHaveLength(1);
     expect(innerComponent.state().drawerOpen).toEqual(false);
   });
 
@@ -89,6 +93,14 @@ describe('DefaultBuildTab component', () => {
     expect(innerComponent.state().drawerOpen).toEqual(true);
     drawer.props().onClose();
     expect(innerComponent.state().drawerOpen).toEqual(false);
+  });
+
+  it('snackbar should be able to open and close', () => {
+    const { innerComponent, buildDiagram, snackbar } = setup();
+    buildDiagram.props().showWarning('test warning');
+    expect(innerComponent.state().warning).toEqual('test warning');
+    snackbar.props().onClose();
+    expect(innerComponent.state().warning).toEqual('');
   });
 });
 

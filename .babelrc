@@ -24,7 +24,7 @@
           "flow-runtime",
           {
             "assert": false,
-            "annotate": true
+            "annotate": false
           }
         ]
       ]

@@ -8,6 +8,8 @@ import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
 import BuildParser from '../../app/components/build/parsers/BuildParser';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
+import DefaultDataPortModel from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataPortModel';
+import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 
 jest.mock('../../app/components/build/parsers/BuildParser');
 
@@ -137,6 +139,7 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       isConstructor={false}
       editHistory={new EditHistory(1, jest.fn())}
       updateLoading={jest.fn()}
+      showWarning={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -155,10 +158,7 @@ describe('BuildDiagram component', () => {
 
   it('resetListener should remove and add listeners', () => {
     const { component } = setup(false, false);
-    const {
-      onParse,
-      updateGasHistory
-    } = component.props();
+    const { onParse, updateGasHistory } = component.props();
     const instance = component.dive().instance();
     // test if clearListener is being called
     instance.model.addListener({ a: jest.fn() });
@@ -183,11 +183,7 @@ describe('BuildDiagram component', () => {
 
   it('parseNodes should reset buildParser and call update functions', () => {
     const { component } = setup(false, false);
-    const {
-      onParse,
-      updateGasHistory,
-      updateLoading
-    } = component.props();
+    const { onParse, updateGasHistory, updateLoading } = component.props();
     const instance = component.dive().instance();
     const mockBuildParserInstance = BuildParser.mock.instances[0];
     mockBuildParserInstance.parse.mockReturnValueOnce('the code');
@@ -414,12 +410,12 @@ describe('BuildDiagram component', () => {
         outPortTrue: expect.objectContaining({
           name: 'bottom',
           position: 'bottom',
-          in: true
+          in: false
         }),
         outPortFalse: expect.objectContaining({
           name: 'right',
           position: 'right',
-          in: true
+          in: false
         })
       })
     );
@@ -436,5 +432,103 @@ describe('BuildDiagram component', () => {
       preventDefault
     });
     expect(preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  describe('onLinksUpdated function', () => {
+    it('should not pass when source and target default ports are both in ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DefaultDataPortModel(true, '');
+      const targetPort = new DefaultDataPortModel(true, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).toHaveBeenCalledTimes(1);
+      expect(updateLoading).toHaveBeenCalledWith(false);
+      expect(setTimeout).not.toHaveBeenCalled();
+    });
+
+    it('should not pass when source and target diamond ports are both in ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DiamondPortModel('top', true, '');
+      const targetPort = new DiamondPortModel('left', true, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).toHaveBeenCalledTimes(1);
+      expect(updateLoading).toHaveBeenCalledWith(false);
+      expect(setTimeout).not.toHaveBeenCalled();
+    });
+
+    it('should not pass when source diamond and target default ports are both out ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DiamondPortModel('top', false, '');
+      const targetPort = new DefaultDataPortModel(false, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).toHaveBeenCalledTimes(1);
+      expect(updateLoading).toHaveBeenCalledWith(false);
+      expect(setTimeout).not.toHaveBeenCalled();
+    });
+
+    it('should not pass when source default and target diamond ports are both out ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DefaultDataPortModel(false, '');
+      const targetPort = new DiamondPortModel('top', false, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).toHaveBeenCalledTimes(1);
+      expect(updateLoading).toHaveBeenCalledWith(false);
+      expect(setTimeout).not.toHaveBeenCalled();
+    });
+
+    it('should pass when source default and target diamond ports are opposite ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DefaultDataPortModel(true, '');
+      const targetPort = new DiamondPortModel('top', false, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).not.toHaveBeenCalled();
+      expect(updateLoading).toHaveBeenCalledWith(true);
+      expect(setTimeout).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Number)
+      );
+    });
+
+    it('should pass when source diamond and target default ports are opposite ports', () => {
+      jest.useFakeTimers();
+      const { component } = setup(false, false);
+      const { showWarning, updateLoading } = component.props();
+      const instance = component.dive().instance();
+      const sourcePort = new DiamondPortModel('top', true, '');
+      const targetPort = new DefaultDataPortModel(false, '');
+      instance.onLinksUpdated({
+        link: { sourcePort, targetPort }
+      });
+      expect(showWarning).not.toHaveBeenCalled();
+      expect(updateLoading).toHaveBeenCalledWith(true);
+      expect(setTimeout).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Number)
+      );
+    });
   });
 });

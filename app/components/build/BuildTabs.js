@@ -93,6 +93,18 @@ class BuildTabs extends React.Component {
     }
   };
 
+  onParse = (newState, i) => {
+    const { buildState, onTabsChange } = this.props;
+    const parsedState = Object.entries(newState)
+      .map(([key, value]) => {
+        const newVal = [...buildState[key]];
+        newVal[i] = value;
+        return { [key]: newVal };
+      })
+      .reduce((result, current) => ({ ...result, ...current }), {});
+    onTabsChange(parsedState, this.editHistory.addNode);
+  };
+
   render() {
     const {
       classes,
@@ -161,13 +173,7 @@ class BuildTabs extends React.Component {
                   varList={variables}
                   events={buildState.events}
                   entities={buildState.entities}
-                  onParse={newState => {
-                    const newBuildState = {...buildState};
-                    for (const key of ['tabsCode', 'tabsReturn', 'isView', 'diagrams']) {
-                      newBuildState[key][i] = newState[key];
-                    }
-                    onTabsChange(newBuildState, (state) => this.editHistory.addNode(state));
-                  }}
+                  onParse={newState => this.onParse(newState, i)}
                   onChangeParams={newParams =>
                     this.handleChangeParams(newParams, i)
                   }

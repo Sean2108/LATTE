@@ -2,20 +2,37 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Drawer from '@material-ui/core/Drawer';
+import { Snackbar, SnackbarContent } from '@material-ui/core';
+import WarningIcon from '@material-ui/icons/Warning';
+import { amber } from '@material-ui/core/colors';
 import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './build_components/RequiresList';
 import GasDrawer from './diagram/GasDrawer';
 
-const styles = {
+const styles = theme => ({
   drawer: {
     width: '40%'
+  },
+  warning: {
+    backgroundColor: amber[700],
+    margin: theme.spacing.unit
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing.unit
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center'
   }
-};
+});
 
 class DefaultBuildTab extends React.Component {
   state = {
-    drawerOpen: false
+    drawerOpen: false,
+    warning: ''
   };
 
   componentWillMount() {
@@ -47,6 +64,8 @@ class DefaultBuildTab extends React.Component {
 
   closeDrawer = () => this.setState({ drawerOpen: false });
 
+  hideWarning = () => this.setState({ warning: '' });
+
   render() {
     const {
       classes,
@@ -68,13 +87,13 @@ class DefaultBuildTab extends React.Component {
       editHistory,
       updateLoading
     } = this.props;
-    const { drawerOpen } = this.state;
+    const { drawerOpen, warning } = this.state;
     const variables = this.flattenParamsToObject(params, settings.bitsMode);
     return (
       <div>
         <VariableList
           header="Function Inputs"
-          updateVariables={vars => onChangeParams(vars)}
+          updateVariables={onChangeParams}
           vars={params}
           tooltipText="These are the names and types of information that will be provided to this function when an external user attempts to use it. This information can be used in the Checking and Action phases below."
           bitsMode={settings.bitsMode}
@@ -105,6 +124,9 @@ class DefaultBuildTab extends React.Component {
           isConstructor={isConstructor}
           editHistory={editHistory}
           updateLoading={updateLoading}
+          showWarning={(newWarning: string) =>
+            this.setState({ warning: newWarning })
+          }
         />
 
         <Drawer
@@ -120,6 +142,21 @@ class DefaultBuildTab extends React.Component {
             <GasDrawer history={gasHistory} />
           </div>
         </Drawer>
+        <Snackbar
+          open={!!warning}
+          autoHideDuration={10000}
+          onClose={this.hideWarning}
+        >
+          <SnackbarContent
+            className={classes.warning}
+            message={
+              <span className={classes.message}>
+                <WarningIcon />
+                {warning}
+              </span>
+            }
+          />
+        </Snackbar>
       </div>
     );
   }
@@ -145,4 +182,4 @@ DefaultBuildTab.propTypes = {
   updateLoading: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(DefaultBuildTab);
+export default withStyles(styles, { withTheme: true })(DefaultBuildTab);

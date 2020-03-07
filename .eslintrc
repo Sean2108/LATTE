@@ -9,9 +9,6 @@
     "browser": true,
     "node": true
   },
-  "globals": {
-    "_": true
-  },
   "rules": {
     "arrow-parens": ["off"],
     "class-methods-use-this": "off",

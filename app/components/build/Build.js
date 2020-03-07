@@ -48,7 +48,6 @@ class Build extends React.Component {
 
   render() {
     const { classes, onback, connection, settings } = this.props;
-
     const { variables } = this.state.buildState;
 
     return (
@@ -60,7 +59,9 @@ class Build extends React.Component {
               variables={variables}
               onTabsChange={(buildState, callback = () => {}) =>
                 this.setState(
-                  prevState => ({ ...prevState, ...buildState }),
+                  prevState => ({
+                    buildState: { ...prevState.buildState, ...buildState }
+                  }),
                   () => callback(this.state.buildState)
                 )
               }

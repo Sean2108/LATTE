@@ -1,25 +1,28 @@
+// @flow
+
 import * as React from 'react';
-import { PortWidget, DefaultPortLabel } from 'storm-react-diagrams';
+import { PortWidget } from 'storm-react-diagrams';
 import DiamondNodeModel from './DiamondNodeModel';
+import DiamondPortLabel from './DiamondPortLabelWidget';
 
-export interface DiamonNodeWidgetProps {
+type DiamondNodeWidgetProps = {
   node: DiamondNodeModel,
-  size?: number,
+  size: number,
   text?: string
-}
+};
 
-export interface DiamonNodeWidgetState {}
+type DiamondNodeWidgetState = {};
 
-export default class DiamonNodeWidget extends React.Component<
-  DiamonNodeWidgetProps,
-  DiamonNodeWidgetState
+export default class DiamondNodeWidget extends React.Component<
+  DiamondNodeWidgetProps,
+  DiamondNodeWidgetState
 > {
-  constructor(props: DiamonNodeWidgetProps) {
+  constructor(props: DiamondNodeWidgetProps) {
     super(props);
     this.state = {};
   }
 
-  render() {
+  render(): React.Node {
     const { size, text, node } = this.props;
     return (
       <div
@@ -33,7 +36,8 @@ export default class DiamonNodeWidget extends React.Component<
         <svg
           width={size}
           height={size}
-          dangerouslySetInnerHTML={{ // eslint-disable-line react/no-danger
+          dangerouslySetInnerHTML={{
+            // eslint-disable-line react/no-danger
             __html:
               `
           <g id="Layer_1">
@@ -96,7 +100,7 @@ export default class DiamonNodeWidget extends React.Component<
             top: size / 2 - 8
           }}
         >
-          <DefaultPortLabel
+          <DiamondPortLabel
             name="right"
             node={node}
             model={node.outPortFalse}
@@ -110,7 +114,7 @@ export default class DiamonNodeWidget extends React.Component<
             top: size - 8
           }}
         >
-          <DefaultPortLabel
+          <DiamondPortLabel
             name="bottom"
             node={node}
             model={node.outPortTrue}

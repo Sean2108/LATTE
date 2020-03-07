@@ -1,9 +1,10 @@
+import * as _ from 'lodash';
 import {
   NodeModel,
   NodeModelListener,
-  Toolkit,
-  DefaultPortModel
+  Toolkit
 } from 'storm-react-diagrams';
+import DefaultDataPortModel from './DefaultDataPortModel';
 
 export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
   name;
@@ -22,11 +23,11 @@ export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
   }
 
   addInPort(label) {
-    return this.addPort(new DefaultPortModel(true, Toolkit.UID(), label));
+    return this.addPort(new DefaultDataPortModel(true, Toolkit.UID(), label));
   }
 
   addOutPort(label) {
-    return this.addPort(new DefaultPortModel(false, Toolkit.UID(), label));
+    return this.addPort(new DefaultDataPortModel(false, Toolkit.UID(), label));
   }
 
   deSerialize(object, engine) {

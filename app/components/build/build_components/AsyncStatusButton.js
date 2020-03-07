@@ -40,7 +40,8 @@ type Props = {
   classes: Classes,
   loading: boolean,
   success: boolean,
-  onClick: () => void
+  onClick: () => void,
+  children: string
 };
 
 class AsyncStatusButton extends React.Component<Props> {

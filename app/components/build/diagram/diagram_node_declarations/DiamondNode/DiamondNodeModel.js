@@ -1,31 +1,34 @@
+// @flow
+
+import * as _ from 'lodash';
 import * as React from 'react';
 import { NodeModel, DiagramEngine } from 'storm-react-diagrams';
 import DiamondPortModel from './DiamondPortModel';
 
 export default class DiamondNodeModel extends NodeModel {
-  outPortTrue;
+  outPortTrue: DiamondPortModel;
 
-  outPortFalse;
+  outPortFalse: DiamondPortModel;
 
-  name;
+  name: string;
   
-  data;
+  data: {};
 
-  constructor(message, data = {}) {
+  constructor(message: string, data: {} = {}) {
     super('diamond', message);
     this.name = message;
     this.data = data;
-    this.addPort(new DiamondPortModel('top', false, ''));
-    this.addPort(new DiamondPortModel('left', false, ''));
+    this.addPort(new DiamondPortModel('top', true, ''));
+    this.addPort(new DiamondPortModel('left', true, ''));
     this.outPortTrue = this.addPort(
-      new DiamondPortModel('bottom', true, <font color="white">True</font>)
+      new DiamondPortModel('bottom', false, <font color="white">True</font>)
     );
     this.outPortFalse = this.addPort(
-      new DiamondPortModel('right', true, <font color="white">False</font>)
+      new DiamondPortModel('right', false, <font color="white">False</font>)
     );
   }
 
-  deSerialize(object, engine: DiagramEngine) {
+  deSerialize(object: {name: string, data: {}}, engine: DiagramEngine): void {
     super.deSerialize(object, engine);
     this.name = object.name;
     this.data = object.data;
@@ -35,7 +38,7 @@ export default class DiamondNodeModel extends NodeModel {
     this.outPortFalse.label = <font color="white">False</font>;
   }
 
-  serialize() {
+  serialize(): {} {
     return _.merge(super.serialize(), {
       name: this.name,
       data: this.data

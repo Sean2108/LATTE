@@ -13,7 +13,9 @@ import {
   DiagramModel,
   DiagramWidget,
   DefaultPortModel,
-  NodeModel
+  NodeModel,
+  PointModel,
+  PortModel
 } from 'storm-react-diagrams';
 import { Button, IconButton } from '@material-ui/core';
 import TrayWidget from './diagram/TrayWidget';
@@ -104,18 +106,14 @@ type Props = {
   updateBuildError: () => void,
   isConstructor: boolean,
   editHistory: EditHistory,
-  updateLoading: boolean => void // eslint-disable-line react/no-unused-prop-types
-};
-
-type Point = {
-  x: ?number,
-  y: ?number
+  updateLoading: boolean => void, // eslint-disable-line react/no-unused-prop-types
+  showWarning: string => void
 };
 
 type State = {
   open: boolean,
   type: NodeType,
-  points: Point
+  points: PointModel
 };
 
 class BuildDiagram extends React.Component<Props, State> {
@@ -169,22 +167,33 @@ class BuildDiagram extends React.Component<Props, State> {
       this.model.addAll(this.start);
     }
     this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
-    this.resetListener(this.props);
+    this.resetListener();
 
     this.engine.setDiagramModel(this.model);
   }
 
-  resetListener(props: Props) {
+  resetListener() {
     this.model.clearListeners();
     this.model.addListener({
-      linksUpdated: (): void => {
-        props.updateLoading(true);
-        setTimeout((): void => {
-          this.parseNodes(props);
-        }, 5000);
-      }
+      linksUpdated: this.onLinksUpdated
     });
   }
+
+  onLinksUpdated = (event: {
+    link: { sourcePort: PortModel, targetPort: PortModel }
+  }): void => {
+    const { showWarning, updateLoading } = this.props;
+    const { sourcePort, targetPort } = event.link;
+    if (sourcePort && targetPort && !sourcePort.canLinkToPort(targetPort)) {
+      showWarning(
+        'Invalid link - you should connect an incoming port to an outgoing port! Conditional nodes: top and left ports are incoming, bottom and right are outgoing. Other nodes: left port is incoming, right is outgoing.'
+      );
+      updateLoading(false);
+      return;
+    }
+    updateLoading(true);
+    setTimeout((): void => this.parseNodes(this.props), 5000);
+  };
 
   parseNodes({
     varList,
@@ -301,7 +310,7 @@ class BuildDiagram extends React.Component<Props, State> {
     } = this.props;
 
     const { open, type } = this.state;
-    this.resetListener(this.props);
+    this.resetListener();
 
     return (
       <Paper className={classes.paper}>
@@ -311,7 +320,7 @@ class BuildDiagram extends React.Component<Props, State> {
               <Tooltip title="Undo" classes={{ tooltip: classes.tooltipFont }}>
                 <div className={classes.inlineBlock}>
                   <IconButton
-                    onClick={() => editHistory.undo()}
+                    onClick={editHistory.undo}
                     aria-label="undo"
                     color="primary"
                     disabled={!editHistory.canUndo()}
@@ -323,7 +332,7 @@ class BuildDiagram extends React.Component<Props, State> {
               <Tooltip title="Redo" classes={{ tooltip: classes.tooltipFont }}>
                 <div className={classes.inlineBlock}>
                   <IconButton
-                    onClick={() => editHistory.redo()}
+                    onClick={editHistory.redo}
                     aria-label="redo"
                     color="primary"
                     disabled={!editHistory.canRedo()}

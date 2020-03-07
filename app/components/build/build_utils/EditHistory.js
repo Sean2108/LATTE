@@ -18,7 +18,7 @@ export default class EditHistory {
     this.updateState = updateState;
   }
 
-  addNode(data) {
+  addNode = (data) => {
     const next = new EditNode(data, this.current);
     this.current.next = next;
     this.current = next;
@@ -30,21 +30,17 @@ export default class EditHistory {
     }
   }
 
-  canUndo() {
-    return this.current.prev;
-  }
+  canUndo = () => this.current.prev;
 
-  canRedo() {
-    return this.current.next;
-  }
+  canRedo = () => this.current.next;
 
-  undo() {
+  undo = () => {
     this.current = this.current.prev;
     this.length -= 1;
     this.updateState(this.current.data);
   }
 
-  redo() {
+  redo = () => {
     this.current = this.current.next;
     this.length += 1;
     this.updateState(this.current.data);

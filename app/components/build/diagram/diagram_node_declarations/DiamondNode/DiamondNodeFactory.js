@@ -1,6 +1,6 @@
 import * as SRD from 'storm-react-diagrams';
 import * as React from 'react';
-import DiamonNodeWidget from './DiamondNodeWidget';
+import DiamondNodeWidget from './DiamondNodeWidget';
 import DiamondNodeModel from './DiamondNodeModel';
 
 export default class DiamondNodeFactory extends SRD.AbstractNodeFactory {
@@ -9,7 +9,7 @@ export default class DiamondNodeFactory extends SRD.AbstractNodeFactory {
   }
 
   generateReactWidget(diagramEngine, node) {
-    return <DiamonNodeWidget node={node} size={150} text={node.id} />;
+    return <DiamondNodeWidget node={node} size={150} text={node.id} />;
   }
 
   getNewInstance() {

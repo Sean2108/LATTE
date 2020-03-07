@@ -1,14 +1,11 @@
 import * as _ from 'lodash';
-import {
-  PortModel,
-  DefaultLinkModel
-} from 'storm-react-diagrams';
+import { PortModel, DefaultLinkModel } from 'storm-react-diagrams';
 
 export default class DiamondPortModel extends PortModel {
   in;
 
   position;
-  
+
   label;
 
   constructor(pos, isInput, label) {
@@ -34,10 +31,7 @@ export default class DiamondPortModel extends PortModel {
   }
 
   canLinkToPort(port) {
-    if (port instanceof DiamondPortModel) {
-      return this.in !== port.in;
-    }
-    return true;
+    return this.in !== port.in;
   }
 
   createLinkModel() {
