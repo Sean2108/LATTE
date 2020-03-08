@@ -74,7 +74,7 @@ class Build extends React.Component<Props, State> {
               variables={variables}
               onTabsChange={(
                 buildState: {},
-                callback: ({}) => void = (buildState: {}) => {}
+                callback: ({}) => void = () => {}
               ): void =>
                 this.setState(
                   prevState => ({

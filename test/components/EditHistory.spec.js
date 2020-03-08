@@ -21,7 +21,7 @@ describe('EditHistory class', () => {
   it('should have 2 nodes when addNode is called', () => {
     const { editHistory } = setup();
     editHistory.addNode({ item: 2 });
-    expect(editHistory.head.data).toEqual(1);
+    expect(editHistory.head.data).toEqual({ item: 1 });
     expect(editHistory.current.data).toEqual({ item: 2 });
     expect(editHistory.head.next).toBe(editHistory.current);
     expect(editHistory.current.next).toBe(null);
@@ -32,7 +32,7 @@ describe('EditHistory class', () => {
 
   it('should not add node if the new data is the same as the current node', () => {
     const { editHistory } = setup();
-    editHistory.addNode({item: 1});
+    editHistory.addNode({ item: 1 });
     expect(editHistory.head.data).toEqual({ item: 1 });
     expect(editHistory.current.data).toEqual({ item: 1 });
     expect(editHistory.head.next).toBe(null);
@@ -61,7 +61,7 @@ describe('EditHistory class', () => {
 
   it('should be at the same node after undoing and redoing', () => {
     const { editHistory, callback } = setup();
-    editHistory.addNode({item: 2});
+    editHistory.addNode({ item: 2 });
     editHistory.undo();
     expect(callback).toHaveBeenCalledWith({ item: 1 });
     expect(editHistory.canUndo()).toBeFalsy();
