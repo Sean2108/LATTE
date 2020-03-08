@@ -137,7 +137,7 @@ class BuildDiagram extends React.Component<Props, State> {
     this.engine.registerPortFactory(
       new SimplePortFactory(
         'diamond',
-        (): DiamondPortModel => new DiamondPortModel()
+        (): DiamondPortModel => new DiamondPortModel('', true, '')
       )
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());

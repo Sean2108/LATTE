@@ -1,3 +1,5 @@
+// @flow
+
 import * as SRD from 'storm-react-diagrams';
 import * as React from 'react';
 import DiamondNodeWidget from './DiamondNodeWidget';
@@ -8,11 +10,14 @@ export default class DiamondNodeFactory extends SRD.AbstractNodeFactory {
     super('diamond');
   }
 
-  generateReactWidget(diagramEngine, node) {
+  generateReactWidget(
+    diagramEngine: SRD.DiagramEngine,
+    node: SRD.NodeModel
+  ): React.Node {
     return <DiamondNodeWidget node={node} size={150} text={node.id} />;
   }
 
-  getNewInstance() {
-    return new DiamondNodeModel();
+  getNewInstance(): DiamondNodeModel {
+    return new DiamondNodeModel('');
   }
 }

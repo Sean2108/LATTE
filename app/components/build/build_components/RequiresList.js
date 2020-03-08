@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import RequireRow from './RequireRow';
 import BuildParser from '../parsers/BuildParser';
-import {RequireObj, Classes} from '../../../types';
+import { RequireObj, Classes } from '../../../types';
 
 const styles = theme => ({
   paper: {
