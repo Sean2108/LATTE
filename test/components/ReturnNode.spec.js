@@ -47,7 +47,7 @@ describe('ReturnNode component', () => {
   it('should call submit when button is clicked and field is cleared', () => {
     const { textField, button, onchange, close } = setup();
     textField.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
@@ -62,7 +62,7 @@ describe('ReturnNode component', () => {
   it('should call submit when button is clicked and field is not empty', () => {
     const { textField, button, onchange, close } = setup();
     textField.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testReturn'
       }
     });
@@ -77,7 +77,7 @@ describe('ReturnNode component', () => {
   it('should not call submit when close button is clicked', () => {
     const { textField, closeButton, onchange, close } = setup();
     textField.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testReturn'
       }
     });

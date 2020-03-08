@@ -47,7 +47,7 @@ describe('AssignmentNode component', () => {
   it('should call submit when button is clicked and fields are populated', () => {
     const { assignedTo, operator, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testVar'
       }
     });
@@ -57,7 +57,7 @@ describe('AssignmentNode component', () => {
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testStr'
       }
     });
@@ -75,12 +75,12 @@ describe('AssignmentNode component', () => {
   it('should not call submit if assignedTo is empty', () => {
     const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testStr'
       }
     });
@@ -92,12 +92,12 @@ describe('AssignmentNode component', () => {
   it('should not call submit if value is empty', () => {
     const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testVar'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
@@ -109,12 +109,12 @@ describe('AssignmentNode component', () => {
   it('should not call submit if both fields are empty', () => {
     const { assignedTo, value, button, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
@@ -126,12 +126,12 @@ describe('AssignmentNode component', () => {
   it('should call submit with isMemory false when switch is toggled', () => {
     const { assignedTo, value, isMemory, button, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testVar'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testStr'
       }
     });
@@ -154,12 +154,12 @@ describe('AssignmentNode component', () => {
   it('should call not call submit when close button is clicked', () => {
     const { assignedTo, value, closeButton, onchange, close } = setup();
     assignedTo.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testVar'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: 'testStr'
       }
     });

@@ -40,12 +40,12 @@ describe('TransferNode component', () => {
   it('should call submit when button is clicked and field is populated', () => {
     const { address, value, button, onchange, close } = setup();
     address.props().onChange({
-      target: {
+      currentTarget: {
         value: 'an address'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: '6'
       }
     });
@@ -61,12 +61,12 @@ describe('TransferNode component', () => {
   it('should not call submit when address is empty', () => {
     const { address, value, button, onchange, close } = setup();
     address.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: '6'
       }
     });
@@ -78,12 +78,12 @@ describe('TransferNode component', () => {
   it('should not call submit when value is empty', () => {
     const { address, value, button, onchange, close } = setup();
     address.props().onChange({
-      target: {
+      currentTarget: {
         value: 'an address'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });
@@ -95,12 +95,12 @@ describe('TransferNode component', () => {
   it('should not call submit when close button is clicked', () => {
     const { address, value, closeButton, onchange, close } = setup();
     address.props().onChange({
-      target: {
+      currentTarget: {
         value: 'an address'
       }
     });
     value.props().onChange({
-      target: {
+      currentTarget: {
         value: ''
       }
     });

@@ -1,11 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
+import type { Classes } from '../../../../types';
 
 const styles = theme => ({
   paper: {
@@ -31,13 +33,24 @@ const styles = theme => ({
   }
 });
 
-class TransferNode extends React.Component {
+type Props = {
+  classes: Classes,
+  close: () => void,
+  submit: (string, State & { type: 'transfer' }) => void
+};
+
+type State = {
+  variableSelected: string,
+  value: string
+};
+
+class TransferNode extends React.Component<Props, State> {
   state = {
     variableSelected: '',
     value: ''
   };
 
-  render() {
+  render(): React.Node {
     const { classes, close, submit } = this.props;
 
     return (
@@ -47,8 +60,8 @@ class TransferNode extends React.Component {
             label="Transfer to"
             className={classes.textField}
             value={this.state.variableSelected}
-            onChange={event =>
-              this.setState({ variableSelected: event.target.value })
+            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+              this.setState({ variableSelected: event.currentTarget.value })
             }
             margin="none"
           />
@@ -59,7 +72,9 @@ class TransferNode extends React.Component {
             label="Value"
             className={classes.textField}
             value={this.state.value}
-            onChange={event => this.setState({ value: event.target.value })}
+            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+              this.setState({ value: event.currentTarget.value })
+            }
             margin="none"
           />
           <br />
@@ -79,12 +94,15 @@ class TransferNode extends React.Component {
               variant="contained"
               color="primary"
               className={classes.button}
-              onClick={() => {
+              onClick={(): void => {
                 if (!this.state.value || !this.state.variableSelected) {
                   return;
                 }
                 close();
-                submit(`${this.state.value} to ${this.state.variableSelected}`, {...this.state, type: 'transfer'});
+                submit(
+                  `${this.state.value} to ${this.state.variableSelected}`,
+                  { ...this.state, type: 'transfer' }
+                );
               }}
             >
               Done
@@ -96,11 +114,5 @@ class TransferNode extends React.Component {
     );
   }
 }
-
-TransferNode.propTypes = {
-  classes: PropTypes.object.isRequired,
-  close: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired
-};
 
 export default withStyles(styles, { withTheme: true })(TransferNode);
