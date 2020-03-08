@@ -43,6 +43,14 @@ export type VariableObj = {
   bits: ?(number | string)
 };
 
+export type ParserVariable = {
+  name: string,
+  type: string,
+  mapName?: string,
+  keyType?: string,
+  innerKeyType?: string
+};
+
 export type VariablesLookupType = { [key: string]: string | Mapping };
 export type StructLookupType = { [key: string]: Array<VariableObj> };
 

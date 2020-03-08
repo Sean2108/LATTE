@@ -69,7 +69,7 @@ const styles = theme => ({
 type Props = {
   classes: Classes,
   variables: VariablesLookupType,
-  onTabsChange: ({}, ?() => void) => void,
+  onTabsChange: ({}, ?({}) => void) => void,
   buildState: BuildState,
   settings: SettingsObj,
   connection: Web3,

@@ -98,6 +98,9 @@ class BuildOptions extends React.Component {
         indexOfEqualToken
       )}`;
     }
+    if (compileError.includes('Exceeds block gas limit')) {
+      return 'Block gas limit exceeded, please increase gas limit';
+    }
     return compileError;
   }
 
