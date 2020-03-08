@@ -1,6 +1,7 @@
-import React from 'react';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import Drawer from '@material-ui/core/Drawer';
 import { Snackbar, SnackbarContent } from '@material-ui/core';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -9,6 +10,16 @@ import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './build_components/RequiresList';
 import GasDrawer from './diagram/GasDrawer';
+import type {
+  VariablesLookupType,
+  StructLookupType,
+  onParseFn,
+  VariableObj,
+  RequireObj,
+  SettingsObj,
+  Classes
+} from '../../types';
+import EditHistory from './build_utils/EditHistory';
 
 const styles = theme => ({
   drawer: {
@@ -29,7 +40,35 @@ const styles = theme => ({
   }
 });
 
-class DefaultBuildTab extends React.Component {
+type Props = {
+  classes: Classes,
+  varList: VariablesLookupType,
+  events: StructLookupType,
+  entities: StructLookupType,
+  onParse: onParseFn => void,
+  onChangeParams: Array<VariableObj> => void,
+  onChangeRequire: Array<RequireObj> => void,
+  onVariablesChange: VariablesLookupType => void,
+  params: Array<VariableObj>,
+  requires: Array<RequireObj>,
+  diagram: {},
+  settings: SettingsObj,
+  gasHistory: Array<number>,
+  updateGasHistory: () => void,
+  updateBuildError: () => void,
+  isConstructor: boolean,
+  editHistory: EditHistory,
+  updateLoading: boolean => void
+};
+
+type State = {
+  drawerOpen: boolean,
+  warning: string
+};
+
+class DefaultBuildTab extends React.Component<Props, State> {
+  varList: VariablesLookupType;
+
   state = {
     drawerOpen: false,
     warning: ''
@@ -40,33 +79,37 @@ class DefaultBuildTab extends React.Component {
     this.varList = varList;
   }
 
-  varList;
-
-  flattenParamsToObject(params, bitsMode) {
+  flattenParamsToObject(params: Array<VariableObj>, bitsMode: boolean) {
     return params
-      .filter(element => element.name)
-      .reduce((resultParam, currentObject) => {
-        const result = resultParam;
-        if (bitsMode && currentObject.bits) {
-          if (currentObject.type === 'string') {
-            result[currentObject.name] = `bytes${currentObject.bits}`;
+      .filter((element: VariableObj): boolean => !!element.name)
+      .reduce(
+        (
+          resultParam: VariablesLookupType,
+          currentObject: VariableObj
+        ): VariablesLookupType => {
+          const result = resultParam;
+          if (bitsMode && currentObject.bits) {
+            if (currentObject.type === 'string') {
+              result[currentObject.name] = `bytes${currentObject.bits}`;
+            } else {
+              result[
+                currentObject.name
+              ] = `${currentObject.type}${currentObject.bits}`;
+            }
           } else {
-            result[
-              currentObject.name
-            ] = `${currentObject.type}${currentObject.bits}`;
+            result[currentObject.name] = currentObject.type;
           }
-        } else {
-          result[currentObject.name] = currentObject.type;
-        }
-        return result;
-      }, {});
+          return result;
+        },
+        {}
+      );
   }
 
-  closeDrawer = () => this.setState({ drawerOpen: false });
+  closeDrawer = (): void => this.setState({ drawerOpen: false });
 
-  hideWarning = () => this.setState({ warning: '' });
+  hideWarning = (): void => this.setState({ warning: '' });
 
-  render() {
+  render(): React.Node {
     const {
       classes,
       varList,
@@ -161,25 +204,5 @@ class DefaultBuildTab extends React.Component {
     );
   }
 }
-
-DefaultBuildTab.propTypes = {
-  varList: PropTypes.object.isRequired,
-  events: PropTypes.object.isRequired,
-  entities: PropTypes.object.isRequired,
-  onParse: PropTypes.func.isRequired,
-  onChangeParams: PropTypes.func.isRequired,
-  onChangeRequire: PropTypes.func.isRequired,
-  onVariablesChange: PropTypes.func.isRequired,
-  params: PropTypes.array.isRequired,
-  requires: PropTypes.array.isRequired,
-  diagram: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired,
-  gasHistory: PropTypes.array.isRequired,
-  updateGasHistory: PropTypes.func.isRequired,
-  updateBuildError: PropTypes.func.isRequired,
-  isConstructor: PropTypes.bool.isRequired,
-  editHistory: PropTypes.object.isRequired,
-  updateLoading: PropTypes.func.isRequired
-};
 
 export default withStyles(styles, { withTheme: true })(DefaultBuildTab);

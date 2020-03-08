@@ -1,4 +1,4 @@
-import { deepClone } from "./TypeCheckFormattingUtils";
+import { deepClone, objectEquals } from './TypeCheckFormattingUtils';
 
 const MAX_NODES = 10;
 
@@ -18,7 +18,10 @@ export default class EditHistory {
     this.updateState = updateState;
   }
 
-  addNode = (data) => {
+  addNode = data => {
+    if (objectEquals(data, this.current.data)) {
+      return;
+    }
     const next = new EditNode(data, this.current);
     this.current.next = next;
     this.current = next;
@@ -28,7 +31,7 @@ export default class EditHistory {
     } else {
       this.length += 1;
     }
-  }
+  };
 
   canUndo = () => this.current.prev;
 
@@ -38,11 +41,11 @@ export default class EditHistory {
     this.current = this.current.prev;
     this.length -= 1;
     this.updateState(this.current.data);
-  }
+  };
 
   redo = () => {
     this.current = this.current.next;
     this.length += 1;
     this.updateState(this.current.data);
-  }
+  };
 }

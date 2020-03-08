@@ -1,43 +1,54 @@
+// @flow
+
 import * as _ from 'lodash';
 import {
   NodeModel,
   NodeModelListener,
-  Toolkit
+  Toolkit,
+  DiagramEngine,
+  DefaultPortModel
 } from 'storm-react-diagrams';
 import DefaultDataPortModel from './DefaultDataPortModel';
 
 export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
-  name;
+  name: string;
 
-  color;
+  color: string;
 
-  data;
+  data: {};
 
-  ports;
+  ports: Array<DefaultPortModel>;
 
-  constructor(name = 'Untitled', color = 'rgb(0,192,255)', data = {}) {
+  constructor(
+    name: string = 'Untitled',
+    color: string = 'rgb(0,192,255)',
+    data: {} = {}
+  ) {
     super('data');
     this.name = name;
     this.color = color;
     this.data = data;
   }
 
-  addInPort(label) {
+  addInPort(label: string): DefaultPortModel {
     return this.addPort(new DefaultDataPortModel(true, Toolkit.UID(), label));
   }
 
-  addOutPort(label) {
+  addOutPort(label: string): DefaultPortModel {
     return this.addPort(new DefaultDataPortModel(false, Toolkit.UID(), label));
   }
 
-  deSerialize(object, engine) {
+  deSerialize(
+    object: { name: string, color: string, data: {} },
+    engine: DiagramEngine
+  ) {
     super.deSerialize(object, engine);
     this.name = object.name;
     this.color = object.color;
     this.data = object.data;
   }
 
-  serialize() {
+  serialize(): {} {
     return _.merge(super.serialize(), {
       name: this.name,
       color: this.color,
@@ -45,11 +56,11 @@ export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
     });
   }
 
-  getInPorts() {
-    return _.filter(this.ports, portModel => portModel.in);
+  getInPorts(): Array<DefaultPortModel> {
+    return _.filter(this.ports, (portModel: DefaultPortModel): boolean => portModel.in);
   }
 
-  getOutPorts() {
-    return _.filter(this.ports, portModel => !portModel.in);
+  getOutPorts(): Array<DefaultPortModel> {
+    return _.filter(this.ports, (portModel: DefaultPortModel): boolean => !portModel.in);
   }
 }

@@ -215,6 +215,7 @@ class Connect extends React.Component<Props, State> {
           <AsyncStatusButton
             success={!connectionFailed}
             loading={loading}
+            tooltipText='Connect to blockchain. The smart contract will be deployed to this address.'
             onClick={this.login}
           >
             Connect

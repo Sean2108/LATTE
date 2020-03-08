@@ -10,7 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import type { Param, Classes } from '../../../types';
+import type { VariableObj, Classes } from '../../../types';
 
 const styles = theme => ({
   textField: {
@@ -37,15 +37,15 @@ const styles = theme => ({
 type Props = {
   classes: Classes,
   header: string,
-  params: Array<Param>,
-  updateParams: (Array<Param>) => void,
+  params: Array<VariableObj>,
+  updateParams: (Array<VariableObj>) => void,
   tooltipText: string
 };
 
 class ParamList extends React.Component<Props> {
   handleChange = (index: number) => (event: SyntheticInputEvent<HTMLInputElement>) => {
     const { params, updateParams } = this.props;
-    const newParams: Array<Param> = params.filter(param => param.name && param.displayName);
+    const newParams: Array<VariableObj> = params.filter(param => param.name && param.displayName);
     newParams[index].value = event.currentTarget.value;
     updateParams(newParams);
   };
@@ -62,8 +62,8 @@ class ParamList extends React.Component<Props> {
         </Tooltip>
         <br />
         {params
-          .filter((param: Param) => param.name && param.displayName)
-          .map((param: Param, index: number): React.Node => (
+          .filter((param: VariableObj) => param.name && param.displayName)
+          .map((param: VariableObj, index: number): React.Node => (
             <div key={index}>
               {param.type === 'bool' ? (
                 <FormControl className={classes.formControl}>

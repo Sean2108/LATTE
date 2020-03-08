@@ -33,6 +33,7 @@ import EditHistory from './build_utils/EditHistory';
 import type {
   StructLookupType,
   VariablesLookupType,
+  onParseFn,
   Classes
 } from '../../types';
 
@@ -84,13 +85,6 @@ const tooltips: { [key: string]: string } = {
 
 type NodeType = $Keys<typeof tooltips>;
 
-type onParseFn = {
-  tabsCode: string,
-  tabsReturn: string,
-  isView: string,
-  diagrams: {}
-};
-
 type Props = {
   classes: Classes,
   varList: VariablesLookupType,
@@ -103,7 +97,7 @@ type Props = {
   settings: { bitsMode: boolean, indentation: string },
   openDrawer: () => void,
   updateGasHistory: () => void, // eslint-disable-line react/no-unused-prop-types
-  updateBuildError: () => void,
+  updateBuildError: string => void,
   isConstructor: boolean,
   editHistory: EditHistory,
   updateLoading: boolean => void, // eslint-disable-line react/no-unused-prop-types
@@ -137,7 +131,7 @@ class BuildDiagram extends React.Component<Props, State> {
     this.engine.registerPortFactory(
       new SimplePortFactory(
         'diamond',
-        (): DiamondPortModel => new DiamondPortModel()
+        (): DiamondPortModel => new DiamondPortModel('', true, '')
       )
     );
     this.engine.registerNodeFactory(new DiamondNodeFactory());
@@ -180,7 +174,7 @@ class BuildDiagram extends React.Component<Props, State> {
   }
 
   onLinksUpdated = (event: {
-    link: { sourcePort: PortModel, targetPort: PortModel }
+    link: { sourcePort: ?PortModel, targetPort: ?PortModel }
   }): void => {
     const { showWarning, updateLoading } = this.props;
     const { sourcePort, targetPort } = event.link;

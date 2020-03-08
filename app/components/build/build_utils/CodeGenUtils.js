@@ -1,9 +1,23 @@
+// @flow
+
 import { toLowerCamelCase, isString } from './TypeCheckFormattingUtils';
+import type {
+  BuildState,
+  SettingsObj,
+  RequireObj,
+  VariablesLookupType,
+  StructLookupType,
+  VariableObj
+} from '../../../types';
 
 export default class CodeGenUtils {
-  formCode(buildState, settings) {
+  formCode(buildState: BuildState, settings: SettingsObj): string {
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
-    code += this.formStructsEvents(buildState.entities, settings.bitsMode, false);
+    code += this.formStructsEvents(
+      buildState.entities,
+      settings.bitsMode,
+      false
+    );
     code += this.formVars(buildState.variables);
     code += this.formStructsEvents(buildState.events, settings.bitsMode, true);
     for (let i = 0; i < buildState.tabsCode.length; i += 1) {
@@ -12,7 +26,11 @@ export default class CodeGenUtils {
     return `${code}}`;
   }
 
-  formFunctionBody(buildState, i, settings) {
+  formFunctionBody(
+    buildState: BuildState,
+    i: number,
+    settings: SettingsObj
+  ): string {
     const functionName =
       buildState.tabs[i + 1] === 'Initial State'
         ? 'constructor'
@@ -21,9 +39,9 @@ export default class CodeGenUtils {
     const requires = this.formRequires(
       buildState.tabsRequire[i],
       buildState.variables,
-      settings.indentation
+      settings.indentation || '    '
     );
-    const params = this.formParams(buildState.tabsParams[i], settings.bitsMode);
+    const params = this.formParams(buildState.tabsParams[i], settings.bitsMode || false);
     return `${functionName}(${params}) public ${
       buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
         ? 'view'
@@ -31,7 +49,7 @@ export default class CodeGenUtils {
     } ${returnCode}{\n${requires}${buildState.tabsCode[i]}}\n`;
   }
 
-  formReturnCode(returnType) {
+  formReturnCode(returnType: ?string): string {
     if (!returnType) {
       return '';
     }
@@ -42,7 +60,11 @@ export default class CodeGenUtils {
       : `returns (${returnType} memory) `;
   }
 
-  formRequires(requires, variables, indentation) {
+  formRequires(
+    requires: Array<RequireObj>,
+    variables: VariablesLookupType,
+    indentation: string
+  ): string {
     return requires
       .filter(req => req.var1 && req.var2 && req.comp)
       .map(req => {
@@ -58,10 +80,10 @@ export default class CodeGenUtils {
       .join('');
   }
 
-  formParams(params, bitsMode) {
+  formParams(params: Array<VariableObj>, bitsMode: boolean) {
     return params
-      .filter(element => element.name)
-      .map(element => {
+      .filter((element: VariableObj): boolean => !!element.name)
+      .map((element: VariableObj): string => {
         if (bitsMode && element.bits) {
           if (element.type === 'string') {
             return `bytes${element.bits} ${element.name}`;
@@ -76,9 +98,14 @@ export default class CodeGenUtils {
       .join(', ');
   }
 
-  formStructsEvents(entities, bitsMode, isEvent) {
+  formStructsEvents(
+    entities: StructLookupType,
+    bitsMode: boolean,
+    isEvent: boolean
+  ): string {
     let code = '';
-    for (const [name, params] of Object.entries(entities)) {
+    for (const name of Object.keys(entities)) {
+      const params = entities[name];
       code += `${isEvent ? 'event' : 'struct'} ${name} ${
         isEvent ? '(' : '{\n'
       }${params
@@ -86,12 +113,13 @@ export default class CodeGenUtils {
         .map(param => {
           const suffix = isEvent ? '' : ';\n';
           if (bitsMode) {
-            if (param.type === 'string' && param.bits !== '') {
+            if (param.type === 'string' && param.bits) {
               return `bytes${param.bits} ${param.name}${suffix}`;
             }
             if (param.bits) {
               return `${param.type}${param.bits} ${param.name}${suffix}`;
             }
+            return `${param.type} ${param.name}${suffix}`;
           }
           return `${param.type} ${param.name}${suffix}`;
         })
@@ -102,17 +130,17 @@ export default class CodeGenUtils {
     return code;
   }
 
-  formVars(variables) {
+  formVars(variables: VariablesLookupType): string {
     let code = '';
-    for (const [name, type] of Object.entries(variables)) {
+    for (const name of Object.keys(variables)) {
+      const type = variables[name];
       if (typeof type === 'object' && type.type === 'mapping') {
-        code +=
-          'inner' in type
-            ? `mapping(${type.from} => mapping(${
-                type.inner === 'address payable' ? 'address' : type.inner
-              } => ${type.to})) ${name};\n`
-            : `mapping(${type.from} => ${type.to}) ${name};\n`;
-      } else if (type) {
+        code += type.inner
+          ? `mapping(${type.from} => mapping(${
+              type.inner === 'address payable' ? 'address' : type.inner
+            } => ${type.to})) ${name};\n`
+          : `mapping(${type.from} => ${type.to}) ${name};\n`;
+      } else if (typeof type === 'string' && type) {
         code += `${type} private ${name};\n`;
       }
     }

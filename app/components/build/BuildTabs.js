@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -9,12 +10,23 @@ import Popover from '@material-ui/core/Popover';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Web3 from 'web3';
 import InitialStateTab from './InitialStateTab';
 import Web3Utils from './build_utils/Web3Utils';
 import DefaultBuildTab from './DefaultBuildTab';
 import EditHistory from './build_utils/EditHistory';
+import type {
+  VariablesLookupType,
+  BuildState,
+  SettingsObj,
+  VariableObj,
+  RequireObj,
+  onParseFn,
+  StructLookupType,
+  Classes
+} from '../../types';
 
-function TabContainer(props) {
+function TabContainer(props: { children: React.Node }): React.Node {
   const { children } = props;
   return (
     <Typography
@@ -28,10 +40,6 @@ function TabContainer(props) {
     </Typography>
   );
 }
-
-TabContainer.propTypes = {
-  children: PropTypes.node.isRequired
-};
 
 const styles = theme => ({
   buildtabs: {
@@ -58,7 +66,27 @@ const styles = theme => ({
   }
 });
 
-class BuildTabs extends React.Component {
+type Props = {
+  classes: Classes,
+  variables: VariablesLookupType,
+  onTabsChange: ({}, ?() => void) => void,
+  buildState: BuildState,
+  settings: SettingsObj,
+  connection: Web3,
+  updateLoading: boolean => void
+};
+
+type State = {
+  value: number,
+  addTabPopoverAnchor: ?{},
+  popoverContent: string
+};
+
+class BuildTabs extends React.Component<Props, State> {
+  web3Utils: Web3Utils;
+
+  editHistory: EditHistory;
+
   state = {
     value: 0,
     addTabPopoverAnchor: null,
@@ -71,20 +99,24 @@ class BuildTabs extends React.Component {
     this.editHistory = new EditHistory(buildState, onTabsChange);
   }
 
-  handleChange = (event, value) => {
+  handleChange = (event: {}, value: number): void => {
     this.setState({
       value
     });
   };
 
-  handleOnChange = (newState, i, state) => {
+  handleOnChange = (
+    newState: Array<VariableObj> | Array<RequireObj>,
+    i: number,
+    state: string
+  ) => {
     const { buildState, onTabsChange } = this.props;
     const tabsState = [...buildState[state]];
     tabsState[i] = newState;
     onTabsChange({ [state]: tabsState });
   };
 
-  handleChangeParams = (newState, i) => {
+  handleChangeParams = (newState: Array<VariableObj>, i: number): void => {
     const { onTabsChange } = this.props;
     this.handleOnChange(newState, i, 'tabsParams');
     if (i === 0) {
@@ -93,7 +125,7 @@ class BuildTabs extends React.Component {
     }
   };
 
-  onParse = (newState, i) => {
+  onParse = (newState: onParseFn, i: number): void => {
     const { buildState, onTabsChange } = this.props;
     const parsedState = Object.entries(newState)
       .map(([key, value]) => {
@@ -105,7 +137,7 @@ class BuildTabs extends React.Component {
     onTabsChange(parsedState, this.editHistory.addNode);
   };
 
-  render() {
+  render(): React.Node {
     const {
       classes,
       variables,
@@ -115,7 +147,7 @@ class BuildTabs extends React.Component {
       updateLoading
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
-    const updateBuildError = buildError => {
+    const updateBuildError = (buildError: string): void => {
       onTabsChange({ buildError });
     };
 
@@ -125,7 +157,7 @@ class BuildTabs extends React.Component {
           <Tabs
             className={classes.tabs}
             value={value}
-            onChange={(event, val) => {
+            onChange={(event: {}, val: number): void => {
               if (val !== buildState.tabs.length) {
                 this.handleChange(event, val);
               }
@@ -135,11 +167,11 @@ class BuildTabs extends React.Component {
             variant="scrollable"
             scrollButtons="auto"
           >
-            {buildState.tabs.map(label => (
+            {buildState.tabs.map((label: string) => (
               <Tab label={label} key={label} />
             ))}
             <Tab
-              onClick={event =>
+              onClick={(event: SyntheticInputEvent<>) =>
                 this.setState({ addTabPopoverAnchor: event.currentTarget })
               }
               label="+"
@@ -151,12 +183,14 @@ class BuildTabs extends React.Component {
             <InitialStateTab
               entities={buildState.entities}
               events={buildState.events}
-              updateEntities={entities =>
+              updateEntities={(entities: StructLookupType): void =>
                 onTabsChange({ ...buildState, entities })
               }
-              updateEvents={events => onTabsChange({ ...buildState, events })}
+              updateEvents={(events: StructLookupType): void =>
+                onTabsChange({ ...buildState, events })
+              }
               params={buildState.constructorParams}
-              updateParams={params => {
+              updateParams={(params: VariableObj): void => {
                 onTabsChange({
                   constructorParams: params
                 });
@@ -173,22 +207,24 @@ class BuildTabs extends React.Component {
                   varList={variables}
                   events={buildState.events}
                   entities={buildState.entities}
-                  onParse={newState => this.onParse(newState, i)}
-                  onChangeParams={newParams =>
+                  onParse={(newState: onParseFn): void =>
+                    this.onParse(newState, i)
+                  }
+                  onChangeParams={(newParams: Array<VariableObj>): void =>
                     this.handleChangeParams(newParams, i)
                   }
-                  onChangeRequire={newRequire =>
+                  onChangeRequire={(newRequire: Array<RequireObj>): void =>
                     this.handleOnChange(newRequire, i, 'tabsRequire')
                   }
-                  onVariablesChange={newVariables =>
-                    onTabsChange({ variables: newVariables })
-                  }
+                  onVariablesChange={(
+                    newVariables: VariablesLookupType
+                  ): void => onTabsChange({ variables: newVariables })}
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
                   diagram={buildState.diagrams[i]}
                   settings={settings}
                   gasHistory={buildState.gasHistory}
-                  updateGasHistory={() => {
+                  updateGasHistory={(): void => {
                     const history = buildState.gasHistory;
                     this.web3Utils.getGasUsage(
                       buildState,
@@ -210,7 +246,7 @@ class BuildTabs extends React.Component {
           id="simple-popper"
           open={Boolean(addTabPopoverAnchor)}
           anchorEl={addTabPopoverAnchor}
-          onClose={() => this.setState({ addTabPopoverAnchor: null })}
+          onClose={(): void => this.setState({ addTabPopoverAnchor: null })}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'center'
@@ -225,8 +261,8 @@ class BuildTabs extends React.Component {
               id="standard-name"
               label="Function Name"
               className={classes.textField}
-              onChange={event =>
-                this.setState({ popoverContent: event.target.value })
+              onChange={(event: SyntheticInputEvent<HTMLInputElement>) =>
+                this.setState({ popoverContent: event.currentTarget.value })
               }
               value={popoverContent}
             />
@@ -234,7 +270,7 @@ class BuildTabs extends React.Component {
               variant="contained"
               color="primary"
               className={classes.button}
-              onClick={() => {
+              onClick={(): void => {
                 if (
                   this.state.popoverContent &&
                   !buildState.tabs
@@ -265,15 +301,5 @@ class BuildTabs extends React.Component {
     );
   }
 }
-
-BuildTabs.propTypes = {
-  classes: PropTypes.object.isRequired,
-  variables: PropTypes.object.isRequired,
-  onTabsChange: PropTypes.func.isRequired,
-  buildState: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired,
-  connection: PropTypes.object.isRequired,
-  updateLoading: PropTypes.func.isRequired
-};
 
 export default withStyles(styles)(BuildTabs);

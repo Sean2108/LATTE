@@ -1,28 +1,35 @@
 // @flow
 
 export type Classes = { [key: string]: string };
-export type VariablesLookupType = { [key: string]: string };
-export type StructLookupType = { [key: string]: Array<VariableObj> };
 
 type VariableType = 'uint' | 'bool' | 'address payable' | 'string';
+type Comparator = '==' | '!=' | '>' | '>=' | '<' | '<=';
 
-export type Param = {
-  name: ?string,
-  displayName: ?string,
-  value: string | void,
-  type: VariableType,
-  bits: ?(number | string)
+export type onParseFn = {
+  tabsCode: string,
+  tabsReturn: ?string,
+  isView: boolean,
+  diagrams: {}
+};
+
+export type onParseKeys = 'tabsCode' | 'tabsReturn' | 'isView' | 'diagrams';
+
+export type Mapping = {
+  type: 'mapping',
+  inner?: string,
+  from: string,
+  to: string
 };
 
 export type SettingsObj = {
-  bitsMode?: boolean,
-  indentation?: string
+  bitsMode: boolean,
+  indentation: string
 };
 
 export type RequireObj = {
   var1: string,
   displayVar1: string,
-  comp: string,
+  comp: Comparator,
   var2: string,
   displayVar2: string,
   requireMessage: string
@@ -31,6 +38,26 @@ export type RequireObj = {
 export type VariableObj = {
   name: string,
   displayName: string,
-  type: VariableType,
+  value?: string,
+  type: VariableType | string,
   bits: ?(number | string)
+};
+
+export type VariablesLookupType = { [key: string]: string | Mapping };
+export type StructLookupType = { [key: string]: Array<VariableObj> };
+
+export type BuildState = {
+  tabs: Array<string>,
+  tabsCode: Array<string>,
+  variables: VariablesLookupType,
+  tabsParams: Array<Array<VariableObj>>,
+  tabsReturn: Array<string | null>,
+  tabsRequire: Array<Array<RequireObj>>,
+  constructorParams: Array<VariableObj>,
+  events: StructLookupType,
+  entities: StructLookupType,
+  isView: Array<boolean>,
+  diagrams: Array<{}>,
+  gasHistory: Array<number>,
+  buildError: string
 };

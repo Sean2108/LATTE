@@ -1,8 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import Web3 from 'web3';
 import BuildOptions from './BuildOptions';
 import BuildTabs from './BuildTabs';
+import type { SettingsObj, BuildState, Classes } from '../../types';
 
 const styles = theme => ({
   toolbar: {
@@ -26,7 +29,19 @@ const styles = theme => ({
   }
 });
 
-class Build extends React.Component {
+type Props = {
+  classes: Classes,
+  onback: () => void,
+  connection: Web3,
+  settings: SettingsObj
+};
+
+type State = {
+  buildState: BuildState,
+  loading: boolean
+};
+
+class Build extends React.Component<Props, State> {
   state = {
     buildState: {
       tabs: ['Global State', 'Initial State'], // eslint-disable-line react/no-unused-state
@@ -46,7 +61,7 @@ class Build extends React.Component {
     loading: false
   };
 
-  render() {
+  render(): React.Node {
     const { classes, onback, connection, settings } = this.props;
     const { variables } = this.state.buildState;
 
@@ -57,7 +72,10 @@ class Build extends React.Component {
           <div className={classes.root}>
             <BuildTabs
               variables={variables}
-              onTabsChange={(buildState, callback = () => {}) =>
+              onTabsChange={(
+                buildState: {},
+                callback: (?BuildState) => void = () => {}
+              ): void =>
                 this.setState(
                   prevState => ({
                     buildState: { ...prevState.buildState, ...buildState }
@@ -68,13 +86,17 @@ class Build extends React.Component {
               buildState={this.state.buildState}
               settings={settings}
               connection={connection}
-              updateLoading={loading => this.setState({ loading })}
+              updateLoading={(loading: boolean): void =>
+                this.setState({ loading })
+              }
             />
             <BuildOptions
               onback={onback}
               connection={connection}
               buildState={this.state.buildState}
-              loadState={buildState => this.setState({ buildState })}
+              loadState={(buildState: BuildState): void =>
+                this.setState({ buildState })
+              }
               settings={settings}
               loading={this.state.loading}
             />
@@ -84,13 +106,6 @@ class Build extends React.Component {
     );
   }
 }
-
-Build.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onback: PropTypes.func.isRequired,
-  connection: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired
-};
 
 export default withStyles(styles, {
   withTheme: true
