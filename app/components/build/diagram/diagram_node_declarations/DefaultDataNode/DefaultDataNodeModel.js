@@ -5,7 +5,8 @@ import {
   NodeModel,
   NodeModelListener,
   Toolkit,
-  DiagramEngine
+  DiagramEngine,
+  DefaultPortModel
 } from 'storm-react-diagrams';
 import DefaultDataPortModel from './DefaultDataPortModel';
 
@@ -16,7 +17,7 @@ export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
 
   data: {};
 
-  ports: Array<DefaultDataPortModel>;
+  ports: Array<DefaultPortModel>;
 
   constructor(
     name: string = 'Untitled',
@@ -29,11 +30,11 @@ export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
     this.data = data;
   }
 
-  addInPort(label: string): DefaultDataPortModel {
+  addInPort(label: string): DefaultPortModel {
     return this.addPort(new DefaultDataPortModel(true, Toolkit.UID(), label));
   }
 
-  addOutPort(label: string): DefaultDataPortModel {
+  addOutPort(label: string): DefaultPortModel {
     return this.addPort(new DefaultDataPortModel(false, Toolkit.UID(), label));
   }
 
@@ -55,11 +56,11 @@ export default class DefaultDataNodeModel extends NodeModel<NodeModelListener> {
     });
   }
 
-  getInPorts(): Array<DefaultDataPortModel> {
-    return _.filter(this.ports, portModel => portModel.in);
+  getInPorts(): Array<DefaultPortModel> {
+    return _.filter(this.ports, (portModel: DefaultPortModel): boolean => portModel.in);
   }
 
-  getOutPorts(): Array<DefaultDataPortModel> {
-    return _.filter(this.ports, portModel => !portModel.in);
+  getOutPorts(): Array<DefaultPortModel> {
+    return _.filter(this.ports, (portModel: DefaultPortModel): boolean => !portModel.in);
   }
 }

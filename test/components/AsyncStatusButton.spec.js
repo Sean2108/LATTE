@@ -2,7 +2,7 @@ import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { createMount } from '@material-ui/core/test-utils';
-import { CircularProgress, Button } from '@material-ui/core';
+import { CircularProgress, Button, Tooltip } from '@material-ui/core';
 import AsyncStatusButton from '../../app/components/build/build_components/AsyncStatusButton';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -10,24 +10,36 @@ Enzyme.configure({ adapter: new Adapter() });
 function setup(loading, success) {
   const onclick = jest.fn();
   const component = createMount()(
-    <AsyncStatusButton onClick={onclick} loading={loading} success={success}>
+    <AsyncStatusButton
+      onClick={onclick}
+      tooltipText="test tooltip"
+      loading={loading}
+      success={success}
+    >
       Test text
     </AsyncStatusButton>
   );
   const button = component.find(Button).at(0);
+  const tooltip = component.find(Tooltip).at(0);
   return {
     component,
     onclick,
-    button
+    button,
+    tooltip
   };
 }
 
 describe('AsyncStatusButton component', () => {
+  it('should have correct button and tooltip text', () => {
+    const { button, tooltip } = setup(true, true);
+    expect(button.text()).toEqual('Test text');
+    expect(tooltip.props().title).toEqual('test tooltip');
+  });
+
   it('should call onClick when button is clicked', () => {
-    const { component, onclick, button } = setup(true, true);
+    const { component, onclick } = setup(true, true);
     component.props().onClick();
     expect(onclick).toHaveBeenCalledTimes(1);
-    expect(button.text()).toEqual('Test text');
   });
 
   it('should not have circular progress when loading is false', () => {

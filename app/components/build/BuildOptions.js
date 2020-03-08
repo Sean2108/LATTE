@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,6 +10,7 @@ import Web3Utils from './build_utils/Web3Utils';
 import CodeGenUtils from './build_utils/CodeGenUtils';
 import BuildOptionsPopover from './BuildOptionsPopover';
 import AsyncStatusButton from './build_components/AsyncStatusButton';
+import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 
 const styles = theme => ({
   button: {
@@ -35,6 +37,24 @@ class BuildOptions extends React.Component {
     this.getFiles();
   }
 
+  componentDidUpdate(prevProps) {
+    if (!objectEquals(this.props.buildState, prevProps.buildState)) {
+      this.debouncedCompile();
+    }
+  }
+
+  debouncedCompile = _.debounce(
+    () =>
+      this.web3Utils.requestCompile(
+        this.updateCompileError,
+        false,
+        this.props.buildState,
+        this.props.settings,
+        () => {}
+      ),
+    5000
+  );
+
   handleClick = (event, dataOp) => {
     this.setState({
       anchorEl: event.currentTarget,
@@ -59,6 +79,28 @@ class BuildOptions extends React.Component {
     );
   }
 
+  updateCompileError = compileErrorParam => {
+    this.setState({ compileError: compileErrorParam });
+  };
+
+  parseCompileError(compileError: string): string {
+    if (!compileError) {
+      return '';
+    }
+    if (compileError.includes('var memory ')) {
+      const searchTerm = 'var memory ';
+      const afterVarMemory = compileError.slice(
+        compileError.indexOf(searchTerm) + searchTerm.length
+      );
+      const indexOfEqualToken = afterVarMemory.indexOf(' = ');
+      return `Could not infer the type of ${afterVarMemory.slice(
+        0,
+        indexOfEqualToken
+      )}`;
+    }
+    return compileError;
+  }
+
   render() {
     const {
       classes,
@@ -77,7 +119,8 @@ class BuildOptions extends React.Component {
       SAVE_CONTRACT: 3
     };
 
-    const showError = buildState.buildError || compileError;
+    const showError =
+      buildState.buildError || this.parseCompileError(compileError);
 
     return (
       <div>
@@ -102,6 +145,7 @@ class BuildOptions extends React.Component {
             readFile(join('saved_data', fileName), (err, data) => {
               if (err) throw err;
               this.handleClose();
+              console.log(JSON.parse(data));
               loadState(JSON.parse(data));
               console.log(`Data loaded from ${fileName}`);
             })
@@ -181,28 +225,22 @@ class BuildOptions extends React.Component {
           </Button>
         </Tooltip>
 
-        <Tooltip
-          title={`Deploy smart contract to ${connection.currentProvider.host}${
-            showError ? `\nError: ${showError}` : ''
-          }`}
-          classes={{ tooltip: classes.tooltipFont }}
+        <AsyncStatusButton
+          loading={loading}
+          success={!showError}
+          tooltipText={`Deploy smart contract to ${
+            connection.currentProvider.host
+          }${showError ? `\nError: ${showError}` : ''}`}
+          onClick={() =>
+            this.web3Utils.deploySmartContract(
+              buildState,
+              settings,
+              this.updateCompileError
+            )
+          }
         >
-          <AsyncStatusButton
-            loading={loading}
-            success={!showError}
-            onClick={() =>
-              this.web3Utils.deploySmartContract(
-                buildState,
-                settings,
-                compileErrorParam => {
-                  this.setState({ compileError: compileErrorParam });
-                }
-              )
-            }
-          >
-            Deploy
-          </AsyncStatusButton>
-        </Tooltip>
+          Deploy
+        </AsyncStatusButton>
       </div>
     );
   }

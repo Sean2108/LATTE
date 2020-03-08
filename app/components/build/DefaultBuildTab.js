@@ -13,10 +13,9 @@ import GasDrawer from './diagram/GasDrawer';
 import type {
   VariablesLookupType,
   StructLookupType,
-  onParseKeys,
-  Param,
-  RequireObj,
+  onParseFn,
   VariableObj,
+  RequireObj,
   SettingsObj,
   Classes
 } from '../../types';
@@ -46,11 +45,11 @@ type Props = {
   varList: VariablesLookupType,
   events: StructLookupType,
   entities: StructLookupType,
-  onParse: onParseKeys => void,
-  onChangeParams: Param => void,
-  onChangeRequire: RequireObj => void,
-  onVariablesChange: VariableObj => void,
-  params: Array<Param>,
+  onParse: onParseFn => void,
+  onChangeParams: Array<VariableObj> => void,
+  onChangeRequire: Array<RequireObj> => void,
+  onVariablesChange: VariablesLookupType => void,
+  params: Array<VariableObj>,
   requires: Array<RequireObj>,
   diagram: {},
   settings: SettingsObj,
@@ -80,13 +79,13 @@ class DefaultBuildTab extends React.Component<Props, State> {
     this.varList = varList;
   }
 
-  flattenParamsToObject(params: Array<Param>, bitsMode: boolean) {
+  flattenParamsToObject(params: Array<VariableObj>, bitsMode: boolean) {
     return params
-      .filter((element: Param): boolean => !!element.name)
+      .filter((element: VariableObj): boolean => !!element.name)
       .reduce(
         (
           resultParam: VariablesLookupType,
-          currentObject: Param
+          currentObject: VariableObj
         ): VariablesLookupType => {
           const result = resultParam;
           if (bitsMode && currentObject.bits) {

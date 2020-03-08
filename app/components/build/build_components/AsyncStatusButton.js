@@ -7,6 +7,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import green from '@material-ui/core/colors/green';
 import Button from '@material-ui/core/Button';
 import { red } from '@material-ui/core/colors';
+import Tooltip from '@material-ui/core/Tooltip';
 import type { Classes } from '../../../types';
 
 const styles = theme => ({
@@ -34,6 +35,9 @@ const styles = theme => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
+  },
+  tooltipFont: {
+    fontSize: 14
   }
 });
 type Props = {
@@ -41,12 +45,13 @@ type Props = {
   loading: boolean,
   success: boolean,
   onClick: () => void,
-  children: string
+  children: string,
+  tooltipText: string
 };
 
 class AsyncStatusButton extends React.Component<Props> {
   render(): React.Node {
-    const { classes, loading, success, onClick } = this.props;
+    const { classes, loading, success, onClick, tooltipText } = this.props;
     const buttonClassname: string = classNames({
       [classes.buttonSuccess]: success,
       [classes.buttonFailure]: !success
@@ -54,15 +59,19 @@ class AsyncStatusButton extends React.Component<Props> {
 
     return (
       <div className={classes.wrapper}>
-        <Button
-          variant="contained"
-          color="primary"
-          className={buttonClassname}
-          disabled={loading}
-          onClick={onClick}
-        >
-          {this.props.children}
-        </Button>
+        <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
+          <div>
+            <Button
+              variant="contained"
+              color="primary"
+              className={buttonClassname}
+              disabled={loading}
+              onClick={onClick}
+            >
+              {this.props.children}
+            </Button>
+          </div>
+        </Tooltip>
         {loading && (
           <CircularProgress size={24} className={classes.buttonProgress} />
         )}

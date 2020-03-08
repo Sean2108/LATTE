@@ -19,7 +19,7 @@ import type {
   VariablesLookupType,
   BuildState,
   SettingsObj,
-  Param,
+  VariableObj,
   RequireObj,
   onParseFn,
   StructLookupType,
@@ -106,7 +106,7 @@ class BuildTabs extends React.Component<Props, State> {
   };
 
   handleOnChange = (
-    newState: Array<Param> | Array<RequireObj>,
+    newState: Array<VariableObj> | Array<RequireObj>,
     i: number,
     state: string
   ) => {
@@ -116,7 +116,7 @@ class BuildTabs extends React.Component<Props, State> {
     onTabsChange({ [state]: tabsState });
   };
 
-  handleChangeParams = (newState: Array<Param>, i: number): void => {
+  handleChangeParams = (newState: Array<VariableObj>, i: number): void => {
     const { onTabsChange } = this.props;
     this.handleOnChange(newState, i, 'tabsParams');
     if (i === 0) {
@@ -147,7 +147,7 @@ class BuildTabs extends React.Component<Props, State> {
       updateLoading
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
-    const updateBuildError = buildError => {
+    const updateBuildError = (buildError: string): void => {
       onTabsChange({ buildError });
     };
 
@@ -157,7 +157,7 @@ class BuildTabs extends React.Component<Props, State> {
           <Tabs
             className={classes.tabs}
             value={value}
-            onChange={(event: {}, val: number) => {
+            onChange={(event: {}, val: number): void => {
               if (val !== buildState.tabs.length) {
                 this.handleChange(event, val);
               }
@@ -190,7 +190,7 @@ class BuildTabs extends React.Component<Props, State> {
                 onTabsChange({ ...buildState, events })
               }
               params={buildState.constructorParams}
-              updateParams={(params: Param): void => {
+              updateParams={(params: VariableObj): void => {
                 onTabsChange({
                   constructorParams: params
                 });
@@ -210,7 +210,7 @@ class BuildTabs extends React.Component<Props, State> {
                   onParse={(newState: onParseFn): void =>
                     this.onParse(newState, i)
                   }
-                  onChangeParams={(newParams: Array<Param>): void =>
+                  onChangeParams={(newParams: Array<VariableObj>): void =>
                     this.handleChangeParams(newParams, i)
                   }
                   onChangeRequire={(newRequire: Array<RequireObj>): void =>

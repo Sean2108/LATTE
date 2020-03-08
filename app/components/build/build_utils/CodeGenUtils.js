@@ -7,7 +7,7 @@ import type {
   RequireObj,
   VariablesLookupType,
   StructLookupType,
-  Param
+  VariableObj
 } from '../../../types';
 
 export default class CodeGenUtils {
@@ -80,10 +80,10 @@ export default class CodeGenUtils {
       .join('');
   }
 
-  formParams(params: Array<Param>, bitsMode: boolean) {
+  formParams(params: Array<VariableObj>, bitsMode: boolean) {
     return params
-      .filter((element: Param): boolean => !!element.name)
-      .map((element: Param): string => {
+      .filter((element: VariableObj): boolean => !!element.name)
+      .map((element: VariableObj): string => {
         if (bitsMode && element.bits) {
           if (element.type === 'string') {
             return `bytes${element.bits} ${element.name}`;

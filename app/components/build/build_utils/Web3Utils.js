@@ -102,6 +102,7 @@ export default class Web3Utils {
   ) => {
     this.web3.eth.getAccounts((err, accs) => {
       if (err) {
+        console.log(err);
         return;
       }
       if (accs.length === 0) {
