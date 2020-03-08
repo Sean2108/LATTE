@@ -1,3 +1,5 @@
+// @flow
+
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -78,7 +80,7 @@ class VariableRow extends React.Component<Props> {
             <InputLabel htmlFor="protocol"> Number of Bits </InputLabel>
             <Select
               value={val.bits || ''}
-              onChange={(event: SyntheticInputEvent<HTML>): void =>
+              onChange={(event: SyntheticInputEvent<>): void =>
                 updateVariables({ ...val, bits: event.target.value })
               }
               inputProps={{

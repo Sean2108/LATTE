@@ -33,6 +33,7 @@ import EditHistory from './build_utils/EditHistory';
 import type {
   StructLookupType,
   VariablesLookupType,
+  onParseFn,
   Classes
 } from '../../types';
 
@@ -83,13 +84,6 @@ const tooltips: { [key: string]: string } = {
 };
 
 type NodeType = $Keys<typeof tooltips>;
-
-type onParseFn = {
-  tabsCode: string,
-  tabsReturn: string,
-  isView: string,
-  diagrams: {}
-};
 
 type Props = {
   classes: Classes,
