@@ -1,9 +1,17 @@
+// @flow
+
 import { deepClone, objectEquals } from './TypeCheckFormattingUtils';
 
 const MAX_NODES = 10;
 
 class EditNode {
-  constructor(data, prev) {
+  data: {};
+
+  prev: ?EditNode;
+
+  next: ?EditNode;
+
+  constructor(data: {}, prev: ?EditNode) {
     this.data = deepClone(data);
     this.prev = prev;
     this.next = null;
@@ -11,21 +19,29 @@ class EditNode {
 }
 
 export default class EditHistory {
-  constructor(firstNodeData, updateState) {
+  head: EditNode;
+
+  current: EditNode;
+
+  length: number;
+
+  updateState: ({}) => void;
+
+  constructor(firstNodeData: {}, updateState: ({}) => void) {
     this.head = new EditNode(firstNodeData, null);
     this.current = this.head;
     this.length = 1;
     this.updateState = updateState;
   }
 
-  addNode = data => {
+  addNode = (data: {}): void => {
     if (objectEquals(data, this.current.data)) {
       return;
     }
-    const next = new EditNode(data, this.current);
+    const next: EditNode = new EditNode(data, this.current);
     this.current.next = next;
     this.current = next;
-    if (this.length >= MAX_NODES) {
+    if (this.head.next && this.length >= MAX_NODES) {
       this.head = this.head.next;
       this.head.prev = null;
     } else {
@@ -33,19 +49,23 @@ export default class EditHistory {
     }
   };
 
-  canUndo = () => this.current.prev;
+  canUndo = (): boolean => !!this.current.prev;
 
-  canRedo = () => this.current.next;
+  canRedo = (): boolean => !!this.current.next;
 
-  undo = () => {
-    this.current = this.current.prev;
-    this.length -= 1;
-    this.updateState(this.current.data);
+  undo = (): void => {
+    if (this.current.prev) {
+      this.current = this.current.prev;
+      this.length -= 1;
+      this.updateState(this.current.data);
+    }
   };
 
-  redo = () => {
-    this.current = this.current.next;
-    this.length += 1;
-    this.updateState(this.current.data);
+  redo = (): void => {
+    if (this.current.next) {
+      this.current = this.current.next;
+      this.length += 1;
+      this.updateState(this.current.data);
+    }
   };
 }

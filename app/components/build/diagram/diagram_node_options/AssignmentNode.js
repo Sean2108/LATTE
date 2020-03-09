@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import DoneIcon from '@material-ui/icons/Done';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -11,6 +12,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import type { Classes } from '../../../../types';
 
 const styles = theme => ({
   paper: {
@@ -51,7 +53,21 @@ const styles = theme => ({
   }
 });
 
-class ReturnNode extends React.Component {
+type Props = {
+  classes: Classes,
+  close: () => void,
+  submit: (string, State & { type: 'assignment' }) => void,
+  bitsMode: boolean
+};
+
+type State = {
+  variableSelected: string,
+  assignment: string,
+  assignedVal: string,
+  isMemory: boolean
+};
+
+class ReturnNode extends React.Component<Props, State> {
   state = {
     variableSelected: '',
     assignment: '=',
@@ -59,7 +75,7 @@ class ReturnNode extends React.Component {
     isMemory: this.props.bitsMode
   };
 
-  render() {
+  render(): React.Node {
     const { classes, close, submit, bitsMode } = this.props;
 
     return (
@@ -72,8 +88,8 @@ class ReturnNode extends React.Component {
             multiline
             rowsMax="3"
             value={this.state.variableSelected}
-            onChange={event =>
-              this.setState({ variableSelected: event.target.value })
+            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+              this.setState({ variableSelected: event.currentTarget.value })
             }
             margin="dense"
           />
@@ -81,7 +97,7 @@ class ReturnNode extends React.Component {
             <InputLabel htmlFor="assign">Assignment Type</InputLabel>
             <Select
               value={this.state.assignment}
-              onChange={event =>
+              onChange={(event: SyntheticInputEvent<>) =>
                 this.setState({ assignment: event.target.value })
               }
               inputProps={{
@@ -102,8 +118,8 @@ class ReturnNode extends React.Component {
             multiline
             rowsMax="3"
             className={classes.textField}
-            onChange={event =>
-              this.setState({ assignedVal: event.target.value })
+            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+              this.setState({ assignedVal: event.currentTarget.value })
             }
             value={this.state.assignedVal}
             margin="dense"
@@ -115,7 +131,7 @@ class ReturnNode extends React.Component {
             control={
               <Switch
                 checked={this.state.isMemory}
-                onChange={event =>
+                onChange={(event: SyntheticInputEvent<>): void =>
                   this.setState({
                     isMemory: event.target.checked
                   })
@@ -146,15 +162,13 @@ class ReturnNode extends React.Component {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => {
+            onClick={(): void => {
               if (!this.state.variableSelected || !this.state.assignedVal) {
                 return;
               }
               close();
               submit(
-                `${this.state.variableSelected} ${this.state.assignment} ${
-                  this.state.assignedVal
-                }`,
+                `${this.state.variableSelected} ${this.state.assignment} ${this.state.assignedVal}`,
                 { ...this.state, type: 'assignment' }
               );
             }}
@@ -167,12 +181,5 @@ class ReturnNode extends React.Component {
     );
   }
 }
-
-ReturnNode.propTypes = {
-  classes: PropTypes.object.isRequired,
-  close: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired,
-  bitsMode: PropTypes.bool.isRequired
-};
 
 export default withStyles(styles, { withTheme: true })(ReturnNode);

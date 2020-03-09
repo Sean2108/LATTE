@@ -66,13 +66,7 @@ export default class Web3Utils {
           })
           .on('error', error => {
             if (error === Object(error)) {
-              if (error.toString().includes('Exceeds block gas limit')) {
-                updateCompileError(
-                  'Error: Block gas limit exceeded, please increase gas limit'
-                );
-              } else {
-                updateCompileError(error.error);
-              }
+              updateCompileError(error.error ? error.error : error.toString());
             } else {
               updateCompileError(error);
             }

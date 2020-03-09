@@ -1,9 +1,17 @@
+// @flow
+
+import type {
+  ParserVariable,
+  VariableObj,
+  VariablesLookupType
+} from '../../../types';
+
 export function checkIntUintMismatch(
-  parsedLhs,
-  parsedRhs,
-  leftIntReturn,
-  rightIntReturn
-) {
+  parsedLhs: ParserVariable,
+  parsedRhs: ParserVariable,
+  leftIntReturn: ParserVariable,
+  rightIntReturn: ParserVariable
+): ParserVariable | null {
   if (
     parsedLhs.type &&
     parsedRhs.type &&
@@ -15,13 +23,17 @@ export function checkIntUintMismatch(
   return null;
 }
 
-export function bitsModeGetType(info) {
+export function bitsModeGetType(info: VariableObj): string {
   return `${info.type === 'string' && info.bits ? 'bytes' : info.type}${
-    info.bits
+    info.bits ? info.bits : ''
   }`;
 }
 
-export function isSameBaseType(lhs, rhs, bitsMode) {
+export function isSameBaseType(
+  lhs: string,
+  rhs: string,
+  bitsMode: boolean
+): boolean {
   if (lhs === rhs) {
     return true;
   }
@@ -37,7 +49,7 @@ export function isSameBaseType(lhs, rhs, bitsMode) {
   );
 }
 
-export function isPrimitiveType(type) {
+export function isPrimitiveType(type: string): boolean {
   return (
     type.startsWith('uint') ||
     type.startsWith('int') ||
@@ -46,7 +58,7 @@ export function isPrimitiveType(type) {
     type === 'bool'
   );
 }
-export function toLowerCamelCase(str) {
+export function toLowerCamelCase(str: string): string {
   return str
     .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
       index === 0 ? letter.toLowerCase() : letter.toUpperCase()
@@ -54,7 +66,10 @@ export function toLowerCamelCase(str) {
     .replace(/\s+/g, '');
 }
 
-export function isString(rawVariable, vars) {
+export function isString(
+  rawVariable: string,
+  vars: VariablesLookupType
+): boolean {
   const variable = rawVariable.trim();
   return (
     (variable[0] === '"' && variable[variable.length - 1] === '"') ||
@@ -63,10 +78,10 @@ export function isString(rawVariable, vars) {
   );
 }
 
-export function deepClone(toClone) {
+export function deepClone(toClone: {}): {} {
   return JSON.parse(JSON.stringify(toClone));
 }
 
-export function objectEquals(objectA, objectB) {
+export function objectEquals(objectA: {}, objectB: {}): boolean {
   return JSON.stringify(objectA) === JSON.stringify(objectB);
 }

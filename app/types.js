@@ -3,7 +3,8 @@
 export type Classes = { [key: string]: string };
 
 type VariableType = 'uint' | 'bool' | 'address payable' | 'string';
-type Comparator = '==' | '!=' | '>' | '>=' | '<' | '<=';
+
+export type Comparator = '==' | '!=' | '>' | '>=' | '<' | '<=';
 
 export type onParseFn = {
   tabsCode: string,
@@ -32,7 +33,7 @@ export type RequireObj = {
   comp: Comparator,
   var2: string,
   displayVar2: string,
-  requireMessage: string
+  requireMessage?: string
 };
 
 export type VariableObj = {
@@ -41,6 +42,14 @@ export type VariableObj = {
   value?: string,
   type: VariableType | string,
   bits: ?(number | string)
+};
+
+export type ParserVariable = {
+  name: string,
+  type: string,
+  mapName?: string,
+  keyType?: string,
+  innerKeyType?: string
 };
 
 export type VariablesLookupType = { [key: string]: string | Mapping };
