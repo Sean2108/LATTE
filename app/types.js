@@ -33,7 +33,7 @@ export type RequireObj = {
   comp: Comparator,
   var2: string,
   displayVar2: string,
-  requireMessage?: string
+  requireMessage: string
 };
 
 export type VariableObj = {
