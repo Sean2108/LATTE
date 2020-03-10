@@ -26,8 +26,8 @@ type Props = {
   classes: Classes,
   showMessage: boolean,
   updateRequire: RequireObj => void,
-  variables: VariablesLookupType,
-  structList: StructLookupType,
+  variables?: VariablesLookupType,
+  structList?: StructLookupType,
   require: RequireObj
 };
 

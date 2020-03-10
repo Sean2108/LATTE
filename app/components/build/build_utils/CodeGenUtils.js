@@ -41,7 +41,10 @@ export default class CodeGenUtils {
       buildState.variables,
       settings.indentation || '    '
     );
-    const params = this.formParams(buildState.tabsParams[i], settings.bitsMode || false);
+    const params = this.formParams(
+      buildState.tabsParams[i],
+      settings.bitsMode || false
+    );
     return `${functionName}(${params}) public ${
       buildState.isView[i] && buildState.tabs[i + 1] !== 'Initial State'
         ? 'view'
@@ -73,9 +76,13 @@ export default class CodeGenUtils {
           isString(req.var2, variables) &&
           req.comp === '=='
         ) {
-          return `${indentation}require(keccak256(${req.var1}) == keccak256(${req.var2}), "${req.requireMessage}");\n`;
+          return `${indentation}require(keccak256(${req.var1}) == keccak256(${
+            req.var2
+          })${req.requireMessage ? `, "${req.requireMessage}"` : ''});\n`;
         }
-        return `${indentation}require(${req.var1} ${req.comp} ${req.var2}, "${req.requireMessage}");\n`;
+        return `${indentation}require(${req.var1} ${req.comp} ${req.var2}${
+          req.requireMessage ? `, "${req.requireMessage}"` : ''
+        });\n`;
       })
       .join('');
   }

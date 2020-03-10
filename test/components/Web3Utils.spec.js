@@ -56,7 +56,7 @@ describe('Web3Utils getGasUsageCallback', () => {
     const estimateGas = jest
       .fn()
       .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject('test error message'))
+        new Promise((resolve, reject) => reject(new Error('test error message')))
       );
     const web3 = {
       eth: { estimateGas }

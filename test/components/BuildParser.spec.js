@@ -11,7 +11,8 @@ function addNodeToDataNode(
   sourceNode,
   targetNodeName,
   targetNodeData = {},
-  isTargetDataNode = true
+  isTargetDataNode = true,
+  reverseLink = false
 ) {
   const [targetNode, targetPort] = createTargetNode(
     isTargetDataNode,
@@ -19,7 +20,7 @@ function addNodeToDataNode(
     targetNodeData
   );
   const sourcePort = sourceNode.addOutPort(sourceNode.name);
-  addLink(sourcePort, targetPort);
+  (reverseLink ? addReversedLink : addLink)(sourcePort, targetPort);
   return targetNode;
 }
 
@@ -30,21 +31,24 @@ function addBranchesToDiamondNode(
   targetNodeDataTrue = {},
   targetNodeDataFalse = {},
   isTargetTrueDataNode = true,
-  isTargetFalseDataNode = true
+  isTargetFalseDataNode = true,
+  reverseLinks = false
 ) {
   const targetTrueNode = addBranchToDiamondNode(
     sourceNode,
     true,
     targetNodeNameTrue,
     targetNodeDataTrue,
-    isTargetTrueDataNode
+    isTargetTrueDataNode,
+    reverseLinks
   );
   const targetFalseNode = addBranchToDiamondNode(
     sourceNode,
     false,
     targetNodeNameFalse,
     targetNodeDataFalse,
-    isTargetFalseDataNode
+    isTargetFalseDataNode,
+    reverseLinks
   );
   return [targetTrueNode, targetFalseNode];
 }
@@ -54,14 +58,15 @@ function addBranchToDiamondNode(
   isTrueBranch,
   targetNodeName,
   targetNodeData,
-  isTargetDataNode = true
+  isTargetDataNode = true,
+  reverseLinks = false
 ) {
   const [targetNode, targetPort] = createTargetNode(
     isTargetDataNode,
     targetNodeName,
     targetNodeData
   );
-  addLink(
+  (reverseLinks ? addReversedLink : addLink)(
     isTrueBranch ? sourceNode.outPortTrue : sourceNode.outPortFalse,
     targetPort
   );
@@ -83,7 +88,15 @@ function createTargetNode(isTargetDataNode, targetNodeName, targetNodeData) {
 
 function addLink(sourcePort, targetPort) {
   const link = sourcePort.createLinkModel();
+  link.setSourcePort(sourcePort);
   link.setTargetPort(targetPort);
+  sourcePort.addLink(link);
+}
+
+function addReversedLink(sourcePort, targetPort) {
+  const link = targetPort.createLinkModel();
+  link.setSourcePort(targetPort);
+  link.setTargetPort(sourcePort);
   sourcePort.addLink(link);
 }
 
@@ -128,6 +141,24 @@ describe('BuildParser parse', () => {
     const buildParser = new BuildParser(onVariableChange);
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     addNodeToDataNode(startNode, 'first', { first: 2 });
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    mockNodeParserInstance.parseNode.mockReturnValueOnce('code');
+    const code = buildParser.parse(startNode);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNodeForVariables,
+      [[{ first: 2 }]],
+      2
+    );
+    expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
+    expect(onVariableChange).toHaveBeenCalledTimes(1);
+    expect(code).toEqual('code\n');
+  });
+
+  it('should return correct code for diagram with 1 data node with a reverse link', () => {
+    const onVariableChange = jest.fn();
+    const buildParser = new BuildParser(onVariableChange);
+    const startNode = new DefaultDataNodeModel('Start', { start: 1 });
+    addNodeToDataNode(startNode, 'first', { first: 2 }, {}, true, true);
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode.mockReturnValueOnce('code');
     const code = buildParser.parse(startNode);
@@ -189,6 +220,38 @@ describe('BuildParser findVariables', () => {
     );
     addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
     addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    buildParser.findVariables(startNode);
+    expectFunctionCalledWithTimes(
+      mockNodeParserInstance.parseNodeForVariables,
+      [[{ t1: 3 }], [{ f1: 4 }], [{ t2: 5 }], [{ f2: 6 }]],
+      2
+    );
+    expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
+    expect(mockNodeParserInstance.parseNode).toHaveBeenCalledWith({ c: 2 });
+  });
+
+  it('should call node parser correct times for diagram with conditional node and 4 data nodes with reversed links', () => {
+    const buildParser = new BuildParser();
+    const startNode = new DefaultDataNodeModel('Start', { start: 1 });
+    const compareNode = addNodeToDataNode(
+      startNode,
+      'compare',
+      { c: 2 },
+      false
+    );
+    const [targetTrueNode, targetFalseNode] = addBranchesToDiamondNode(
+      compareNode,
+      't1',
+      'f1',
+      { t1: 3 },
+      { f1: 4 },
+      true,
+      true,
+      true
+    );
+    addNodeToDataNode(targetTrueNode, 't2', { t2: 5 }, true, true);
+    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 }, true, true);
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(

@@ -200,10 +200,10 @@ export default class BuildParser {
 
   getNextNode(outPort) {
     const links = Object.values(outPort.getLinks());
-    if (links.length === 0 || !links[0].targetPort) {
+    if (!links.length) {
       return null;
     }
-    return links[0].targetPort.getNode();
+    return links[0].targetPort.in ? links[0].targetPort.getNode() : links[0].sourcePort.getNode();
   }
 
   getNextNodeForDefaultNode(node) {

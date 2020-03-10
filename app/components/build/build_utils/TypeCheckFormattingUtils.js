@@ -9,9 +9,9 @@ import type {
 export function checkIntUintMismatch(
   parsedLhs: ParserVariable,
   parsedRhs: ParserVariable,
-  leftIntReturn: ParserVariable,
-  rightIntReturn: ParserVariable
-): ParserVariable | null {
+  leftIntReturn: string,
+  rightIntReturn: string
+): ?string {
   if (
     parsedLhs.type &&
     parsedRhs.type &&
