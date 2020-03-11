@@ -99,13 +99,12 @@ class BuildOptionsPopover extends React.Component {
                 case DATA_OP.SAVE_DATA:
                   saveData();
                   break;
-                case DATA_OP.LOAD_DATA:
-                  loadData();
-                  break;
                 case DATA_OP.SAVE_CONTRACT:
                   saveContract();
                   break;
+                case DATA_OP.LOAD_DATA:
                 default:
+                  loadData();
                   break;
               }
             }}
