@@ -123,10 +123,14 @@ export default class Web3Utils {
       });
   };
 
-  compileCode = (event, payload, accs, updateCompileError, callback) => {
+  compileCode = (payload, accs, updateCompileError, callback) => {
     const compiledCode = JSON.parse(payload);
-    if ('errors' in compiledCode && !('contracts' in compiledCode)) {
+    if ('errors' in compiledCode) {
       updateCompileError(compiledCode.errors[0].formattedMessage);
+      return;
+    }
+    if (!('contracts' in compiledCode)) {
+      updateCompileError('Compilation failed, please try again.');
       return;
     }
     const abiDefinition = compiledCode.contracts['code.sol'].Code.abi;
@@ -159,7 +163,7 @@ export default class Web3Utils {
     }
     ipcRenderer.send('request-compile', code);
     ipcRenderer.once('request-compile-complete', (event, payload) =>
-      this.compileCode(event, payload, accs, updateCompileError, callback)
+      this.compileCode(payload, accs, updateCompileError, callback)
     );
   };
 }
