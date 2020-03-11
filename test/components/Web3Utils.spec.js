@@ -343,3 +343,91 @@ describe('Web3Utils requestCompile', () => {
     web3Utils.compileCode = originalCompileCode;
   });
 });
+
+describe('Web3Utils action functions', () => {
+  let requestCompile = jest.fn();
+  let gasUsageCallback = jest.fn();
+  let deployCallback = jest.fn();
+  const web3Utils = new Web3Utils({});
+
+  function swapMockFns() {
+    [requestCompile, web3Utils.requestCompile] = [
+      web3Utils.requestCompile,
+      requestCompile
+    ];
+    [gasUsageCallback, web3Utils.gasUsageCallback] = [
+      web3Utils.gasUsageCallback,
+      gasUsageCallback
+    ];
+    [deployCallback, web3Utils.deployCallback] = [
+      web3Utils.deployCallback,
+      deployCallback
+    ];
+  };
+
+  beforeAll(swapMockFns);
+
+  afterAll(swapMockFns);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should call requestCompile correctly when getGasUsage is called', () => {
+    const updateCompileError = jest.fn();
+    web3Utils.getGasUsage(
+      { x: 1, y: 2 },
+      { bitsMode: true, indentation: '  ' },
+      [1, 2, 3, 4],
+      updateCompileError
+    );
+    expect(web3Utils.requestCompile).toHaveBeenCalledWith(
+      updateCompileError,
+      false,
+      { x: 1, y: 2 },
+      { bitsMode: true, indentation: '  ' },
+      expect.any(Function)
+    );
+    web3Utils.requestCompile.mock.calls[0][4](
+      [2, 4],
+      { arguments: ['test'] },
+      { test: 'contract' }
+    );
+    expect(web3Utils.gasUsageCallback).toHaveBeenCalledWith(
+      { x: 1, y: 2 },
+      updateCompileError,
+      [2, 4],
+      { arguments: ['test'] },
+      { test: 'contract' },
+      [1, 2, 3, 4]
+    );
+  });
+
+  it('should call requestCompile correctly when deploySmartContract is called', () => {
+    const updateCompileError = jest.fn();
+    web3Utils.deploySmartContract(
+      { x: 1, y: 2 },
+      { bitsMode: true, indentation: '  ' },
+      updateCompileError
+    );
+    expect(web3Utils.requestCompile).toHaveBeenCalledWith(
+      updateCompileError,
+      true,
+      { x: 1, y: 2 },
+      { bitsMode: true, indentation: '  ' },
+      expect.any(Function)
+    );
+    web3Utils.requestCompile.mock.calls[0][4](
+      [2, 4],
+      { arguments: ['test'] },
+      { test: 'contract' }
+    );
+    expect(web3Utils.deployCallback).toHaveBeenCalledWith(
+      { x: 1, y: 2 },
+      updateCompileError,
+      [2, 4],
+      { arguments: ['test'] },
+      { test: 'contract' }
+    );
+  });
+});
