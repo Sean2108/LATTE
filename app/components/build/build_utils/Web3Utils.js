@@ -126,8 +126,11 @@ export default class Web3Utils {
   compileCode = (payload, accs, updateCompileError, callback) => {
     const compiledCode = JSON.parse(payload);
     if ('errors' in compiledCode) {
-      updateCompileError(compiledCode.errors[0].formattedMessage);
-      return;
+      const error = compiledCode.errors[0].formattedMessage;
+      if (!error.includes('Warning:')) {
+        updateCompileError(error);
+        return;
+      }
     }
     if (!('contracts' in compiledCode)) {
       updateCompileError('Compilation failed, please try again.');
