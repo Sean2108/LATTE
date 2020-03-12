@@ -20,6 +20,8 @@ import type {
   Classes
 } from '../../types';
 import EditHistory from './build_utils/EditHistory';
+import { DiagramEngine, DiagramModel } from 'storm-react-diagrams';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 
 const styles = theme => ({
   drawer: {
@@ -58,7 +60,10 @@ type Props = {
   updateBuildError: () => void,
   isConstructor: boolean,
   editHistory: EditHistory,
-  updateLoading: boolean => void
+  updateLoading: boolean => void,
+  diagramEngine: DiagramEngine,
+  diagramModel: DiagramModel,
+  diagramStartNode: DefaultDataNodeModel
 };
 
 type State = {
@@ -128,7 +133,10 @@ class DefaultBuildTab extends React.Component<Props, State> {
       updateBuildError,
       isConstructor,
       editHistory,
-      updateLoading
+      updateLoading,
+      diagramEngine,
+      diagramModel,
+      diagramStartNode
     } = this.props;
     const { drawerOpen, warning } = this.state;
     const variables = this.flattenParamsToObject(params, settings.bitsMode);
@@ -170,6 +178,9 @@ class DefaultBuildTab extends React.Component<Props, State> {
           showWarning={(newWarning: string) =>
             this.setState({ warning: newWarning })
           }
+          diagramEngine={diagramEngine}
+          diagramModel={diagramModel}
+          diagramStartNode={diagramStartNode}
         />
 
         <Drawer

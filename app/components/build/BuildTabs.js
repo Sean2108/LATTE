@@ -15,6 +15,7 @@ import InitialStateTab from './InitialStateTab';
 import Web3Utils from './build_utils/Web3Utils';
 import DefaultBuildTab from './DefaultBuildTab';
 import EditHistory from './build_utils/EditHistory';
+import { getNewModel } from './build_utils/DiagramUtils';
 import type {
   VariablesLookupType,
   BuildState,
@@ -23,6 +24,7 @@ import type {
   RequireObj,
   onParseFn,
   StructLookupType,
+  DiagramState,
   Classes
 } from '../../types';
 
@@ -73,7 +75,9 @@ type Props = {
   buildState: BuildState,
   settings: SettingsObj,
   connection: Web3,
-  updateLoading: boolean => void
+  updateLoading: boolean => void,
+  diagramState: DiagramState,
+  onDiagramChange: ({}) => void
 };
 
 type State = {
@@ -144,7 +148,9 @@ class BuildTabs extends React.Component<Props, State> {
       onTabsChange,
       buildState,
       settings,
-      updateLoading
+      updateLoading,
+      diagramState,
+      onDiagramChange
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
     const updateBuildError = (buildError: string): void => {
@@ -221,7 +227,6 @@ class BuildTabs extends React.Component<Props, State> {
                   ): void => onTabsChange({ variables: newVariables })}
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
-                  diagram={buildState.diagrams[i]}
                   settings={settings}
                   gasHistory={buildState.gasHistory}
                   updateGasHistory={(): void => {
@@ -238,6 +243,9 @@ class BuildTabs extends React.Component<Props, State> {
                   isConstructor={i === 0}
                   editHistory={this.editHistory}
                   updateLoading={updateLoading}
+                  diagramEngine={diagramState.engine}
+                  diagramModel={diagramState.models[i]}
+                  diagramStartNode={diagramState.startNodes[i]}
                 />
               </TabContainer>
             )
@@ -285,11 +293,17 @@ class BuildTabs extends React.Component<Props, State> {
                     isView: [...buildState.isView, false],
                     diagrams: [...buildState.diagrams, {}]
                   };
+                  const { model, startNode } = getNewModel();
+                  const newDiagramState = {
+                    models: [...diagramState.models, model],
+                    startNodes: [...diagramState.startNodes, startNode]
+                  };
                   this.setState({
                     popoverContent: '',
                     addTabPopoverAnchor: null
                   });
                   onTabsChange(newTabsState);
+                  onDiagramChange(newDiagramState);
                 }
               }}
             >

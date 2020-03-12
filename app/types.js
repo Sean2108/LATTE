@@ -70,3 +70,9 @@ export type BuildState = {
   gasHistory: Array<number>,
   buildError: string
 };
+
+export type DiagramState = {
+  models: Array<?DiagramModel>,
+  startNodes: Array<?DefaultDataNodeModel>,
+  engine: ?DiagramEngine
+};

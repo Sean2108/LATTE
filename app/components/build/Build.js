@@ -5,7 +5,23 @@ import { withStyles } from '@material-ui/core/styles';
 import Web3 from 'web3';
 import BuildOptions from './BuildOptions';
 import BuildTabs from './BuildTabs';
-import type { SettingsObj, BuildState, Classes } from '../../types';
+import {
+  DiagramEngine,
+  DiagramModel,
+  DefaultPortModel
+} from 'storm-react-diagrams';
+import DiamondPortModel from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
+import DiamondNodeFactory from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
+import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
+import SimplePortFactory from './diagram/SimplePortFactory';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
+import { setupDiagram, extractDiagramState } from './build_utils/DiagramUtils';
+import type {
+  SettingsObj,
+  BuildState,
+  DiagramState,
+  Classes
+} from '../../types';
 
 const styles = theme => ({
   toolbar: {
@@ -38,6 +54,7 @@ type Props = {
 
 type State = {
   buildState: BuildState,
+  diagramState: DiagramState,
   loading: boolean
 };
 
@@ -58,8 +75,20 @@ class Build extends React.Component<Props, State> {
       gasHistory: [0], // eslint-disable-line react/no-unused-state
       buildError: '' // eslint-disable-line react/no-unused-state
     },
+    diagramState: {
+      models: [null],
+      startNodes: [null],
+      engine: null
+    },
     loading: false
   };
+
+  componentWillMount() {
+    const { engine, model, startNode } = setupDiagram();
+    this.setState({
+      diagramState: { models: [model], startNodes: [startNode], engine: engine }
+    });
+  }
 
   render(): React.Node {
     const { classes, onback, connection, settings } = this.props;
@@ -89,13 +118,25 @@ class Build extends React.Component<Props, State> {
               updateLoading={(loading: boolean): void =>
                 this.setState({ loading })
               }
+              diagramState={this.state.diagramState}
+              onDiagramChange={(diagramState: {}): void =>
+                this.setState((prevState: State) => ({
+                  diagramState: { ...prevState.diagramState, ...diagramState }
+                }))
+              }
             />
             <BuildOptions
               onback={onback}
               connection={connection}
               buildState={this.state.buildState}
               loadState={(buildState: BuildState): void =>
-                this.setState({ buildState })
+                this.setState((prevState: State) => {
+                  const diagramState = extractDiagramState(
+                    prevState.diagramState.engine,
+                    buildState.diagrams
+                  );
+                  return { buildState, diagramState };
+                })
               }
               settings={settings}
               loading={this.state.loading}
