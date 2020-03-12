@@ -126,9 +126,11 @@ export default class Web3Utils {
   compileCode = (payload, accs, updateCompileError, callback) => {
     const compiledCode = JSON.parse(payload);
     if ('errors' in compiledCode) {
-      const error = compiledCode.errors[0].formattedMessage;
-      if (!error.includes('Warning:')) {
-        updateCompileError(error);
+      const errors = compiledCode.errors
+        .filter(err => err.severity === 'error')
+        .map(err => err.formattedMessage);
+      if (errors.length) {
+        updateCompileError(errors[0]);
         return;
       }
     }

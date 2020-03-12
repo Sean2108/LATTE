@@ -205,7 +205,10 @@ describe('Web3Utils compileCode', () => {
   it('should updateCompileError and stop when there is an error in compiled code', () => {
     const web3Utils = new Web3Utils({});
     const payload = {
-      errors: [{ formattedMessage: 'test error str' }],
+      errors: [
+        { formattedMessage: 'Warning: test warning str', severity: 'warning' },
+        { formattedMessage: 'test error str', severity: 'error' }
+      ],
       contracts: { 'code.sol': { Code: { abi: 'test abi' } } }
     };
     const updateCompileError = jest.fn();
@@ -241,12 +244,15 @@ describe('Web3Utils compileCode', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it('should work correctly when there are warnings', () => {
+  it('should work correctly when there are only warnings', () => {
     const web3Utils = new Web3Utils(new Web3(''));
     const bytecode =
       '6080604052603e8060116000396000f3fe6080604052600080fdfea265627a7a72305820e634eb09997590801b0462c736f1ecc45599be5385ae9a3e5d535af70e2096c164736f6c63430005090032';
     const payload = {
-      errors: [{ formattedMessage: 'Warning: test warning str' }],
+      errors: [
+        { formattedMessage: 'Warning: test warning str', severity: 'warning' },
+        { formattedMessage: 'Warning: test warning str2', severity: 'warning' }
+      ],
       contracts: {
         'code.sol': {
           Code: {
@@ -408,7 +414,7 @@ describe('Web3Utils action functions', () => {
       web3Utils.deployCallback,
       deployCallback
     ];
-  };
+  }
 
   beforeAll(swapMockFns);
 

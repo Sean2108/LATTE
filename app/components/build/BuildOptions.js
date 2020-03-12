@@ -52,7 +52,7 @@ class BuildOptions extends React.Component {
         this.props.settings,
         () => {}
       ),
-    5000
+    500
   );
 
   handleClick = (event, dataOp) => {
