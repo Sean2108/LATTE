@@ -8,6 +8,7 @@ import VariableList from '../../app/components/build/build_components/VariableLi
 import RequiresList from '../../app/components/build/build_components/RequiresList';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
+import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -32,6 +33,9 @@ function setup(createComponentMount = true) {
       isConstructor={false}
       editHistory={new EditHistory(1)}
       updateLoading={jest.fn()}
+      engine={setupEngine()}
+      startNode={null}
+      updateStartNode={jest.fn()}
     />
   );
   const input = [

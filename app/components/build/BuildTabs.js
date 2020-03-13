@@ -11,11 +11,12 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Web3 from 'web3';
+import { DiagramEngine } from 'storm-react-diagrams';
 import InitialStateTab from './InitialStateTab';
 import Web3Utils from './build_utils/Web3Utils';
 import DefaultBuildTab from './DefaultBuildTab';
 import EditHistory from './build_utils/EditHistory';
-import { getNewModel } from './build_utils/DiagramUtils';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 import type {
   VariablesLookupType,
   BuildState,
@@ -24,7 +25,6 @@ import type {
   RequireObj,
   onParseFn,
   StructLookupType,
-  DiagramState,
   Classes
 } from '../../types';
 
@@ -76,8 +76,9 @@ type Props = {
   settings: SettingsObj,
   connection: Web3,
   updateLoading: boolean => void,
-  diagramState: DiagramState,
-  onDiagramChange: ({}) => void
+  engine: DiagramEngine,
+  startNodes: Array<?DefaultDataNodeModel>,
+  updateStartNodes: (Array<?DefaultDataNodeModel>) => void
 };
 
 type State = {
@@ -149,8 +150,9 @@ class BuildTabs extends React.Component<Props, State> {
       buildState,
       settings,
       updateLoading,
-      diagramState,
-      onDiagramChange
+      engine,
+      startNodes,
+      updateStartNodes
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
     const updateBuildError = (buildError: string): void => {
@@ -227,6 +229,7 @@ class BuildTabs extends React.Component<Props, State> {
                   ): void => onTabsChange({ variables: newVariables })}
                   params={buildState.tabsParams[i]}
                   requires={buildState.tabsRequire[i]}
+                  diagram={buildState.diagrams[i]}
                   settings={settings}
                   gasHistory={buildState.gasHistory}
                   updateGasHistory={(): void => {
@@ -243,9 +246,13 @@ class BuildTabs extends React.Component<Props, State> {
                   isConstructor={i === 0}
                   editHistory={this.editHistory}
                   updateLoading={updateLoading}
-                  diagramEngine={diagramState.engine}
-                  diagramModel={diagramState.models[i]}
-                  diagramStartNode={diagramState.startNodes[i]}
+                  engine={engine}
+                  startNode={startNodes[i]}
+                  updateStartNode={(startNode: DefaultDataNodeModel): void => {
+                    const newStartNodes = [...startNodes];
+                    newStartNodes[i] = startNode;
+                    updateStartNodes(newStartNodes);
+                  }}
                 />
               </TabContainer>
             )
@@ -293,17 +300,12 @@ class BuildTabs extends React.Component<Props, State> {
                     isView: [...buildState.isView, false],
                     diagrams: [...buildState.diagrams, {}]
                   };
-                  const { model, startNode } = getNewModel();
-                  const newDiagramState = {
-                    models: [...diagramState.models, model],
-                    startNodes: [...diagramState.startNodes, startNode]
-                  };
                   this.setState({
                     popoverContent: '',
                     addTabPopoverAnchor: null
                   });
                   onTabsChange(newTabsState);
-                  onDiagramChange(newDiagramState);
+                  updateStartNodes([...startNodes, null])
                 }
               }}
             >

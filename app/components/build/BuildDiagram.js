@@ -21,16 +21,14 @@ import { Button, IconButton } from '@material-ui/core';
 import TrayWidget from './diagram/TrayWidget';
 import TrayItemWidget from './diagram/TrayItemWidget';
 import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
-import DiamondNodeFactory from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
-import SimplePortFactory from './diagram/SimplePortFactory';
-import DiamondPortModel from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
 import DiagramModal from './diagram/DiagramModal';
 import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
-import type {
+import { findStart, getNewStartNode } from './build_utils/DiagramUtils';
+import type
+ {
   StructLookupType,
   VariablesLookupType,
   onParseFn,
@@ -102,9 +100,9 @@ type Props = {
   editHistory: EditHistory,
   updateLoading: boolean => void, // eslint-disable-line react/no-unused-prop-types
   showWarning: string => void,
-  diagramEngine: DiagramEngine,
-  diagramModel: DiagramModel,
-  diagramStartNode: DefaultDataNodeModel
+  engine: DiagramEngine,
+  startNode: ?DefaultDataNodeModel, // eslint-disable-line react/no-unused-prop-types
+  updateStartNode: (?DefaultDataNodeModel) => void
 };
 
 type State = {
@@ -116,6 +114,8 @@ type State = {
 class BuildDiagram extends React.Component<Props, State> {
   buildParser: BuildParser;
 
+  model: DiagramModel;
+
   state = {
     open: false,
     type: 'assignment',
@@ -123,22 +123,37 @@ class BuildDiagram extends React.Component<Props, State> {
   };
 
   componentWillMount(): void {
-    const {
-      diagramEngine,
-      diagramModel,
-      onVariablesChange,
-      updateBuildError
-    } = this.props;
-
-    this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
-    this.resetListener(diagramModel);
-
-    diagramEngine.setDiagramModel(diagramModel);
+    this.renderDiagram();
   }
 
-  resetListener(diagramModel: DiagramModel) {
-    diagramModel.clearListeners();
-    diagramModel.addListener({
+  componentDidUpdate(prevProps: Props): void {
+    if (!objectEquals(this.props.diagram, prevProps.diagram)) {
+      this.renderDiagram();
+    }
+  }
+
+  renderDiagram(): void {
+    const { diagram, onVariablesChange, updateBuildError, updateStartNode, engine } = this.props;
+    this.model = new DiagramModel();
+    let startNode: ?DefaultDataNodeModel = null;
+    if (Object.entries(diagram).length > 0) {
+      this.model.deSerializeDiagram(diagram, engine);
+      startNode = findStart(this.model);
+    }
+    if (!startNode) {
+      startNode = getNewStartNode();
+      this.model.addAll(startNode);
+    }
+    this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
+    this.resetListener();
+
+    engine.setDiagramModel(this.model);
+    updateStartNode(startNode);
+  }
+
+  resetListener() {
+    this.model.clearListeners();
+    this.model.addListener({
       linksUpdated: this.onLinksUpdated
     });
   }
@@ -168,16 +183,15 @@ class BuildDiagram extends React.Component<Props, State> {
     onParse,
     updateGasHistory,
     updateLoading,
-    diagramModel,
-    diagramStartNode
+    startNode
   }): void {
     this.buildParser.reset(varList, functionParams, events, entities, settings);
-    const code: string = this.buildParser.parse(diagramStartNode);
+    const code: string = this.buildParser.parse(startNode);
     onParse({
       tabsCode: code,
       tabsReturn: this.buildParser.getReturnVar(),
       isView: this.buildParser.getView(),
-      diagrams: diagramModel.serializeDiagram()
+      diagrams: this.model.serializeDiagram()
     });
     updateGasHistory();
     updateLoading(false);
@@ -250,7 +264,7 @@ class BuildDiagram extends React.Component<Props, State> {
     const node = this.selectNode(type, info, data);
     node.x = points.x;
     node.y = points.y;
-    this.props.diagramModel.addNode(node);
+    this.props.engine.getDiagramModel().addNode(node);
     this.forceUpdate();
   }
 
@@ -264,12 +278,11 @@ class BuildDiagram extends React.Component<Props, State> {
       openDrawer,
       isConstructor,
       editHistory,
-      diagramEngine,
-      diagramModel
+      engine
     } = this.props;
 
     const { open, type } = this.state;
-    this.resetListener(diagramModel);
+    this.resetListener();
 
     return (
       <Paper className={classes.paper}>
@@ -424,16 +437,16 @@ class BuildDiagram extends React.Component<Props, State> {
                 this.setState({
                   open: true,
                   type: data.type,
-                  points: diagramEngine.getRelativeMousePoint(event)
+                  points: engine.getRelativeMousePoint(event)
                 });
-                diagramModel.clearSelection();
+                this.model.clearSelection();
               }}
               onDragOver={event => {
                 event.preventDefault();
               }}
             >
               <DiagramWidget
-                diagramEngine={diagramEngine}
+                diagramEngine={engine}
                 className="srd-canvas"
                 allowLooseLinks={false}
               />

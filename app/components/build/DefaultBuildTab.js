@@ -6,6 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import { Snackbar, SnackbarContent } from '@material-ui/core';
 import WarningIcon from '@material-ui/icons/Warning';
 import { amber } from '@material-ui/core/colors';
+import { DiagramEngine } from 'storm-react-diagrams';
 import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './build_components/RequiresList';
@@ -20,7 +21,6 @@ import type {
   Classes
 } from '../../types';
 import EditHistory from './build_utils/EditHistory';
-import { DiagramEngine, DiagramModel } from 'storm-react-diagrams';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 
 const styles = theme => ({
@@ -61,9 +61,9 @@ type Props = {
   isConstructor: boolean,
   editHistory: EditHistory,
   updateLoading: boolean => void,
-  diagramEngine: DiagramEngine,
-  diagramModel: DiagramModel,
-  diagramStartNode: DefaultDataNodeModel
+  engine: DiagramEngine,
+  startNode: ?DefaultDataNodeModel,
+  updateStartNode: (?DefaultDataNodeModel) => void
 };
 
 type State = {
@@ -134,9 +134,9 @@ class DefaultBuildTab extends React.Component<Props, State> {
       isConstructor,
       editHistory,
       updateLoading,
-      diagramEngine,
-      diagramModel,
-      diagramStartNode
+      engine,
+      startNode,
+      updateStartNode
     } = this.props;
     const { drawerOpen, warning } = this.state;
     const variables = this.flattenParamsToObject(params, settings.bitsMode);
@@ -178,9 +178,9 @@ class DefaultBuildTab extends React.Component<Props, State> {
           showWarning={(newWarning: string) =>
             this.setState({ warning: newWarning })
           }
-          diagramEngine={diagramEngine}
-          diagramModel={diagramModel}
-          diagramStartNode={diagramStartNode}
+          engine={engine}
+          startNode={startNode}
+          updateStartNode={updateStartNode}
         />
 
         <Drawer

@@ -3,24 +3,16 @@
 import {
   DiagramEngine,
   DiagramModel,
-  DiagramWidget,
   DefaultPortModel,
-  NodeModel,
-  PointModel,
-  PortModel
+  NodeModel
 } from 'storm-react-diagrams';
 import DiamondPortModel from '../diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 import DiamondNodeFactory from '../diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
 import DefaultDataNodeFactory from '../diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
 import SimplePortFactory from '../diagram/SimplePortFactory';
 import DefaultDataNodeModel from '../diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import type { DiagramState } from '../../../types';
 
-export function setupDiagram(): {
-  engine: DiagramEngine,
-  model: DiagramModel,
-  startNode: DefaultDataNodeModel
-} {
+export function setupEngine(): DiagramEngine {
   const engine: DiagramEngine = new DiagramEngine();
   engine.installDefaultFactories();
   engine.registerPortFactory(
@@ -31,43 +23,31 @@ export function setupDiagram(): {
   );
   engine.registerNodeFactory(new DiamondNodeFactory());
   engine.registerNodeFactory(new DefaultDataNodeFactory());
-
-  return { engine, ...getNewModel() };
+  return engine;
 }
 
-export function extractDiagramState(engine, diagrams: Array<{}>): DiagramState {
-  const models: Array<DiagramModel> = diagrams.map(
-    (diagram: {}): DiagramModel => {
+export function extractStartNodes(
+  engine: DiagramEngine,
+  diagrams: Array<{}>
+): Array<?DefaultDataNodeModel> {
+  return diagrams
+    .map((diagram: {}): DiagramModel => {
       const diagramModel: DiagramModel = new DiagramModel();
       if (Object.entries(diagram).length > 0) {
         diagramModel.deSerializeDiagram(diagram, engine);
       }
       return diagramModel;
-    }
-  );
-  const startNodes: Array<DefaultDataNodeModel> = models.map(
-    (model: DiagramModel): DefaultDataNodeModel => {
+    })
+    .map((model: DiagramModel): DefaultDataNodeModel => {
       const startNode = findStart(model);
       if (!startNode) {
         model.addAll(getNewStartNode());
       }
       return startNode;
-    }
-  );
-  return { engine, startNodes, models };
+    });
 }
 
-export function getNewModel(): {
-  model: DiagramModel,
-  startNode: DefaultDataNodeModel
-} {
-  const model: DiagramModel = new DiagramModel();
-  const startNode: DefaultDataNodeModel = getNewStartNode();
-  model.addAll(startNode);
-  return { model, startNode };
-}
-
-function getNewStartNode() {
+export function getNewStartNode() {
   const startNode: DefaultDataNodeModel = new DefaultDataNodeModel(
     'Start',
     'rgb(0,192,255)'
@@ -78,7 +58,7 @@ function getNewStartNode() {
   return startNode;
 }
 
-function findStart(model: DiagramModel): NodeModel {
+export function findStart(model: DiagramModel): NodeModel {
   for (const node: NodeModel of Object.values(model.getNodes())) {
     if (node.name === 'Start') {
       return node;

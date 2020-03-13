@@ -10,6 +10,7 @@ import BuildParser from '../../app/components/build/parsers/BuildParser';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
 import DefaultDataPortModel from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataPortModel';
 import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
+import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils';
 
 jest.mock('../../app/components/build/parsers/BuildParser');
 
@@ -140,6 +141,9 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       editHistory={new EditHistory(1, jest.fn())}
       updateLoading={jest.fn()}
       showWarning={jest.fn()}
+      engine={setupEngine()}
+      startNode={null}
+      updateStartNode={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -197,7 +201,8 @@ describe('BuildDiagram component', () => {
       settings: { bitsMode: true, indentation: '    ' },
       onParse,
       updateGasHistory,
-      updateLoading
+      updateLoading,
+      startNode: {}
     });
     expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
       { a: 1 },
@@ -218,8 +223,7 @@ describe('BuildDiagram component', () => {
 
   it('parseNodes should pass correct callback to diamond port factory', () => {
     const { component } = setup(false, false);
-    const instance = component.dive().instance();
-    const { cb } = instance.engine.getPortFactory('diamond');
+    const { cb } = component.props().engine.getPortFactory('diamond');
     expect(cb()).toEqual(
       expect.objectContaining({
         maximumLinks: 1,

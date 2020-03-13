@@ -3,25 +3,12 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Web3 from 'web3';
+import { DiagramEngine } from 'storm-react-diagrams';
 import BuildOptions from './BuildOptions';
 import BuildTabs from './BuildTabs';
-import {
-  DiagramEngine,
-  DiagramModel,
-  DefaultPortModel
-} from 'storm-react-diagrams';
-import DiamondPortModel from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
-import DiamondNodeFactory from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
-import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
-import SimplePortFactory from './diagram/SimplePortFactory';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import { setupDiagram, extractDiagramState } from './build_utils/DiagramUtils';
-import type {
-  SettingsObj,
-  BuildState,
-  DiagramState,
-  Classes
-} from '../../types';
+import { setupEngine, extractStartNodes } from './build_utils/DiagramUtils';
+import type { SettingsObj, BuildState, Classes } from '../../types';
 
 const styles = theme => ({
   toolbar: {
@@ -54,7 +41,8 @@ type Props = {
 
 type State = {
   buildState: BuildState,
-  diagramState: DiagramState,
+  engine: DiagramEngine,
+  startNodes: Array<?DefaultDataNodeModel>,
   loading: boolean
 };
 
@@ -75,24 +63,20 @@ class Build extends React.Component<Props, State> {
       gasHistory: [0], // eslint-disable-line react/no-unused-state
       buildError: '' // eslint-disable-line react/no-unused-state
     },
-    diagramState: {
-      models: [null],
-      startNodes: [null],
-      engine: null
-    },
+    engine: null,
+    startNodes: [null],
     loading: false
   };
 
   componentWillMount() {
-    const { engine, model, startNode } = setupDiagram();
-    this.setState({
-      diagramState: { models: [model], startNodes: [startNode], engine: engine }
-    });
+    const engine = setupEngine();
+    this.setState({ engine });
   }
 
   render(): React.Node {
     const { classes, onback, connection, settings } = this.props;
-    const { variables } = this.state.buildState;
+    const { buildState, engine, startNodes, loading } = this.state;
+    const { variables } = buildState;
 
     return (
       <main align="center" className={classes.content}>
@@ -102,44 +86,46 @@ class Build extends React.Component<Props, State> {
             <BuildTabs
               variables={variables}
               onTabsChange={(
-                buildState: {},
+                newBuildState: {},
                 callback: ({}) => void = () => {}
               ): void =>
                 this.setState(
                   prevState => ({
-                    buildState: { ...prevState.buildState, ...buildState }
+                    buildState: { ...prevState.buildState, ...newBuildState }
                   }),
                   () => callback(this.state.buildState)
                 )
               }
-              buildState={this.state.buildState}
+              buildState={buildState}
               settings={settings}
               connection={connection}
-              updateLoading={(loading: boolean): void =>
-                this.setState({ loading })
+              updateLoading={(newLoading: boolean): void =>
+                this.setState({ loading: newLoading })
               }
-              diagramState={this.state.diagramState}
-              onDiagramChange={(diagramState: {}): void =>
-                this.setState((prevState: State) => ({
-                  diagramState: { ...prevState.diagramState, ...diagramState }
-                }))
-              }
+              engine={engine}
+              startNodes={startNodes}
+              updateStartNodes={(
+                newStartNodes: Array<?DefaultDataNodeModel>
+              ): void => this.setState({ startNodes: newStartNodes })}
             />
             <BuildOptions
               onback={onback}
               connection={connection}
-              buildState={this.state.buildState}
-              loadState={(buildState: BuildState): void =>
+              buildState={buildState}
+              loadState={(newBuildState: BuildState): void =>
                 this.setState((prevState: State) => {
-                  const diagramState = extractDiagramState(
-                    prevState.diagramState.engine,
-                    buildState.diagrams
+                  const extractedStartNodes: Array<?DefaultDataNodeModel> = extractStartNodes(
+                    prevState.engine,
+                    newBuildState.diagrams
                   );
-                  return { buildState, diagramState };
+                  return {
+                    buildState: newBuildState,
+                    startNodes: extractedStartNodes
+                  };
                 })
               }
               settings={settings}
-              loading={this.state.loading}
+              loading={loading}
             />
           </div>
         </div>
