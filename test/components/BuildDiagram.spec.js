@@ -6,13 +6,10 @@ import Button from '@material-ui/core/Button';
 import { DiagramModel } from 'storm-react-diagrams';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
-import BuildParser from '../../app/components/build/parsers/BuildParser';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
 import DefaultDataPortModel from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataPortModel';
 import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils';
-
-jest.mock('../../app/components/build/parsers/BuildParser');
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -129,7 +126,6 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       functionParams={{}}
       events={{}}
       entities={{}}
-      onParse={jest.fn()}
       onVariablesChange={jest.fn()}
       diagram={diagram}
       settings={{ bitsMode: false, indentation: '    ' }}
@@ -156,10 +152,6 @@ function setup(emptyDiagram = true, useCreateMount = true) {
 }
 
 describe('BuildDiagram component', () => {
-  beforeEach(() => {
-    BuildParser.mockClear();
-  });
-
   it('resetListener should remove and add listeners', () => {
     const { component } = setup(false, false);
     const { onParse, updateGasHistory } = component.props();
@@ -185,43 +177,7 @@ describe('BuildDiagram component', () => {
     ).toEqual(true);
   });
 
-  it('parseNodes should reset buildParser and call update functions', () => {
-    const { component } = setup(false, false);
-    const { onParse, updateGasHistory, updateLoading } = component.props();
-    const instance = component.dive().instance();
-    const mockBuildParserInstance = BuildParser.mock.instances[0];
-    mockBuildParserInstance.parse.mockReturnValueOnce('the code');
-    mockBuildParserInstance.getReturnVar.mockReturnValueOnce('return var');
-    mockBuildParserInstance.getView.mockReturnValueOnce(true);
-    instance.parseNodes({
-      varList: { a: 1 },
-      functionParams: { b: 2 },
-      events: { c: 3 },
-      entities: { d: 4 },
-      settings: { bitsMode: true, indentation: '    ' },
-      onParse,
-      updateGasHistory,
-      updateLoading,
-      startNode: {}
-    });
-    expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-      { a: 1 },
-      { b: 2 },
-      { c: 3 },
-      { d: 4 },
-      { bitsMode: true, indentation: '    ' }
-    );
-    expect(onParse).toHaveBeenCalledWith({
-      tabsCode: 'the code',
-      tabsReturn: 'return var',
-      isView: true,
-      diagrams: instance.model.serializeDiagram()
-    });
-    expect(updateGasHistory).toHaveBeenCalledTimes(1);
-    expect(updateLoading).toHaveBeenCalledWith(false);
-  });
-
-  it('parseNodes should pass correct callback to diamond port factory', () => {
+  it('should pass correct callback to diamond port factory', () => {
     const { component } = setup(false, false);
     const { cb } = component.props().engine.getPortFactory('diamond');
     expect(cb()).toEqual(

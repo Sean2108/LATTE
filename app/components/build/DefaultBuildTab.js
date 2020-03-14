@@ -14,7 +14,6 @@ import GasDrawer from './diagram/GasDrawer';
 import type {
   VariablesLookupType,
   StructLookupType,
-  onParseFn,
   VariableObj,
   RequireObj,
   SettingsObj,
@@ -47,11 +46,11 @@ type Props = {
   varList: VariablesLookupType,
   events: StructLookupType,
   entities: StructLookupType,
-  onParse: onParseFn => void,
   onChangeParams: Array<VariableObj> => void,
   onChangeRequire: Array<RequireObj> => void,
   onVariablesChange: VariablesLookupType => void,
   params: Array<VariableObj>,
+  flattenedParams: VariablesLookupType,
   requires: Array<RequireObj>,
   diagram: {},
   settings: SettingsObj,
@@ -63,7 +62,8 @@ type Props = {
   updateLoading: boolean => void,
   engine: DiagramEngine,
   startNode: ?DefaultDataNodeModel,
-  updateStartNode: (?DefaultDataNodeModel) => void
+  updateStartNode: (?DefaultDataNodeModel) => void,
+  triggerParse: ({}) => void
 };
 
 type State = {
@@ -84,32 +84,6 @@ class DefaultBuildTab extends React.Component<Props, State> {
     this.varList = varList;
   }
 
-  flattenParamsToObject(params: Array<VariableObj>, bitsMode: boolean) {
-    return params
-      .filter((element: VariableObj): boolean => !!element.name)
-      .reduce(
-        (
-          resultParam: VariablesLookupType,
-          currentObject: VariableObj
-        ): VariablesLookupType => {
-          const result = resultParam;
-          if (bitsMode && currentObject.bits) {
-            if (currentObject.type === 'string') {
-              result[currentObject.name] = `bytes${currentObject.bits}`;
-            } else {
-              result[
-                currentObject.name
-              ] = `${currentObject.type}${currentObject.bits}`;
-            }
-          } else {
-            result[currentObject.name] = currentObject.type;
-          }
-          return result;
-        },
-        {}
-      );
-  }
-
   closeDrawer = (): void => this.setState({ drawerOpen: false });
 
   hideWarning = (): void => this.setState({ warning: '' });
@@ -120,11 +94,11 @@ class DefaultBuildTab extends React.Component<Props, State> {
       varList,
       events,
       entities,
-      onParse,
       onChangeParams,
       onChangeRequire,
       onVariablesChange,
       params,
+      flattenedParams,
       requires,
       diagram,
       settings,
@@ -136,10 +110,10 @@ class DefaultBuildTab extends React.Component<Props, State> {
       updateLoading,
       engine,
       startNode,
-      updateStartNode
+      updateStartNode,
+      triggerParse
     } = this.props;
     const { drawerOpen, warning } = this.state;
-    const variables = this.flattenParamsToObject(params, settings.bitsMode);
     return (
       <div>
         <VariableList
@@ -152,7 +126,7 @@ class DefaultBuildTab extends React.Component<Props, State> {
         <br />
         <RequiresList
           header="Checking Phase"
-          vars={{ ...varList, ...variables }}
+          vars={{ ...varList, ...flattenedParams }}
           onChangeRequire={onChangeRequire}
           requires={requires}
           tooltipText="Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user."
@@ -161,10 +135,8 @@ class DefaultBuildTab extends React.Component<Props, State> {
         <br />
         <BuildDiagram
           varList={this.varList}
-          functionParams={variables}
           events={events}
           entities={entities}
-          onParse={onParse}
           onVariablesChange={onVariablesChange}
           diagram={diagram}
           settings={settings}
@@ -181,6 +153,7 @@ class DefaultBuildTab extends React.Component<Props, State> {
           engine={engine}
           startNode={startNode}
           updateStartNode={updateStartNode}
+          triggerParse={triggerParse}
         />
 
         <Drawer

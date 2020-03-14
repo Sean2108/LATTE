@@ -23,15 +23,12 @@ import TrayItemWidget from './diagram/TrayItemWidget';
 import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 import DiagramModal from './diagram/DiagramModal';
-import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
 import { findStart, getNewStartNode } from './build_utils/DiagramUtils';
-import type
- {
+import type {
   StructLookupType,
   VariablesLookupType,
-  onParseFn,
   Classes
 } from '../../types';
 
@@ -86,23 +83,19 @@ type NodeType = $Keys<typeof tooltips>;
 type Props = {
   classes: Classes,
   varList: VariablesLookupType,
-  functionParams: VariablesLookupType, // eslint-disable-line react/no-unused-prop-types
   events: StructLookupType,
   entities: StructLookupType,
-  onParse: onParseFn => void, // eslint-disable-line react/no-unused-prop-types
-  onVariablesChange: VariablesLookupType => void,
   diagram: {},
   settings: { bitsMode: boolean, indentation: string },
   openDrawer: () => void,
-  updateGasHistory: () => void, // eslint-disable-line react/no-unused-prop-types
-  updateBuildError: string => void,
   isConstructor: boolean,
   editHistory: EditHistory,
   updateLoading: boolean => void, // eslint-disable-line react/no-unused-prop-types
   showWarning: string => void,
   engine: DiagramEngine,
   startNode: ?DefaultDataNodeModel, // eslint-disable-line react/no-unused-prop-types
-  updateStartNode: (?DefaultDataNodeModel) => void
+  updateStartNode: (?DefaultDataNodeModel) => void,
+  triggerParse: ({}) => void
 };
 
 type State = {
@@ -112,8 +105,6 @@ type State = {
 };
 
 class BuildDiagram extends React.Component<Props, State> {
-  buildParser: BuildParser;
-
   model: DiagramModel;
 
   state = {
@@ -133,7 +124,7 @@ class BuildDiagram extends React.Component<Props, State> {
   }
 
   renderDiagram(): void {
-    const { diagram, onVariablesChange, updateBuildError, updateStartNode, engine } = this.props;
+    const { diagram, updateStartNode, engine } = this.props;
     this.model = new DiagramModel();
     let startNode: ?DefaultDataNodeModel = null;
     if (Object.entries(diagram).length > 0) {
@@ -144,7 +135,6 @@ class BuildDiagram extends React.Component<Props, State> {
       startNode = getNewStartNode();
       this.model.addAll(startNode);
     }
-    this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
     this.resetListener();
 
     engine.setDiagramModel(this.model);
@@ -171,31 +161,11 @@ class BuildDiagram extends React.Component<Props, State> {
       return;
     }
     updateLoading(true);
-    setTimeout((): void => this.parseNodes(this.props), 5000);
+    setTimeout(
+      (): void => this.props.triggerParse(this.model.serializeDiagram()),
+      5000
+    );
   };
-
-  parseNodes({
-    varList,
-    functionParams,
-    events,
-    entities,
-    settings,
-    onParse,
-    updateGasHistory,
-    updateLoading,
-    startNode
-  }): void {
-    this.buildParser.reset(varList, functionParams, events, entities, settings);
-    const code: string = this.buildParser.parse(startNode);
-    onParse({
-      tabsCode: code,
-      tabsReturn: this.buildParser.getReturnVar(),
-      isView: this.buildParser.getView(),
-      diagrams: this.model.serializeDiagram()
-    });
-    updateGasHistory();
-    updateLoading(false);
-  }
 
   createDefaultNode(
     label: string,
