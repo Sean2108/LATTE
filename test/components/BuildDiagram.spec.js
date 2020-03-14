@@ -190,7 +190,6 @@ describe('BuildDiagram component', () => {
 
   it('renderDiagram should not be called when props are unchanged', () => {
     const { component } = setup(true, false);
-    const { onParse, updateGasHistory } = component.props();
     const instance = component.dive().instance();
     instance.componentDidUpdate({ diagram: {} });
     expect(component.props().updateStartNode).toHaveBeenCalledTimes(1);

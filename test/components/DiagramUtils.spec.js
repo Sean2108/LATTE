@@ -3,7 +3,6 @@ import {
   extractStartNodes,
   getNewStartNode
 } from '../../app/components/build/build_utils/DiagramUtils';
-import { DiagramEngine } from 'storm-react-diagrams';
 
 describe('DiagramUtils component', () => {
   const serializedDiagram = {
@@ -130,7 +129,7 @@ describe('DiagramUtils component', () => {
         y: 100
       })
     );
-    const ports = startNode.ports;
+    const { ports } = startNode;
     expect(Object.keys(ports)).toHaveLength(1);
     expect(Object.values(ports)[0]).toEqual(
       expect.objectContaining({ maximumLinks: 1, in: false })

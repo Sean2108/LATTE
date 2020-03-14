@@ -391,13 +391,10 @@ ${INDENTATION}}
       { c: 2 },
       false
     );
-    const [compareNode2, compareTargetPort] = createTargetNode(
-      false,
-      'compare2',
-      { c: 3 }
-    );
+    const [, compareTargetPort] = createTargetNode(false, 'compare2', {
+      c: 3
+    });
     addLink(compareNode.outPortTrue, compareTargetPort);
-    const mockNodeParserInstance = NodeParser.mock.instances[0];
     const result = buildParser.generateCodeForCycle(compareNode, 1, true);
     expect(result).toBe(null);
   });
