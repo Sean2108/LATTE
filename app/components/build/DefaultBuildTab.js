@@ -6,6 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import { Snackbar, SnackbarContent } from '@material-ui/core';
 import WarningIcon from '@material-ui/icons/Warning';
 import { amber } from '@material-ui/core/colors';
+import { DiagramEngine } from 'storm-react-diagrams';
 import VariableList from './build_components/VariableList';
 import BuildDiagram from './BuildDiagram';
 import RequiresList from './build_components/RequiresList';
@@ -13,13 +14,13 @@ import GasDrawer from './diagram/GasDrawer';
 import type {
   VariablesLookupType,
   StructLookupType,
-  onParseFn,
   VariableObj,
   RequireObj,
   SettingsObj,
   Classes
 } from '../../types';
 import EditHistory from './build_utils/EditHistory';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 
 const styles = theme => ({
   drawer: {
@@ -45,20 +46,23 @@ type Props = {
   varList: VariablesLookupType,
   events: StructLookupType,
   entities: StructLookupType,
-  onParse: onParseFn => void,
   onChangeParams: Array<VariableObj> => void,
   onChangeRequire: Array<RequireObj> => void,
   onVariablesChange: VariablesLookupType => void,
   params: Array<VariableObj>,
+  flattenedParams: VariablesLookupType,
   requires: Array<RequireObj>,
   diagram: {},
   settings: SettingsObj,
   gasHistory: Array<number>,
-  updateGasHistory: () => void,
   updateBuildError: () => void,
   isConstructor: boolean,
   editHistory: EditHistory,
-  updateLoading: boolean => void
+  updateLoading: boolean => void,
+  engine: DiagramEngine,
+  startNode: ?DefaultDataNodeModel,
+  updateStartNode: (?DefaultDataNodeModel) => void,
+  triggerParse: ({}) => void
 };
 
 type State = {
@@ -79,32 +83,6 @@ class DefaultBuildTab extends React.Component<Props, State> {
     this.varList = varList;
   }
 
-  flattenParamsToObject(params: Array<VariableObj>, bitsMode: boolean) {
-    return params
-      .filter((element: VariableObj): boolean => !!element.name)
-      .reduce(
-        (
-          resultParam: VariablesLookupType,
-          currentObject: VariableObj
-        ): VariablesLookupType => {
-          const result = resultParam;
-          if (bitsMode && currentObject.bits) {
-            if (currentObject.type === 'string') {
-              result[currentObject.name] = `bytes${currentObject.bits}`;
-            } else {
-              result[
-                currentObject.name
-              ] = `${currentObject.type}${currentObject.bits}`;
-            }
-          } else {
-            result[currentObject.name] = currentObject.type;
-          }
-          return result;
-        },
-        {}
-      );
-  }
-
   closeDrawer = (): void => this.setState({ drawerOpen: false });
 
   hideWarning = (): void => this.setState({ warning: '' });
@@ -115,23 +93,25 @@ class DefaultBuildTab extends React.Component<Props, State> {
       varList,
       events,
       entities,
-      onParse,
       onChangeParams,
       onChangeRequire,
       onVariablesChange,
       params,
+      flattenedParams,
       requires,
       diagram,
       settings,
       gasHistory,
-      updateGasHistory,
       updateBuildError,
       isConstructor,
       editHistory,
-      updateLoading
+      updateLoading,
+      engine,
+      startNode,
+      updateStartNode,
+      triggerParse
     } = this.props;
     const { drawerOpen, warning } = this.state;
-    const variables = this.flattenParamsToObject(params, settings.bitsMode);
     return (
       <div>
         <VariableList
@@ -144,7 +124,7 @@ class DefaultBuildTab extends React.Component<Props, State> {
         <br />
         <RequiresList
           header="Checking Phase"
-          vars={{ ...varList, ...variables }}
+          vars={{ ...varList, ...flattenedParams }}
           onChangeRequire={onChangeRequire}
           requires={requires}
           tooltipText="Theses are the conditions that must be met for the function to be run successfully by an external user. If the conditions are not met, the function will not be run and the failure message will be shown to the external user."
@@ -153,16 +133,13 @@ class DefaultBuildTab extends React.Component<Props, State> {
         <br />
         <BuildDiagram
           varList={this.varList}
-          functionParams={variables}
           events={events}
           entities={entities}
-          onParse={onParse}
           onVariablesChange={onVariablesChange}
           diagram={diagram}
           settings={settings}
           openDrawer={() => this.setState({ drawerOpen: true })}
           gasHistory={gasHistory}
-          updateGasHistory={updateGasHistory}
           updateBuildError={updateBuildError}
           isConstructor={isConstructor}
           editHistory={editHistory}
@@ -170,6 +147,10 @@ class DefaultBuildTab extends React.Component<Props, State> {
           showWarning={(newWarning: string) =>
             this.setState({ warning: newWarning })
           }
+          engine={engine}
+          startNode={startNode}
+          updateStartNode={updateStartNode}
+          triggerParse={triggerParse}
         />
 
         <Drawer

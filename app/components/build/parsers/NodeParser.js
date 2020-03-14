@@ -86,9 +86,6 @@ export default class NodeParser {
       this.structList,
       this.bitsMode
     );
-    if (!parsedLhs.type || !parsedRhs.type) {
-      return true;
-    }
     if ('mapName' in parsedLhs) {
       if (parsedLhs.keyType !== 'var' && parsedRhs.type !== 'var') {
         this.updateVariablesForMap(parsedLhs, parsedRhs, variables);
@@ -155,9 +152,6 @@ export default class NodeParser {
   parseNode(nodeData, indentation = '') {
     const variables = this.getAllVariables();
     switch (nodeData.type) {
-      case 'assignment':
-        this.isView = false;
-        return indentation + this.parseAssignmentNode(nodeData, variables);
       case 'event':
         this.isView = false;
         return indentation + this.parseEventNode(nodeData, variables);
@@ -179,8 +173,10 @@ export default class NodeParser {
       }
       case 'conditional':
         return this.parseCompareNode(nodeData, variables);
+      case 'assignment':
       default:
-        return '';
+        this.isView = false;
+        return indentation + this.parseAssignmentNode(nodeData, variables);
     }
   }
 
@@ -197,9 +193,6 @@ export default class NodeParser {
       this.structList,
       this.bitsMode
     );
-    if (!parsedLhs.type || !parsedRhs.type) {
-      return `${parsedLhs.name} ${data.assignment} ${parsedRhs.name};`;
-    }
     if ('mapName' in parsedLhs) {
       this.updateVariablesForMap(parsedLhs, parsedRhs, variables);
     } else if (

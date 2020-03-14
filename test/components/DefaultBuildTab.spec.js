@@ -8,6 +8,7 @@ import VariableList from '../../app/components/build/build_components/VariableLi
 import RequiresList from '../../app/components/build/build_components/RequiresList';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
+import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -32,17 +33,11 @@ function setup(createComponentMount = true) {
       isConstructor={false}
       editHistory={new EditHistory(1)}
       updateLoading={jest.fn()}
+      engine={setupEngine()}
+      startNode={null}
+      updateStartNode={jest.fn()}
     />
   );
-  const input = [
-    { name: '', type: 'uint' },
-    { name: 'some_uint', type: 'uint' },
-    { name: 'some_uint_bits', type: 'uint', bits: '8' },
-    { name: 'some_str', type: 'string' },
-    { name: 'some_str_bits', type: 'string', bits: '16' },
-    { name: 'some_addr', type: 'address' },
-    { name: 'some_bool', type: 'bool' }
-  ];
   const innerComponent = component.childAt(0);
   const variableList = component.find(VariableList);
   const requiresList = component.find(RequiresList);
@@ -56,8 +51,7 @@ function setup(createComponentMount = true) {
     requiresList,
     buildDiagram,
     drawer,
-    snackbar,
-    input
+    snackbar
   };
 }
 
@@ -101,43 +95,5 @@ describe('DefaultBuildTab component', () => {
     expect(innerComponent.state().warning).toEqual('test warning');
     snackbar.props().onClose();
     expect(innerComponent.state().warning).toEqual('');
-  });
-});
-
-describe('DefaultBuildTab flattenParamsToObject function', () => {
-  it('should work with bitsMode on', () => {
-    const { component, input } = setup(false);
-    const expected = {
-      some_uint: 'uint',
-      some_uint_bits: 'uint8',
-      some_str: 'string',
-      some_str_bits: 'bytes16',
-      some_addr: 'address',
-      some_bool: 'bool'
-    };
-    expect(
-      component
-        .dive()
-        .instance()
-        .flattenParamsToObject(input, true)
-    ).toEqual(expected);
-  });
-
-  it('should work with bitsMode off', () => {
-    const { component, input } = setup(false);
-    const expected = {
-      some_uint: 'uint',
-      some_uint_bits: 'uint',
-      some_str: 'string',
-      some_str_bits: 'string',
-      some_addr: 'address',
-      some_bool: 'bool'
-    };
-    expect(
-      component
-        .dive()
-        .instance()
-        .flattenParamsToObject(input, false)
-    ).toEqual(expected);
   });
 });

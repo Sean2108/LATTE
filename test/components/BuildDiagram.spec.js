@@ -6,12 +6,10 @@ import Button from '@material-ui/core/Button';
 import { DiagramModel } from 'storm-react-diagrams';
 import BuildDiagram from '../../app/components/build/BuildDiagram';
 import DiagramModal from '../../app/components/build/diagram/DiagramModal';
-import BuildParser from '../../app/components/build/parsers/BuildParser';
 import EditHistory from '../../app/components/build/build_utils/EditHistory';
 import DefaultDataPortModel from '../../app/components/build/diagram/diagram_node_declarations/DefaultDataNode/DefaultDataPortModel';
 import DiamondPortModel from '../../app/components/build/diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
-
-jest.mock('../../app/components/build/parsers/BuildParser');
+import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -128,7 +126,6 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       functionParams={{}}
       events={{}}
       entities={{}}
-      onParse={jest.fn()}
       onVariablesChange={jest.fn()}
       diagram={diagram}
       settings={{ bitsMode: false, indentation: '    ' }}
@@ -140,6 +137,10 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       editHistory={new EditHistory(1, jest.fn())}
       updateLoading={jest.fn()}
       showWarning={jest.fn()}
+      engine={setupEngine()}
+      startNode={null}
+      updateStartNode={jest.fn()}
+      triggerParse={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -152,10 +153,6 @@ function setup(emptyDiagram = true, useCreateMount = true) {
 }
 
 describe('BuildDiagram component', () => {
-  beforeEach(() => {
-    BuildParser.mockClear();
-  });
-
   it('resetListener should remove and add listeners', () => {
     const { component } = setup(false, false);
     const { onParse, updateGasHistory } = component.props();
@@ -181,45 +178,26 @@ describe('BuildDiagram component', () => {
     ).toEqual(true);
   });
 
-  it('parseNodes should reset buildParser and call update functions', () => {
-    const { component } = setup(false, false);
-    const { onParse, updateGasHistory, updateLoading } = component.props();
+  it('renderDiagram should be called when props are changed', () => {
+    const { component } = setup(true, false);
     const instance = component.dive().instance();
-    const mockBuildParserInstance = BuildParser.mock.instances[0];
-    mockBuildParserInstance.parse.mockReturnValueOnce('the code');
-    mockBuildParserInstance.getReturnVar.mockReturnValueOnce('return var');
-    mockBuildParserInstance.getView.mockReturnValueOnce(true);
-    instance.parseNodes({
-      varList: { a: 1 },
-      functionParams: { b: 2 },
-      events: { c: 3 },
-      entities: { d: 4 },
-      settings: { bitsMode: true, indentation: '    ' },
-      onParse,
-      updateGasHistory,
-      updateLoading
-    });
-    expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-      { a: 1 },
-      { b: 2 },
-      { c: 3 },
-      { d: 4 },
-      { bitsMode: true, indentation: '    ' }
+    instance.componentDidUpdate({ diagram: { a: 1 } });
+    expect(component.props().updateStartNode).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Start' })
     );
-    expect(onParse).toHaveBeenCalledWith({
-      tabsCode: 'the code',
-      tabsReturn: 'return var',
-      isView: true,
-      diagrams: instance.model.serializeDiagram()
-    });
-    expect(updateGasHistory).toHaveBeenCalledTimes(1);
-    expect(updateLoading).toHaveBeenCalledWith(false);
+    expect(component.props().updateStartNode).toHaveBeenCalledTimes(2);
   });
 
-  it('parseNodes should pass correct callback to diamond port factory', () => {
-    const { component } = setup(false, false);
+  it('renderDiagram should not be called when props are unchanged', () => {
+    const { component } = setup(true, false);
     const instance = component.dive().instance();
-    const { cb } = instance.engine.getPortFactory('diamond');
+    instance.componentDidUpdate({ diagram: {} });
+    expect(component.props().updateStartNode).toHaveBeenCalledTimes(1);
+  });
+
+  it('should pass correct callback to diamond port factory', () => {
+    const { component } = setup(false, false);
+    const { cb } = component.props().engine.getPortFactory('diamond');
     expect(cb()).toEqual(
       expect.objectContaining({
         maximumLinks: 1,
@@ -498,7 +476,7 @@ describe('BuildDiagram component', () => {
     it('should pass when source default and target diamond ports are opposite ports', () => {
       jest.useFakeTimers();
       const { component } = setup(false, false);
-      const { showWarning, updateLoading } = component.props();
+      const { showWarning, updateLoading, triggerParse } = component.props();
       const instance = component.dive().instance();
       const sourcePort = new DefaultDataPortModel(true, '');
       const targetPort = new DiamondPortModel('top', false, '');
@@ -511,12 +489,14 @@ describe('BuildDiagram component', () => {
         expect.any(Function),
         expect.any(Number)
       );
+      setTimeout.mock.calls[0][0]();
+      expect(triggerParse).toHaveBeenCalledWith(expect.any(Object));
     });
 
     it('should pass when source diamond and target default ports are opposite ports', () => {
       jest.useFakeTimers();
       const { component } = setup(false, false);
-      const { showWarning, updateLoading } = component.props();
+      const { showWarning, updateLoading, triggerParse } = component.props();
       const instance = component.dive().instance();
       const sourcePort = new DiamondPortModel('top', true, '');
       const targetPort = new DefaultDataPortModel(false, '');
@@ -529,6 +509,8 @@ describe('BuildDiagram component', () => {
         expect.any(Function),
         expect.any(Number)
       );
+      setTimeout.mock.calls[0][0]();
+      expect(triggerParse).toHaveBeenCalledWith(expect.any(Object));
     });
   });
 });

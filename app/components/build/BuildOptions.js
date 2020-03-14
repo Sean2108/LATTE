@@ -148,7 +148,6 @@ class BuildOptions extends React.Component {
             readFile(join('saved_data', fileName), (err, data) => {
               if (err) throw err;
               this.handleClose();
-              console.log(JSON.parse(data));
               loadState(JSON.parse(data));
               console.log(`Data loaded from ${fileName}`);
             })

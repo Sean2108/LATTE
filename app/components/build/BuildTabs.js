@@ -11,17 +11,19 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Web3 from 'web3';
+import { DiagramEngine } from 'storm-react-diagrams';
 import InitialStateTab from './InitialStateTab';
 import Web3Utils from './build_utils/Web3Utils';
 import DefaultBuildTab from './DefaultBuildTab';
 import EditHistory from './build_utils/EditHistory';
+import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
+import GlobalParser from './parsers/GlobalParser';
 import type {
   VariablesLookupType,
   BuildState,
   SettingsObj,
   VariableObj,
   RequireObj,
-  onParseFn,
   StructLookupType,
   Classes
 } from '../../types';
@@ -73,7 +75,10 @@ type Props = {
   buildState: BuildState,
   settings: SettingsObj,
   connection: Web3,
-  updateLoading: boolean => void
+  updateLoading: boolean => void,
+  engine: DiagramEngine,
+  startNodes: Array<?DefaultDataNodeModel>,
+  updateStartNodes: (Array<?DefaultDataNodeModel>) => void
 };
 
 type State = {
@@ -87,6 +92,8 @@ class BuildTabs extends React.Component<Props, State> {
 
   editHistory: EditHistory;
 
+  globalParser: GlobalParser;
+
   state = {
     value: 0,
     addTabPopoverAnchor: null,
@@ -97,6 +104,10 @@ class BuildTabs extends React.Component<Props, State> {
     const { buildState, connection, onTabsChange } = this.props;
     this.web3Utils = new Web3Utils(connection);
     this.editHistory = new EditHistory(buildState, onTabsChange);
+    this.globalParser = new GlobalParser(
+      this.onVariablesChange,
+      this.updateBuildError
+    );
   }
 
   handleChange = (event: {}, value: number): void => {
@@ -106,7 +117,7 @@ class BuildTabs extends React.Component<Props, State> {
   };
 
   handleOnChange = (
-    newState: Array<VariableObj> | Array<RequireObj>,
+    newState: Array<VariableObj> | Array<RequireObj> | {},
     i: number,
     state: string
   ) => {
@@ -125,16 +136,11 @@ class BuildTabs extends React.Component<Props, State> {
     }
   };
 
-  onParse = (newState: onParseFn, i: number): void => {
-    const { buildState, onTabsChange } = this.props;
-    const parsedState = Object.entries(newState)
-      .map(([key, value]) => {
-        const newVal = [...buildState[key]];
-        newVal[i] = value;
-        return { [key]: newVal };
-      })
-      .reduce((result, current) => ({ ...result, ...current }), {});
-    onTabsChange(parsedState, this.editHistory.addNode);
+  onVariablesChange = (newVariables: VariablesLookupType): void =>
+    this.props.onTabsChange({ variables: newVariables });
+
+  updateBuildError = (buildError: string): void => {
+    this.props.onTabsChange({ buildError });
   };
 
   render(): React.Node {
@@ -144,12 +150,12 @@ class BuildTabs extends React.Component<Props, State> {
       onTabsChange,
       buildState,
       settings,
-      updateLoading
+      updateLoading,
+      engine,
+      startNodes,
+      updateStartNodes
     } = this.props;
     const { value, addTabPopoverAnchor, popoverContent } = this.state;
-    const updateBuildError = (buildError: string): void => {
-      onTabsChange({ buildError });
-    };
 
     return (
       <div className={classes.buildtabs}>
@@ -190,11 +196,11 @@ class BuildTabs extends React.Component<Props, State> {
                 onTabsChange({ ...buildState, events })
               }
               params={buildState.constructorParams}
-              updateParams={(params: VariableObj): void => {
+              updateParams={(params: Array<VariableObj>): void =>
                 onTabsChange({
                   constructorParams: params
-                });
-              }}
+                })
+              }
               settings={settings}
             />
           </TabContainer>
@@ -207,37 +213,41 @@ class BuildTabs extends React.Component<Props, State> {
                   varList={variables}
                   events={buildState.events}
                   entities={buildState.entities}
-                  onParse={(newState: onParseFn): void =>
-                    this.onParse(newState, i)
-                  }
                   onChangeParams={(newParams: Array<VariableObj>): void =>
                     this.handleChangeParams(newParams, i)
                   }
                   onChangeRequire={(newRequire: Array<RequireObj>): void =>
                     this.handleOnChange(newRequire, i, 'tabsRequire')
                   }
-                  onVariablesChange={(
-                    newVariables: VariablesLookupType
-                  ): void => onTabsChange({ variables: newVariables })}
+                  onVariablesChange={this.onVariablesChange}
                   params={buildState.tabsParams[i]}
+                  flattenedParams={this.globalParser.flattenParamsToObject(
+                    buildState.tabsParams[i],
+                    settings.bitsMode
+                  )}
                   requires={buildState.tabsRequire[i]}
                   diagram={buildState.diagrams[i]}
                   settings={settings}
                   gasHistory={buildState.gasHistory}
-                  updateGasHistory={(): void => {
-                    const history = buildState.gasHistory;
-                    this.web3Utils.getGasUsage(
-                      buildState,
-                      settings,
-                      history,
-                      updateBuildError
-                    );
-                    onTabsChange({ gasHistory: history });
-                  }}
-                  updateBuildError={updateBuildError}
+                  updateBuildError={this.updateBuildError}
                   isConstructor={i === 0}
                   editHistory={this.editHistory}
                   updateLoading={updateLoading}
+                  engine={engine}
+                  startNode={startNodes[i]}
+                  updateStartNode={(startNode: DefaultDataNodeModel): void => {
+                    const newStartNodes = [...startNodes];
+                    newStartNodes[i] = startNode;
+                    updateStartNodes(newStartNodes);
+                  }}
+                  triggerParse={serializedDiagram => {
+                    this.handleOnChange(serializedDiagram, i, 'diagrams');
+                    this.globalParser.parse(
+                      this.props,
+                      this.web3Utils,
+                      this.editHistory
+                    );
+                  }}
                 />
               </TabContainer>
             )
@@ -290,6 +300,7 @@ class BuildTabs extends React.Component<Props, State> {
                     addTabPopoverAnchor: null
                   });
                   onTabsChange(newTabsState);
+                  updateStartNodes([...startNodes, null]);
                 }
               }}
             >

@@ -6,15 +6,6 @@ type VariableType = 'uint' | 'bool' | 'address payable' | 'string';
 
 export type Comparator = '==' | '!=' | '>' | '>=' | '<' | '<=';
 
-export type onParseFn = {
-  tabsCode: string,
-  tabsReturn: ?string,
-  isView: boolean,
-  diagrams: {}
-};
-
-export type onParseKeys = 'tabsCode' | 'tabsReturn' | 'isView' | 'diagrams';
-
 export type Mapping = {
   type: 'mapping',
   inner?: string,

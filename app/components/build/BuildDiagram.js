@@ -21,19 +21,14 @@ import { Button, IconButton } from '@material-ui/core';
 import TrayWidget from './diagram/TrayWidget';
 import TrayItemWidget from './diagram/TrayItemWidget';
 import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
-import DiamondNodeFactory from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeFactory';
-import SimplePortFactory from './diagram/SimplePortFactory';
-import DiamondPortModel from './diagram/diagram_node_declarations/DiamondNode/DiamondPortModel';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
-import DefaultDataNodeFactory from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeFactory';
 import DiagramModal from './diagram/DiagramModal';
-import BuildParser from './parsers/BuildParser';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
+import { findStart, getNewStartNode } from './build_utils/DiagramUtils';
 import type {
   StructLookupType,
   VariablesLookupType,
-  onParseFn,
   Classes
 } from '../../types';
 
@@ -88,20 +83,19 @@ type NodeType = $Keys<typeof tooltips>;
 type Props = {
   classes: Classes,
   varList: VariablesLookupType,
-  functionParams: VariablesLookupType, // eslint-disable-line react/no-unused-prop-types
   events: StructLookupType,
   entities: StructLookupType,
-  onParse: onParseFn => void, // eslint-disable-line react/no-unused-prop-types
-  onVariablesChange: VariablesLookupType => void,
   diagram: {},
   settings: { bitsMode: boolean, indentation: string },
   openDrawer: () => void,
-  updateGasHistory: () => void, // eslint-disable-line react/no-unused-prop-types
-  updateBuildError: string => void,
   isConstructor: boolean,
   editHistory: EditHistory,
   updateLoading: boolean => void, // eslint-disable-line react/no-unused-prop-types
-  showWarning: string => void
+  showWarning: string => void,
+  engine: DiagramEngine,
+  startNode: ?DefaultDataNodeModel, // eslint-disable-line react/no-unused-prop-types
+  updateStartNode: (?DefaultDataNodeModel) => void,
+  triggerParse: ({}) => void
 };
 
 type State = {
@@ -111,13 +105,7 @@ type State = {
 };
 
 class BuildDiagram extends React.Component<Props, State> {
-  engine: DiagramEngine;
-
-  start: NodeModel;
-
   model: DiagramModel;
-
-  buildParser: BuildParser;
 
   state = {
     open: false,
@@ -126,16 +114,6 @@ class BuildDiagram extends React.Component<Props, State> {
   };
 
   componentWillMount(): void {
-    this.engine = new DiagramEngine();
-    this.engine.installDefaultFactories();
-    this.engine.registerPortFactory(
-      new SimplePortFactory(
-        'diamond',
-        (): DiamondPortModel => new DiamondPortModel('', true, '')
-      )
-    );
-    this.engine.registerNodeFactory(new DiamondNodeFactory());
-    this.engine.registerNodeFactory(new DefaultDataNodeFactory());
     this.renderDiagram();
   }
 
@@ -146,24 +124,21 @@ class BuildDiagram extends React.Component<Props, State> {
   }
 
   renderDiagram(): void {
-    const { diagram, onVariablesChange, updateBuildError } = this.props;
+    const { diagram, updateStartNode, engine } = this.props;
     this.model = new DiagramModel();
-    this.start = null;
+    let startNode: ?DefaultDataNodeModel = null;
     if (Object.entries(diagram).length > 0) {
-      this.model.deSerializeDiagram(diagram, this.engine);
-      this.start = this.findStart();
+      this.model.deSerializeDiagram(diagram, engine);
+      startNode = findStart(this.model);
     }
-    if (!this.start) {
-      this.start = new DefaultDataNodeModel('Start', 'rgb(0,192,255)');
-      const startOut: DefaultPortModel = this.start.addOutPort(' ');
-      startOut.setMaximumLinks(1);
-      this.start.setPosition(100, 100);
-      this.model.addAll(this.start);
+    if (!startNode) {
+      startNode = getNewStartNode();
+      this.model.addAll(startNode);
     }
-    this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
     this.resetListener();
 
-    this.engine.setDiagramModel(this.model);
+    engine.setDiagramModel(this.model);
+    updateStartNode(startNode);
   }
 
   resetListener() {
@@ -186,39 +161,11 @@ class BuildDiagram extends React.Component<Props, State> {
       return;
     }
     updateLoading(true);
-    setTimeout((): void => this.parseNodes(this.props), 5000);
+    setTimeout(
+      (): void => this.props.triggerParse(this.model.serializeDiagram()),
+      5000
+    );
   };
-
-  parseNodes({
-    varList,
-    functionParams,
-    events,
-    entities,
-    settings,
-    onParse,
-    updateGasHistory,
-    updateLoading
-  }): void {
-    this.buildParser.reset(varList, functionParams, events, entities, settings);
-    const code: string = this.buildParser.parse(this.start);
-    onParse({
-      tabsCode: code,
-      tabsReturn: this.buildParser.getReturnVar(),
-      isView: this.buildParser.getView(),
-      diagrams: this.model.serializeDiagram()
-    });
-    updateGasHistory();
-    updateLoading(false);
-  }
-
-  findStart(): NodeModel {
-    for (const node: NodeModel of Object.values(this.model.getNodes())) {
-      if (node.name === 'Start') {
-        return node;
-      }
-    }
-    return null;
-  }
 
   createDefaultNode(
     label: string,
@@ -287,7 +234,7 @@ class BuildDiagram extends React.Component<Props, State> {
     const node = this.selectNode(type, info, data);
     node.x = points.x;
     node.y = points.y;
-    this.engine.getDiagramModel().addNode(node);
+    this.props.engine.getDiagramModel().addNode(node);
     this.forceUpdate();
   }
 
@@ -300,7 +247,8 @@ class BuildDiagram extends React.Component<Props, State> {
       settings,
       openDrawer,
       isConstructor,
-      editHistory
+      editHistory,
+      engine
     } = this.props;
 
     const { open, type } = this.state;
@@ -459,7 +407,7 @@ class BuildDiagram extends React.Component<Props, State> {
                 this.setState({
                   open: true,
                   type: data.type,
-                  points: this.engine.getRelativeMousePoint(event)
+                  points: engine.getRelativeMousePoint(event)
                 });
                 this.model.clearSelection();
               }}
@@ -468,7 +416,7 @@ class BuildDiagram extends React.Component<Props, State> {
               }}
             >
               <DiagramWidget
-                diagramEngine={this.engine}
+                diagramEngine={engine}
                 className="srd-canvas"
                 allowLooseLinks={false}
               />
