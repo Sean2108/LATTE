@@ -4,7 +4,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import { createMount } from '@material-ui/core/test-utils';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import { TextField, Select } from '@material-ui/core';
+import { TextField, Select, InputLabel } from '@material-ui/core';
 import ParamList from '../../app/components/build/build_components/ParamList';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -39,9 +39,15 @@ describe('ParamList component', () => {
     expect(tooltip.props().title).toBe('test tooltip');
     expect(textRows).toHaveLength(2);
     expect(selectRow).toHaveLength(1);
-    expect(textRows.at(0).props().value).toBe('teststr');
-    expect(textRows.at(1).props().value).toBe('42');
-    expect(selectRow.props().value).toBe('true');
+    expect(textRows.at(0).props().value).toEqual('teststr');
+    expect(textRows.at(0).props().label).toEqual('Value of str (Text)');
+    expect(textRows.at(1).props().value).toEqual('42');
+    expect(textRows.at(1).props().label).toEqual('Value of int (Number)');
+    expect(selectRow.props().value).toEqual('true');
+    const selectInputLabel = component.find(InputLabel).at(2);
+    expect(selectInputLabel.props().children).toEqual(
+      'Value of boolean (True/False)'
+    );
   });
 
   it(' should result in correct function call when str text box value is changed', () => {

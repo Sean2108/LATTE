@@ -55,7 +55,6 @@ type Props = {
   diagram: {},
   settings: SettingsObj,
   gasHistory: Array<number>,
-  updateGasHistory: () => void,
   updateBuildError: () => void,
   isConstructor: boolean,
   editHistory: EditHistory,
@@ -103,7 +102,6 @@ class DefaultBuildTab extends React.Component<Props, State> {
       diagram,
       settings,
       gasHistory,
-      updateGasHistory,
       updateBuildError,
       isConstructor,
       editHistory,
@@ -142,7 +140,6 @@ class DefaultBuildTab extends React.Component<Props, State> {
           settings={settings}
           openDrawer={() => this.setState({ drawerOpen: true })}
           gasHistory={gasHistory}
-          updateGasHistory={updateGasHistory}
           updateBuildError={updateBuildError}
           isConstructor={isConstructor}
           editHistory={editHistory}

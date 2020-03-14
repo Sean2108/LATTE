@@ -30,21 +30,13 @@ export function extractStartNodes(
   engine: DiagramEngine,
   diagrams: Array<{}>
 ): Array<?DefaultDataNodeModel> {
-  return diagrams
-    .map((diagram: {}): DiagramModel => {
-      const diagramModel: DiagramModel = new DiagramModel();
-      if (Object.entries(diagram).length > 0) {
-        diagramModel.deSerializeDiagram(diagram, engine);
-      }
-      return diagramModel;
-    })
-    .map((model: DiagramModel): DefaultDataNodeModel => {
-      const startNode = findStart(model);
-      if (!startNode) {
-        model.addAll(getNewStartNode());
-      }
-      return startNode;
-    });
+  return diagrams.map((diagram: {}): DefaultDataNodeModel => {
+    const diagramModel: DiagramModel = new DiagramModel();
+    if (Object.entries(diagram).length > 0) {
+      diagramModel.deSerializeDiagram(diagram, engine);
+    }
+    return findStart(diagramModel);
+  });
 }
 
 export function getNewStartNode() {

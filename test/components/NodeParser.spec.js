@@ -53,10 +53,7 @@ describe('NodeParser parseAssignmentNodeForVariables', () => {
   });
 
   it('should return true and variables should be correct when map types are known', () => {
-    nodeParser.reset(
-      { key: 'string', rhs: 'uint' },
-      {}
-    );
+    nodeParser.reset({ key: 'string', rhs: 'uint' }, {});
     const result = nodeParser.parseNodeForVariables({
       type: 'assignment',
       variableSelected: 'map of key',
@@ -261,15 +258,23 @@ describe('NodeParser parseTransferNodeForVariables', () => {
   });
 });
 
+describe('NodeParser parse other nodes for variables', () => {
+  it('should always return true', () => {
+    const nodeParser = new NodeParser();
+    expect(nodeParser.parseNodeForVariables({ type: 'event' })).toBe(true);
+    expect(nodeParser.parseNodeForVariables({ type: 'return' })).toBe(true);
+    expect(nodeParser.parseNodeForVariables({ type: 'conditional' })).toBe(
+      true
+    );
+  });
+});
+
 describe('NodeParser parseAssignmentNode', () => {
   const updateBuildError = jest.fn();
   const nodeParser = new NodeParser(updateBuildError);
 
   it('should return correct code and variables should be correct for single layer map', () => {
-    nodeParser.reset(
-      { key: 'string', rhs: 'uint' },
-      {}
-    );
+    nodeParser.reset({ key: 'string', rhs: 'uint' }, {});
     const result = nodeParser.parseNode({
       type: 'assignment',
       variableSelected: 'map of key',
@@ -523,7 +528,9 @@ describe('NodeParser parseTransferNode', () => {
       variableSelected: '"a"',
       value: '5'
     });
-    expect(updateBuildError).toHaveBeenCalledWith(`Transfer target should be a payable address at transfer node`);
+    expect(updateBuildError).toHaveBeenCalledWith(
+      `Transfer target should be a payable address at transfer node`
+    );
   });
 
   it('should call updateBuildError for string value', () => {
@@ -532,7 +539,9 @@ describe('NodeParser parseTransferNode', () => {
       variableSelected: 'an address',
       value: '"5"'
     });
-    expect(updateBuildError).toHaveBeenCalledWith(`Value should be an integer at transfer node`);
+    expect(updateBuildError).toHaveBeenCalledWith(
+      `Value should be an integer at transfer node`
+    );
   });
 });
 

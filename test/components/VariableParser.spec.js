@@ -125,6 +125,20 @@ describe('VariableParser parseVariable function', () => {
     });
   });
 
+  it('parseStruct should return null type when type is not in structList', () => {
+    expect(
+      parseVariable(
+        "a's c",
+        { a: 'A' },
+        { A: [{ name: 'b', type: 'int', bits: 8 }] },
+        true
+      )
+    ).toEqual({
+      name: 'a.c',
+      type: null
+    });
+  });
+
   it('parseMap should work without innerKey', () => {
     expect(
       parseVariable(

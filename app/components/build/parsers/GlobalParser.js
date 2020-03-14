@@ -12,13 +12,13 @@ import type {
 
 type SingleTabUpdate = {
   tabsCode: string,
-  tabsReturn: string,
+  tabsReturn: ?string,
   isView: boolean
 };
 
 type TabUpdates = {
   tabsCode: Array<string>,
-  tabsReturn: Array<string>,
+  tabsReturn: Array<?string>,
   isView: Array<boolean>
 };
 
@@ -52,7 +52,7 @@ export default class GlobalParser {
     if (!startNode) {
       return {
         tabsCode: '',
-        tabsReturn: '',
+        tabsReturn: null,
         isView: true
       };
     }

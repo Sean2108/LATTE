@@ -117,7 +117,7 @@ class BuildTabs extends React.Component<Props, State> {
   };
 
   handleOnChange = (
-    newState: Array<VariableObj> | Array<RequireObj>,
+    newState: Array<VariableObj> | Array<RequireObj> | {},
     i: number,
     state: string
   ) => {
@@ -196,11 +196,11 @@ class BuildTabs extends React.Component<Props, State> {
                 onTabsChange({ ...buildState, events })
               }
               params={buildState.constructorParams}
-              updateParams={(params: VariableObj): void => {
+              updateParams={(params: Array<VariableObj>): void =>
                 onTabsChange({
                   constructorParams: params
-                });
-              }}
+                })
+              }
               settings={settings}
             />
           </TabContainer>

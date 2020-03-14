@@ -85,3 +85,14 @@ export function deepClone(toClone: {}): {} {
 export function objectEquals(objectA: {}, objectB: {}): boolean {
   return JSON.stringify(objectA) === JSON.stringify(objectB);
 }
+
+export function convertTypeToReadable(type: string): string {
+  return {
+    uint: 'Number',
+    int: 'Number',
+    bool: 'True/False',
+    address: 'Address',
+    'address payable': 'Address',
+    string: 'Text'
+  }[type];
+}

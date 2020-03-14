@@ -140,6 +140,7 @@ function setup(emptyDiagram = true, useCreateMount = true) {
       engine={setupEngine()}
       startNode={null}
       updateStartNode={jest.fn()}
+      triggerParse={jest.fn()}
     />
   );
   const buttons = component.find(Button);
@@ -175,6 +176,24 @@ describe('BuildDiagram component', () => {
     expect(
       'linksUpdated' in Object.values(instance.model.listeners)[0]
     ).toEqual(true);
+  });
+
+  it('renderDiagram should be called when props are changed', () => {
+    const { component } = setup(true, false);
+    const instance = component.dive().instance();
+    instance.componentDidUpdate({ diagram: { a: 1 } });
+    expect(component.props().updateStartNode).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Start' })
+    );
+    expect(component.props().updateStartNode).toHaveBeenCalledTimes(2);
+  });
+
+  it('renderDiagram should not be called when props are unchanged', () => {
+    const { component } = setup(true, false);
+    const { onParse, updateGasHistory } = component.props();
+    const instance = component.dive().instance();
+    instance.componentDidUpdate({ diagram: {} });
+    expect(component.props().updateStartNode).toHaveBeenCalledTimes(1);
   });
 
   it('should pass correct callback to diamond port factory', () => {
@@ -458,7 +477,7 @@ describe('BuildDiagram component', () => {
     it('should pass when source default and target diamond ports are opposite ports', () => {
       jest.useFakeTimers();
       const { component } = setup(false, false);
-      const { showWarning, updateLoading } = component.props();
+      const { showWarning, updateLoading, triggerParse } = component.props();
       const instance = component.dive().instance();
       const sourcePort = new DefaultDataPortModel(true, '');
       const targetPort = new DiamondPortModel('top', false, '');
@@ -471,12 +490,14 @@ describe('BuildDiagram component', () => {
         expect.any(Function),
         expect.any(Number)
       );
+      setTimeout.mock.calls[0][0]();
+      expect(triggerParse).toHaveBeenCalledWith(expect.any(Object));
     });
 
     it('should pass when source diamond and target default ports are opposite ports', () => {
       jest.useFakeTimers();
       const { component } = setup(false, false);
-      const { showWarning, updateLoading } = component.props();
+      const { showWarning, updateLoading, triggerParse } = component.props();
       const instance = component.dive().instance();
       const sourcePort = new DiamondPortModel('top', true, '');
       const targetPort = new DefaultDataPortModel(false, '');
@@ -489,6 +510,8 @@ describe('BuildDiagram component', () => {
         expect.any(Function),
         expect.any(Number)
       );
+      setTimeout.mock.calls[0][0]();
+      expect(triggerParse).toHaveBeenCalledWith(expect.any(Object));
     });
   });
 });

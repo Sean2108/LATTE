@@ -193,11 +193,12 @@ describe('BuildParser findVariables', () => {
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
+    mockNodeParserInstance.parseNodeForVariables.mockReturnValueOnce(true);
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
       [[{ first: 2 }]],
-      2
+      1
     );
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
   });
@@ -221,11 +222,15 @@ describe('BuildParser findVariables', () => {
     addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
     addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
+    mockNodeParserInstance.parseNodeForVariables
+      .mockReturnValueOnce(true)
+      .mockReturnValue(false);
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
       [[{ t1: 3 }], [{ f1: 4 }], [{ t2: 5 }], [{ f2: 6 }]],
-      2
+      1,
+      3
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledWith({ c: 2 });
@@ -375,6 +380,26 @@ ${INDENTATION.repeat(2)}f2
 ${INDENTATION}}
 `
     );
+  });
+
+  it('generateCodeForCycle should fail for consecutive diamond nodes', () => {
+    const buildParser = new BuildParser();
+    const startNode = new DefaultDataNodeModel('Start', { start: 1 });
+    const compareNode = addNodeToDataNode(
+      startNode,
+      'compare1',
+      { c: 2 },
+      false
+    );
+    const [compareNode2, compareTargetPort] = createTargetNode(
+      false,
+      'compare2',
+      { c: 3 }
+    );
+    addLink(compareNode.outPortTrue, compareTargetPort);
+    const mockNodeParserInstance = NodeParser.mock.instances[0];
+    const result = buildParser.generateCodeForCycle(compareNode, 1, true);
+    expect(result).toBe(null);
   });
 
   it('should output correct code for diagram with conditional node and 2 data nodes in 1 branch', () => {

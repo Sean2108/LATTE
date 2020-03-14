@@ -184,7 +184,7 @@ describe('GlobalParser component', () => {
       expect(mockBuildParserInstance.reset).not.toHaveBeenCalled();
       expect(res).toEqual({
         tabsCode: '',
-        tabsReturn: '',
+        tabsReturn: null,
         isView: true
       });
     });
