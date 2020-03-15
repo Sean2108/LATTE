@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
+import { promisify } from 'util';
 import Tooltip from '@material-ui/core/Tooltip';
 import Web3Utils from './build_utils/Web3Utils';
 import CodeGenUtils from './build_utils/CodeGenUtils';
@@ -73,11 +74,23 @@ class BuildOptions extends React.Component {
     });
   };
 
-  getFiles() {
-    readdir('saved_data', (err, items) =>
-      this.setState({ files: items.filter(item => item.slice(-5) === '.json') })
-    );
-  }
+  getFiles = async () => {
+    const items = await promisify(readdir)('saved_data');
+    this.setState({ files: items.filter(item => item.slice(-5) === '.json') });
+  };
+
+  loadData = async fileName => {
+    const data = await promisify(readFile)(join('saved_data', fileName));
+    this.handleClose();
+    this.props.loadState(JSON.parse(data));
+    console.log(`Data loaded from ${fileName}`);
+  };
+
+  saveFile = async (directory, filename, data) => {
+    await promisify(writeFile)(join(directory, filename), data);
+    this.handleClose();
+    this.getFiles();
+  };
 
   updateCompileError = compileErrorParam => {
     this.setState({ compileError: compileErrorParam });
@@ -137,30 +150,15 @@ class BuildOptions extends React.Component {
           saveData={() => {
             const data = JSON.stringify(buildState);
             const filename = `${fileName.replace(/\s+/g, '_')}.json`;
-            writeFile(join('saved_data', filename), data, err => {
-              if (err) throw err;
-              this.handleClose();
-              console.log(`Data written to file ${filename}`);
-              this.getFiles();
-            });
+            this.saveFile('saved_data', filename, data);
+            console.log(`Data written to file ${filename}`);
           }}
-          loadData={() =>
-            readFile(join('saved_data', fileName), (err, data) => {
-              if (err) throw err;
-              this.handleClose();
-              loadState(JSON.parse(data));
-              console.log(`Data loaded from ${fileName}`);
-            })
-          }
+          loadData={() => this.loadData(fileName)}
           saveContract={() => {
             const code = this.codeGenUtils.formCode(buildState, settings);
             const filename = `${fileName.replace(/\s+/g, '_')}.sol`;
-            writeFile(join('saved_contracts', filename), code, err => {
-              if (err) throw err;
-              this.handleClose();
-              console.log(`Contract written to file ${filename}`);
-              this.getFiles();
-            });
+            this.saveFile('saved_contracts', filename, code);
+            console.log(`Contract written to file ${filename}`);
           }}
           DATA_OP={DATA_OP}
         />

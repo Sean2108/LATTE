@@ -114,7 +114,6 @@ class Build extends React.Component<Props, State> {
               buildState={buildState}
               loadState={(newBuildState: BuildState): void =>
                 this.setState((prevState: State) => {
-                  console.log(newBuildState)
                   const extractedStartNodes: Array<?DefaultDataNodeModel> = extractStartNodes(
                     prevState.engine,
                     newBuildState.diagrams
