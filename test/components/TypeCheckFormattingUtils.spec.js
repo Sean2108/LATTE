@@ -6,7 +6,8 @@ import {
   toLowerCamelCase,
   isString,
   deepClone,
-  objectEquals
+  objectEquals,
+  flattenParamsToObject
 } from '../../app/components/build/build_utils/TypeCheckFormattingUtils';
 
 describe('TypeCheckFormattingUtils utility functions', () => {
@@ -134,5 +135,41 @@ describe('TypeCheckFormattingUtils utility functions', () => {
       )
     ).toEqual(false);
     expect(objectEquals({}, {})).toEqual(true);
+  });
+});
+
+describe('flattenParamsToObject function', () => {
+  const input = [
+    { name: '', type: 'uint' },
+    { name: 'some_uint', type: 'uint' },
+    { name: 'some_uint_bits', type: 'uint', bits: '8' },
+    { name: 'some_str', type: 'string' },
+    { name: 'some_str_bits', type: 'string', bits: '16' },
+    { name: 'some_addr', type: 'address' },
+    { name: 'some_bool', type: 'bool' }
+  ];
+
+  it('should work with bitsMode on', () => {
+    const expected = {
+      some_uint: 'uint',
+      some_uint_bits: 'uint8',
+      some_str: 'string',
+      some_str_bits: 'bytes16',
+      some_addr: 'address',
+      some_bool: 'bool'
+    };
+    expect(flattenParamsToObject(input, true)).toEqual(expected);
+  });
+
+  it('should work with bitsMode off', () => {
+    const expected = {
+      some_uint: 'uint',
+      some_uint_bits: 'uint',
+      some_str: 'string',
+      some_str_bits: 'string',
+      some_addr: 'address',
+      some_bool: 'bool'
+    };
+    expect(flattenParamsToObject(input, false)).toEqual(expected);
   });
 });

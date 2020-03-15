@@ -67,6 +67,10 @@ describe('VariableParser parseVariable function', () => {
       name: 'a * b',
       type: 'var'
     });
+    expect(parseVariable('1 + "a"', {}, {})).toEqual({
+      name: '1 + "a"',
+      type: 'var'
+    });
   });
 
   it('parseStruct should work with bitsMode off', () => {

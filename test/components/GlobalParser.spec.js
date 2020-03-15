@@ -4,46 +4,6 @@ import BuildParser from '../../app/components/build/parsers/BuildParser';
 jest.mock('../../app/components/build/parsers/BuildParser');
 
 describe('GlobalParser component', () => {
-  describe('flattenParamsToObject function', () => {
-    const input = [
-      { name: '', type: 'uint' },
-      { name: 'some_uint', type: 'uint' },
-      { name: 'some_uint_bits', type: 'uint', bits: '8' },
-      { name: 'some_str', type: 'string' },
-      { name: 'some_str_bits', type: 'string', bits: '16' },
-      { name: 'some_addr', type: 'address' },
-      { name: 'some_bool', type: 'bool' }
-    ];
-
-    it('should work with bitsMode on', () => {
-      const globalParser = new GlobalParser(null, null);
-      const expected = {
-        some_uint: 'uint',
-        some_uint_bits: 'uint8',
-        some_str: 'string',
-        some_str_bits: 'bytes16',
-        some_addr: 'address',
-        some_bool: 'bool'
-      };
-      expect(globalParser.flattenParamsToObject(input, true)).toEqual(expected);
-    });
-
-    it('should work with bitsMode off', () => {
-      const globalParser = new GlobalParser(null, null);
-      const expected = {
-        some_uint: 'uint',
-        some_uint_bits: 'uint',
-        some_str: 'string',
-        some_str_bits: 'string',
-        some_addr: 'address',
-        some_bool: 'bool'
-      };
-      expect(globalParser.flattenParamsToObject(input, false)).toEqual(
-        expected
-      );
-    });
-  });
-
   describe('parse function', () => {
     beforeEach(() => {
       BuildParser.mockClear();
@@ -100,9 +60,18 @@ describe('GlobalParser component', () => {
       const addNode = jest.fn();
       const editHistory = { addNode };
       mockBuildParserInstance.parse
-        .mockReturnValueOnce('code1')
-        .mockReturnValueOnce('code2')
-        .mockReturnValueOnce('code3');
+        .mockReturnValueOnce({
+          code: 'code1',
+          variables: { testvar1: 'test1' }
+        })
+        .mockReturnValueOnce({
+          code: 'code2',
+          variables: { testvar1: 'test1', testvar2: 'test2' }
+        })
+        .mockReturnValueOnce({
+          code: 'code3',
+          variables: { testvar: 'test', testvar2: 'test2', testvar3: 'test3' }
+        });
       mockBuildParserInstance.getReturnVar
         .mockReturnValueOnce('return1')
         .mockReturnValueOnce('return2')
@@ -113,7 +82,7 @@ describe('GlobalParser component', () => {
         .mockReturnValueOnce(true);
       globalParser.parse(props, web3Utils, editHistory);
       expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-        { a: 1 },
+        {},
         { test1: 'uint8' },
         { c: 3 },
         { d: 4 },
@@ -123,7 +92,7 @@ describe('GlobalParser component', () => {
         node1: 'a'
       });
       expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-        { a: 1 },
+        { testvar1: 'test1' },
         { test2: 'bytes16' },
         { c: 3 },
         { d: 4 },
@@ -133,7 +102,7 @@ describe('GlobalParser component', () => {
         node2: 'b'
       });
       expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-        { a: 1 },
+        { testvar1: 'test1', testvar2: 'test2' },
         { test3: 'bool', test4: 'address' },
         { c: 3 },
         { d: 4 },
@@ -142,22 +111,29 @@ describe('GlobalParser component', () => {
       expect(mockBuildParserInstance.parse).toHaveBeenCalledWith({
         node3: 'c'
       });
+      const expectedChanges = {
+        tabsCode: ['code1', 'code2', 'code3'],
+        tabsReturn: ['return1', 'return2', 'return3'],
+        isView: [true, false, true],
+        gasHistory: [0, 1, 2]
+      };
       expect(getGasUsage).toHaveBeenCalledWith(
-        buildState,
+        {
+          ...buildState,
+          ...expectedChanges,
+          variables: { testvar: 'test', testvar2: 'test2', testvar3: 'test3' }
+        },
         settings,
         [0, 1, 2],
         updateBuildError
       );
-      expect(onTabsChange).toHaveBeenCalledWith(
-        {
-          tabsCode: ['code1', 'code2', 'code3'],
-          tabsReturn: ['return1', 'return2', 'return3'],
-          isView: [true, false, true],
-          gasHistory: [0, 1, 2]
-        },
-        addNode
-      );
+      expect(onTabsChange).toHaveBeenCalledWith(expectedChanges, addNode);
       expect(updateLoading).toHaveBeenCalledWith(false);
+      expect(globalParser.variables).toEqual({
+        testvar: 'test',
+        testvar2: 'test2',
+        testvar3: 'test3'
+      });
     });
   });
 
@@ -192,7 +168,10 @@ describe('GlobalParser component', () => {
     it('should reset buildParser and call update functions', () => {
       const globalParser = new GlobalParser(null, null);
       const mockBuildParserInstance = BuildParser.mock.instances[0];
-      mockBuildParserInstance.parse.mockReturnValueOnce('the code');
+      mockBuildParserInstance.parse.mockReturnValueOnce({
+        code: 'the code',
+        variables: { testvar: 'test' }
+      });
       mockBuildParserInstance.getReturnVar.mockReturnValueOnce('return var');
       mockBuildParserInstance.getView.mockReturnValueOnce(true);
       const res = globalParser.parseStartNode(
@@ -208,7 +187,7 @@ describe('GlobalParser component', () => {
         }
       );
       expect(mockBuildParserInstance.reset).toHaveBeenCalledWith(
-        { a: 1 },
+        {},
         { b: 2 },
         { c: 3 },
         { d: 4 },
@@ -220,6 +199,7 @@ describe('GlobalParser component', () => {
         tabsReturn: 'return var',
         isView: true
       });
+      expect(globalParser.variables).toEqual({ testvar: 'test' });
     });
   });
 });

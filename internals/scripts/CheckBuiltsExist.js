@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 // @flow
 // Check if the renderer and main bundles are built
 import path from 'path';

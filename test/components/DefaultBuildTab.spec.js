@@ -1,7 +1,7 @@
 import React from 'react';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { createMount, createShallow } from '@material-ui/core/test-utils';
+import { createMount } from '@material-ui/core/test-utils';
 import { Drawer, Snackbar } from '@material-ui/core';
 import DefaultBuildTab from '../../app/components/build/DefaultBuildTab';
 import VariableList from '../../app/components/build/build_components/VariableList';
@@ -12,9 +12,8 @@ import { setupEngine } from '../../app/components/build/build_utils/DiagramUtils
 
 Enzyme.configure({ adapter: new Adapter() });
 
-function setup(createComponentMount = true) {
-  const createComponentFn = createComponentMount ? createMount : createShallow;
-  const component = createComponentFn()(
+function setup() {
+  const component = createMount()(
     <DefaultBuildTab
       varList={{}}
       events={{}}

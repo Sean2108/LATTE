@@ -76,7 +76,6 @@ class Build extends React.Component<Props, State> {
   render(): React.Node {
     const { classes, onback, connection, settings } = this.props;
     const { buildState, engine, startNodes, loading } = this.state;
-    const { variables } = buildState;
 
     return (
       <main align="center" className={classes.content}>
@@ -84,7 +83,6 @@ class Build extends React.Component<Props, State> {
         <div>
           <div className={classes.root}>
             <BuildTabs
-              variables={variables}
               onTabsChange={(
                 newBuildState: {},
                 callback: ({}) => void = () => {}

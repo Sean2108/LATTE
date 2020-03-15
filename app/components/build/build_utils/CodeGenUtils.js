@@ -13,13 +13,9 @@ import type {
 export default class CodeGenUtils {
   formCode(buildState: BuildState, settings: SettingsObj): string {
     let code = 'pragma solidity ^0.5.4;\ncontract Code {\n';
-    code += this.formStructsEvents(
-      buildState.entities,
-      settings.bitsMode,
-      false
-    );
+    code += this.formStructsEvents(buildState.entities, settings, false);
     code += this.formVars(buildState.variables);
-    code += this.formStructsEvents(buildState.events, settings.bitsMode, true);
+    code += this.formStructsEvents(buildState.events, settings, true);
     for (let i = 0; i < buildState.tabsCode.length; i += 1) {
       code += this.formFunctionBody(buildState, i, settings);
     }
@@ -107,7 +103,7 @@ export default class CodeGenUtils {
 
   formStructsEvents(
     entities: StructLookupType,
-    bitsMode: boolean,
+    settings: SettingsObj,
     isEvent: boolean
   ): string {
     let code = '';
@@ -119,16 +115,17 @@ export default class CodeGenUtils {
         .filter(param => param.name)
         .map(param => {
           const suffix = isEvent ? '' : ';\n';
-          if (bitsMode) {
+          const indentation = isEvent ? '' : settings.indentation;
+          if (settings.bitsMode) {
             if (param.type === 'string' && param.bits) {
-              return `bytes${param.bits} ${param.name}${suffix}`;
+              return `${indentation}bytes${param.bits} ${param.name}${suffix}`;
             }
             if (param.bits) {
-              return `${param.type}${param.bits} ${param.name}${suffix}`;
+              return `${indentation}${param.type}${param.bits} ${param.name}${suffix}`;
             }
-            return `${param.type} ${param.name}${suffix}`;
+            return `${indentation}${param.type} ${param.name}${suffix}`;
           }
-          return `${param.type} ${param.name}${suffix}`;
+          return `${indentation}${param.type} ${param.name}${suffix}`;
         })
         .join(isEvent ? ', ' : '')}${isEvent ? ')' : '}'}${
         isEvent ? ';' : ''

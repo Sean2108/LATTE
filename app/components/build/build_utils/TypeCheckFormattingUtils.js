@@ -96,3 +96,32 @@ export function convertTypeToReadable(type: string): string {
     string: 'Text'
   }[type];
 }
+
+export function flattenParamsToObject(
+  params: Array<VariableObj>,
+  bitsMode: boolean
+): VariablesLookupType {
+  return params
+    .filter((element: VariableObj): boolean => !!element.name)
+    .reduce(
+      (
+        resultParam: VariablesLookupType,
+        currentObject: VariableObj
+      ): VariablesLookupType => {
+        const result = resultParam;
+        if (bitsMode && currentObject.bits) {
+          if (currentObject.type === 'string') {
+            result[currentObject.name] = `bytes${currentObject.bits}`;
+          } else {
+            result[
+              currentObject.name
+            ] = `${currentObject.type}${currentObject.bits}`;
+          }
+        } else {
+          result[currentObject.name] = currentObject.type;
+        }
+        return result;
+      },
+      {}
+    );
+}

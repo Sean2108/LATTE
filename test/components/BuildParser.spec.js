@@ -133,7 +133,7 @@ describe('BuildParser parse', () => {
     expect(mockNodeParserInstance.parseNodeForVariables).not.toHaveBeenCalled();
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
     expect(onVariableChange).toHaveBeenCalledTimes(1);
-    expect(code).toEqual('');
+    expect(code).toEqual({ code: '', variables: {} });
   });
 
   it('should return correct code for diagram with 1 data node', () => {
@@ -143,6 +143,8 @@ describe('BuildParser parse', () => {
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode.mockReturnValueOnce('code');
+    mockNodeParserInstance.variables = { v1: 'a' };
+    mockNodeParserInstance.varList = { v2: 'b' };
     const code = buildParser.parse(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
@@ -151,7 +153,7 @@ describe('BuildParser parse', () => {
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
     expect(onVariableChange).toHaveBeenCalledTimes(1);
-    expect(code).toEqual('code\n');
+    expect(code).toEqual({ code: 'code\n', variables: { v1: 'a', v2: 'b' } });
   });
 
   it('should return correct code for diagram with 1 data node with a reverse link', () => {
@@ -161,6 +163,8 @@ describe('BuildParser parse', () => {
     addNodeToDataNode(startNode, 'first', { first: 2 }, {}, true, true);
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode.mockReturnValueOnce('code');
+    mockNodeParserInstance.variables = { v1: 'a' };
+    mockNodeParserInstance.varList = { v2: 'b' };
     const code = buildParser.parse(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
@@ -169,7 +173,7 @@ describe('BuildParser parse', () => {
     );
     expect(mockNodeParserInstance.parseNode).toHaveBeenCalledTimes(1);
     expect(onVariableChange).toHaveBeenCalledTimes(1);
-    expect(code).toEqual('code\n');
+    expect(code).toEqual({ code: 'code\n', variables: { v1: 'a', v2: 'b' } });
   });
 });
 
@@ -193,11 +197,14 @@ describe('BuildParser findVariables', () => {
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     addNodeToDataNode(startNode, 'first', { first: 2 });
     const mockNodeParserInstance = NodeParser.mock.instances[0];
-    mockNodeParserInstance.parseNodeForVariables.mockReturnValueOnce(true);
+    mockNodeParserInstance.parseNodeForVariables
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
     buildParser.findVariables(startNode);
     expectFunctionCalledWithTimes(
       mockNodeParserInstance.parseNodeForVariables,
       [[{ first: 2 }]],
+      1,
       1
     );
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();

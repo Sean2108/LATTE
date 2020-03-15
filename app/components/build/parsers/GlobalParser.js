@@ -3,6 +3,7 @@ import BuildParser from './BuildParser';
 import DefaultDataNodeModel from '../diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 import Web3Utils from '../build_utils/Web3Utils';
 import EditHistory from '../build_utils/EditHistory';
+import { flattenParamsToObject } from '../build_utils/TypeCheckFormattingUtils';
 import type {
   VariablesLookupType,
   VariableObj,
@@ -12,18 +13,17 @@ import type {
 
 type SingleTabUpdate = {
   tabsCode: string,
-  tabsReturn: ?string,
+  tabsReturn: string | null,
   isView: boolean
 };
 
 type TabUpdates = {
   tabsCode: Array<string>,
-  tabsReturn: Array<?string>,
+  tabsReturn: Array<string | null>,
   isView: Array<boolean>
 };
 
 type Props = {
-  variables: VariablesLookupType,
   startNodes: Array<?DefaultDataNodeModel>,
   onTabsChange: ({}, ?({}) => void) => void,
   settings: SettingsObj,
@@ -36,19 +36,22 @@ export default class GlobalParser {
 
   updateBuildError: string => void;
 
+  variables: VariablesLookupType;
+
   constructor(
     onVariablesChange: VariablesLookupType => void,
     updateBuildError: string => void
   ): void {
     this.buildParser = new BuildParser(onVariablesChange, updateBuildError);
     this.updateBuildError = updateBuildError;
+    this.variables = {};
   }
 
-  parseStartNode = (
+  parseStartNode(
     startNode: ?DefaultDataNodeModel,
     functionParams: VariablesLookupType,
     props: Props
-  ): SingleTabUpdate => {
+  ): SingleTabUpdate {
     if (!startNode) {
       return {
         tabsCode: '',
@@ -56,29 +59,26 @@ export default class GlobalParser {
         isView: true
       };
     }
-    const { variables, buildState, settings } = props;
+    const { buildState, settings } = props;
     const { events, entities } = buildState;
     this.buildParser.reset(
-      variables,
+      this.variables,
       functionParams,
       events,
       entities,
       settings
     );
 
-    const code: string = this.buildParser.parse(startNode);
+    const { code, variables } = this.buildParser.parse(startNode);
+    this.variables = variables;
     return {
       tabsCode: code,
       tabsReturn: this.buildParser.getReturnVar(),
       isView: this.buildParser.getView()
     };
-  };
+  }
 
-  parse = (
-    props: Props,
-    web3Utils: Web3Utils,
-    editHistory: EditHistory
-  ): void => {
+  parse(props: Props, web3Utils: Web3Utils, editHistory: EditHistory): void {
     const {
       startNodes,
       onTabsChange,
@@ -86,9 +86,10 @@ export default class GlobalParser {
       updateLoading,
       buildState
     } = props;
+    this.variables = {};
     const functionParamsArr: Array<VariablesLookupType> = buildState.tabsParams.map(
       (params: Array<VariableObj>): VariablesLookupType =>
-        this.flattenParamsToObject(params, settings.bitsMode)
+        flattenParamsToObject(params, settings.bitsMode)
     );
     const changedTabState: TabUpdates = startNodes
       .map((startNode: ?DefaultDataNodeModel, index: number): SingleTabUpdate =>
@@ -109,48 +110,24 @@ export default class GlobalParser {
     onTabsChange(
       {
         ...changedTabState,
-        gasHistory: this.getGasHistory(buildState, settings, web3Utils)
+        gasHistory: this.getGasHistory(
+          { ...buildState, ...changedTabState, variables: this.variables },
+          settings,
+          web3Utils
+        )
       },
       editHistory.addNode
     );
     updateLoading(false);
-  };
+  }
 
-  getGasHistory = (
+  getGasHistory(
     buildState: BuildState,
     settings: SettingsObj,
     web3Utils: Web3Utils
-  ): Array<number> => {
+  ): Array<number> {
     const history: Array<number> = buildState.gasHistory;
     web3Utils.getGasUsage(buildState, settings, history, this.updateBuildError);
     return history;
-  };
-
-  flattenParamsToObject = (
-    params: Array<VariableObj>,
-    bitsMode: boolean
-  ): VariablesLookupType =>
-    params
-      .filter((element: VariableObj): boolean => !!element.name)
-      .reduce(
-        (
-          resultParam: VariablesLookupType,
-          currentObject: VariableObj
-        ): VariablesLookupType => {
-          const result = resultParam;
-          if (bitsMode && currentObject.bits) {
-            if (currentObject.type === 'string') {
-              result[currentObject.name] = `bytes${currentObject.bits}`;
-            } else {
-              result[
-                currentObject.name
-              ] = `${currentObject.type}${currentObject.bits}`;
-            }
-          } else {
-            result[currentObject.name] = currentObject.type;
-          }
-          return result;
-        },
-        {}
-      );
+  }
 }

@@ -18,6 +18,7 @@ import DefaultBuildTab from './DefaultBuildTab';
 import EditHistory from './build_utils/EditHistory';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 import GlobalParser from './parsers/GlobalParser';
+import { flattenParamsToObject } from './build_utils/TypeCheckFormattingUtils';
 import type {
   VariablesLookupType,
   BuildState,
@@ -70,7 +71,6 @@ const styles = theme => ({
 
 type Props = {
   classes: Classes,
-  variables: VariablesLookupType,
   onTabsChange: ({}, ?({}) => void) => void,
   buildState: BuildState,
   settings: SettingsObj,
@@ -146,7 +146,6 @@ class BuildTabs extends React.Component<Props, State> {
   render(): React.Node {
     const {
       classes,
-      variables,
       onTabsChange,
       buildState,
       settings,
@@ -190,10 +189,10 @@ class BuildTabs extends React.Component<Props, State> {
               entities={buildState.entities}
               events={buildState.events}
               updateEntities={(entities: StructLookupType): void =>
-                onTabsChange({ ...buildState, entities })
+                onTabsChange({ entities })
               }
               updateEvents={(events: StructLookupType): void =>
-                onTabsChange({ ...buildState, events })
+                onTabsChange({ events })
               }
               params={buildState.constructorParams}
               updateParams={(params: Array<VariableObj>): void =>
@@ -210,7 +209,7 @@ class BuildTabs extends React.Component<Props, State> {
             value === i + 1 && (
               <TabContainer key={i}>
                 <DefaultBuildTab
-                  varList={variables}
+                  varList={buildState.variables}
                   events={buildState.events}
                   entities={buildState.entities}
                   onChangeParams={(newParams: Array<VariableObj>): void =>
@@ -221,7 +220,7 @@ class BuildTabs extends React.Component<Props, State> {
                   }
                   onVariablesChange={this.onVariablesChange}
                   params={buildState.tabsParams[i]}
-                  flattenedParams={this.globalParser.flattenParamsToObject(
+                  flattenedParams={flattenParamsToObject(
                     buildState.tabsParams[i],
                     settings.bitsMode
                   )}
@@ -241,6 +240,7 @@ class BuildTabs extends React.Component<Props, State> {
                     updateStartNodes(newStartNodes);
                   }}
                   triggerParse={serializedDiagram => {
+                    this.onVariablesChange({});
                     this.handleOnChange(serializedDiagram, i, 'diagrams');
                     this.globalParser.parse(
                       this.props,

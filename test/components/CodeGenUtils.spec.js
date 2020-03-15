@@ -446,28 +446,40 @@ describe('codeGenUtils class formStructsEvents function', () => {
     const { codeGen, entities } = setup();
     const expected =
       'event itemA (uint paramA, string paramB);\nevent itemB (string paramC, address paramD, bool paramE);\n';
-    expect(codeGen.formStructsEvents(entities, false, true)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, {
+      bitsMode: false,
+      indentation: '    '
+    }, true)).toEqual(expected);
   });
 
   it('should return correct result for events when bitsMode is on', () => {
     const { codeGen, entities } = setup();
     const expected =
       'event itemA (uint8 paramA, string paramB);\nevent itemB (bytes16 paramC, address paramD, bool paramE);\n';
-    expect(codeGen.formStructsEvents(entities, true, true)).toEqual(expected);
+    expect(codeGen.formStructsEvents(entities, {
+      bitsMode: true,
+      indentation: '    '
+    }, true)).toEqual(expected);
   });
 
   it('should return correct result for structs when bitsMode is off', () => {
     const { codeGen, entities } = setup();
     const expected =
-      'struct itemA {\nuint paramA;\nstring paramB;\n}\nstruct itemB {\nstring paramC;\naddress paramD;\nbool paramE;\n}\n';
-    expect(codeGen.formStructsEvents(entities, false, false)).toEqual(expected);
+      'struct itemA {\n    uint paramA;\n    string paramB;\n}\nstruct itemB {\n    string paramC;\n    address paramD;\n    bool paramE;\n}\n';
+    expect(codeGen.formStructsEvents(entities, {
+      bitsMode: false,
+      indentation: '    '
+    }, false)).toEqual(expected);
   });
 
   it('should return correct result for structs when bitsMode is on', () => {
     const { codeGen, entities } = setup();
     const expected =
-      'struct itemA {\nuint8 paramA;\nstring paramB;\n}\nstruct itemB {\nbytes16 paramC;\naddress paramD;\nbool paramE;\n}\n';
-    expect(codeGen.formStructsEvents(entities, true, false)).toEqual(expected);
+      'struct itemA {\n    uint8 paramA;\n    string paramB;\n}\nstruct itemB {\n    bytes16 paramC;\n    address paramD;\n    bool paramE;\n}\n';
+    expect(codeGen.formStructsEvents(entities, {
+      bitsMode: true,
+      indentation: '    '
+    }, false)).toEqual(expected);
   });
 });
 

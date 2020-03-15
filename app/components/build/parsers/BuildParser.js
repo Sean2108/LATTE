@@ -43,11 +43,12 @@ export default class BuildParser {
   parse(start) {
     this.findVariables(start);
     const code = this.traverseNextNode(start, 1);
-    this.onVariablesChange({
+    const variables = {
       ...this.nodeParser.variables,
       ...this.nodeParser.varList
-    });
-    return code;
+    };
+    this.onVariablesChange(variables);
+    return {code, variables};
   }
 
   findVariables(start) {

@@ -8,7 +8,12 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import parseVariable from '../parsers/VariableParser';
-import type { RequireObj,VariablesLookupType, StructLookupType, Classes } from '../../../types';
+import type {
+  RequireObj,
+  VariablesLookupType,
+  StructLookupType,
+  Classes
+} from '../../../types';
 
 const styles = theme => ({
   formControl: {
@@ -32,26 +37,12 @@ type Props = {
 };
 
 class RequireRow extends React.Component<Props> {
-  handleChange = (name: string) => (
-    event: SyntheticInputEvent<>
-  ) => {
+  handleChange = (name: string) => (event: SyntheticInputEvent<>) => {
     const { require, variables, structList, updateRequire } = this.props;
     const state: RequireObj = { ...require, [name]: event.target.value };
-    try {
-      if (variables && structList) {
-        state.var1 = parseVariable(
-          state.displayVar1,
-          variables,
-          structList
-        ).name;
-        state.var2 = parseVariable(
-          state.displayVar2,
-          variables,
-          structList
-        ).name;
-      }
-    } catch (err) {
-      console.log(err);
+    if (variables && structList) {
+      state.var1 = parseVariable(state.displayVar1, variables, structList).name;
+      state.var2 = parseVariable(state.displayVar2, variables, structList).name;
     }
     updateRequire(state);
   };
