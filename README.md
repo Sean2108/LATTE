@@ -6,6 +6,8 @@ LATTE is a graphical user interface tool that makes it easy for both developers 
 
 Uses electron, react, solc and web3. Material-UI is used to style the application. Tested using Jest, Enzyme and Sinon.
 
+LATTE will be presented at the ACM SIGMOD Conference 2020 as a demo paper.
+
 ![More on LATTE](poster.jpg)
 
 ## To run:
