@@ -122,7 +122,6 @@ class BuildOptions extends React.Component {
       classes,
       onback,
       buildState,
-      loadState,
       settings,
       connection,
       loading
