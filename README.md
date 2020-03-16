@@ -10,6 +10,8 @@ LATTE will be presented at the ACM SIGMOD Conference 2020 as a demo paper.
 
 ![More on LATTE](poster.jpg)
 
+![](https://imgur.com/2Co24AZ.gif)
+
 ## To run:
 - yarn - installs all packages and dependencies
 - yarn dev - runs the application in development mode (with the console available)
