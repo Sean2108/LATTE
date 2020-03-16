@@ -8,9 +8,11 @@ Uses electron, react, solc and web3. Material-UI is used to style the applicatio
 
 LATTE will be presented at the ACM SIGMOD Conference 2020 as a demo paper.
 
+## Poster:
 ![More on LATTE](poster.jpg)
 
-![](https://imgur.com/vDm9S8V.gif)
+## Demo:
+![Demo](https://imgur.com/vDm9S8V.gif)
 
 ## To run:
 - yarn - installs all packages and dependencies
