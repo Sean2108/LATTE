@@ -8,6 +8,9 @@ import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import VariableRow from './VariableRow';
 import type { VariableObj, Classes } from '../../../types';
+import {
+  getDuplicateIndices
+} from '../build_utils/TypeCheckFormattingUtils';
 
 const styles = theme => ({
   paper: {
@@ -49,6 +52,12 @@ class VariableList extends React.Component<Props> {
       vars.push({ name: '', displayName: '', type: 'uint', bits: '' });
     }
 
+    const duplicateIndices = getDuplicateIndices(
+      vars
+        .filter((item: VariableObj): boolean => !!item.displayName)
+        .map((item: VariableObj): string => item.displayName)
+    );
+
     return (
       <Paper className={classes.paper}>
         <Tooltip title={tooltipText} classes={{ tooltip: classes.tooltipFont }}>
@@ -66,6 +75,7 @@ class VariableList extends React.Component<Props> {
               updateVariables(variables);
             }}
             bitsMode={bitsMode}
+            isDuplicate={duplicateIndices.includes(index)}
           />
         ))}
         <Button

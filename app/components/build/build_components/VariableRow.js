@@ -26,12 +26,13 @@ type Props = {
   classes: Classes,
   updateVariables: VariableObj => void,
   val: VariableObj,
-  bitsMode: boolean
+  bitsMode: boolean,
+  isDuplicate: boolean
 };
 
 class VariableRow extends React.Component<Props> {
   render(): React.Node {
-    const { classes, updateVariables, val, bitsMode } = this.props;
+    const { classes, updateVariables, val, bitsMode, isDuplicate } = this.props;
     return (
       <div>
         <FormControl className={classes.formControl}>
@@ -39,6 +40,8 @@ class VariableRow extends React.Component<Props> {
             label="Variable Name"
             className={classes.textField}
             value={val.displayName}
+            error={isDuplicate}
+            helperText={isDuplicate ? `"${val.displayName}" already exists!` : ''}
             onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
               updateVariables({
                 ...val,

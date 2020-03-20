@@ -125,3 +125,27 @@ export function flattenParamsToObject(
       {}
     );
 }
+
+export function getDuplicateIndices(items: Array<string>): Array<number> {
+  const lookup = {};
+  items.forEach((item: string) => {
+    if (!lookup[item]) {
+      lookup[item] = 0;
+    }
+    lookup[item] += 1;
+  });
+  return items
+    .map((item: string, index: number): { item: string, index: number } => ({
+      item,
+      index
+    }))
+    .filter(({ item }): boolean => lookup[item] > 1)
+    .map(({ item, index }): number => {
+      lookup[item] -= 1;
+      if (lookup[item] === 0) {
+        return index;
+      }
+      return -1;
+    })
+    .filter((item: number) => item !== -1);
+}

@@ -7,7 +7,8 @@ import {
   isString,
   deepClone,
   objectEquals,
-  flattenParamsToObject
+  flattenParamsToObject,
+  getDuplicateIndices
 } from '../../app/components/build/build_utils/TypeCheckFormattingUtils';
 
 describe('TypeCheckFormattingUtils utility functions', () => {
@@ -171,5 +172,26 @@ describe('flattenParamsToObject function', () => {
       some_bool: 'bool'
     };
     expect(flattenParamsToObject(input, false)).toEqual(expected);
+  });
+});
+
+describe('getDuplicateIndices function', () => {
+  it('should return empty array when there are no duplicates', () => {
+    expect(getDuplicateIndices([])).toEqual([]);
+    expect(getDuplicateIndices(['a'])).toEqual([]);
+    expect(getDuplicateIndices(['a', 'b', 'c'])).toEqual([]);
+  });
+
+  it('should return array with indices of last repeated item when there are duplicates', () => {
+    expect(getDuplicateIndices(['a', 'a'])).toEqual([1]);
+    expect(getDuplicateIndices(['a', 'a', 'a'])).toEqual([2]);
+    expect(getDuplicateIndices(['a', 'a', 'a', 'b'])).toEqual([2]);
+    expect(getDuplicateIndices(['a', 'a', 'b', 'a'])).toEqual([3]);
+    expect(getDuplicateIndices(['a', 'a', 'b', 'a', 'b'])).toEqual([3, 4]);
+    expect(getDuplicateIndices(['a', 'b', 'c', 'a', 'b', 'c', 'd'])).toEqual([
+      3,
+      4,
+      5
+    ]);
   });
 });
