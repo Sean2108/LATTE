@@ -44,14 +44,12 @@ type Props = {
 };
 
 class ParamList extends React.Component<Props> {
-  handleChange = (index: number) => (
-    event: SyntheticInputEvent<HTMLInputElement>
-  ) => {
+  handleChange = (index: number) => (event: SyntheticInputEvent<>) => {
     const { params, updateParams } = this.props;
     const newParams: Array<VariableObj> = params.filter(
       param => param.name && param.displayName
     );
-    newParams[index].value = event.currentTarget.value;
+    newParams[index].value = event.target.value;
     updateParams(newParams);
   };
 
@@ -59,14 +57,12 @@ class ParamList extends React.Component<Props> {
     const { classes, header, params, tooltipText } = this.props;
 
     const filteredParams: Array<VariableObj> = params.filter(
-      (param: VariableObj) => param.name && param.displayName
+      (param: VariableObj) => param.name && param.displayName && param.type
     );
 
     const labels: Array<string> = filteredParams.map(
       (param: VariableObj): string =>
-        `Value of ${param.displayName || param.name || ''}${
-          param.type ? ` (${convertTypeToReadable(param.type)})` : ''
-        }`
+        `Value of ${param.displayName} (${convertTypeToReadable(param.type)})`
     );
 
     return (

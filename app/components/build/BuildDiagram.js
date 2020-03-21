@@ -12,20 +12,22 @@ import {
   DiagramEngine,
   DiagramModel,
   DiagramWidget,
-  DefaultPortModel,
-  NodeModel,
   PointModel,
   PortModel
 } from 'storm-react-diagrams';
-import { Button, IconButton } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import TrayWidget from './diagram/TrayWidget';
 import TrayItemWidget from './diagram/TrayItemWidget';
-import DiamondNodeModel from './diagram/diagram_node_declarations/DiamondNode/DiamondNodeModel';
 import DefaultDataNodeModel from './diagram/diagram_node_declarations/DefaultDataNode/DefaultDataNodeModel';
 import DiagramModal from './diagram/DiagramModal';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 import EditHistory from './build_utils/EditHistory';
-import { findStart, getNewStartNode } from './build_utils/DiagramUtils';
+import {
+  findStart,
+  getNewStartNode,
+  selectNode
+} from './build_utils/DiagramUtils';
+import UndoRedoButton from './build_components/UndoRedoButton';
 import type {
   StructLookupType,
   VariablesLookupType,
@@ -58,9 +60,6 @@ const styles = theme => ({
     display: 'flex',
     'justify-content': 'space-between',
     'flex-basis': '200px'
-  },
-  inlineBlock: {
-    display: 'inline-block'
   }
 });
 
@@ -167,75 +166,73 @@ class BuildDiagram extends React.Component<Props, State> {
     );
   };
 
-  createDefaultNode(
-    label: string,
-    color: string,
-    data: {},
-    isReturn: boolean
-  ): DefaultDataNodeModel {
-    const node: DefaultDataNodeModel = new DefaultDataNodeModel(
-      label,
-      color,
-      data
-    );
-    node.addInPort(' ');
-    if (!isReturn) {
-      const outPort: DefaultPortModel = node.addOutPort(' ');
-      outPort.setMaximumLinks(1);
-    }
-    return node;
-  }
-
-  selectNode(type: NodeType, desc: string, data: {}): NodeModel {
-    switch (type) {
-      case 'event':
-        return this.createDefaultNode(
-          `Emit Event: ${desc}`,
-          'rgb(0,192,0)',
-          data,
-          false
-        );
-      case 'entity':
-        return this.createDefaultNode(
-          `New Entity: ${desc}`,
-          'rgb(100,100,0)',
-          data,
-          false
-        );
-      case 'transfer':
-        return this.createDefaultNode(
-          `Transfer: ${desc}`,
-          'rgb(255,100,0)',
-          data,
-          false
-        );
-      case 'return':
-        return this.createDefaultNode(
-          `Return: ${desc}`,
-          'rgb(192,255,0)',
-          data,
-          true
-        );
-      case 'conditional':
-        return new DiamondNodeModel(`${desc}`, data);
-      case 'assignment':
-      default:
-        return this.createDefaultNode(
-          `Assignment: ${desc}`,
-          'rgb(192,0,0)',
-          data,
-          false
-        );
-    }
-  }
-
   addNode(info: string, data: {}): void {
     const { type, points } = this.state;
-    const node = this.selectNode(type, info, data);
+    const node = selectNode(type, info, data);
     node.x = points.x;
     node.y = points.y;
     this.props.engine.getDiagramModel().addNode(node);
     this.forceUpdate();
+  }
+
+  getTrayWidgetItems(): React.Node {
+    const { classes, isConstructor } = this.props;
+    const trayItemWidgetProperties: Array<{
+      type: string,
+      name: string,
+      color: string,
+      hide?: boolean
+    }> = [
+      {
+        type: 'assignment',
+        name: 'Assignment Node',
+        color: 'rgb(192,0,0)'
+      },
+      {
+        type: 'event',
+        name: 'Event Node',
+        color: 'rgb(0,192,0)'
+      },
+      {
+        type: 'entity',
+        name: 'New Entity Node',
+        color: 'rgb(100,100,0)'
+      },
+      {
+        type: 'transfer',
+        name: 'Transfer Node',
+        color: 'rgb(255,100,0)'
+      },
+      {
+        type: 'return',
+        name: 'Return Node',
+        color: 'rgb(192,255,0)',
+        hide: isConstructor
+      },
+      {
+        type: 'conditional',
+        name: 'Conditional Node',
+        color: 'rgb(192,0,255)'
+      }
+    ];
+    return trayItemWidgetProperties.map(
+      ({ type, name, color, hide }): ?React.Node =>
+        !hide ? (
+          <Tooltip
+            title={tooltips[type]}
+            classes={{ tooltip: classes.tooltipFont }}
+            key={type}
+          >
+            <TrayItemWidget
+              model={{
+                type
+              }}
+              name={name}
+              color={color}
+            />
+          </Tooltip>
+        ) : null
+    );
   }
 
   render(): React.Node {
@@ -246,7 +243,6 @@ class BuildDiagram extends React.Component<Props, State> {
       entities,
       settings,
       openDrawer,
-      isConstructor,
       editHistory,
       engine
     } = this.props;
@@ -259,30 +255,20 @@ class BuildDiagram extends React.Component<Props, State> {
         <div className={classes.titleDiv}>
           <div className={classes.flexChild}>
             <div>
-              <Tooltip title="Undo" classes={{ tooltip: classes.tooltipFont }}>
-                <div className={classes.inlineBlock}>
-                  <IconButton
-                    onClick={editHistory.undo}
-                    aria-label="undo"
-                    color="primary"
-                    disabled={!editHistory.canUndo()}
-                  >
-                    <UndoIcon />
-                  </IconButton>
-                </div>
-              </Tooltip>
-              <Tooltip title="Redo" classes={{ tooltip: classes.tooltipFont }}>
-                <div className={classes.inlineBlock}>
-                  <IconButton
-                    onClick={editHistory.redo}
-                    aria-label="redo"
-                    color="primary"
-                    disabled={!editHistory.canRedo()}
-                  >
-                    <RedoIcon />
-                  </IconButton>
-                </div>
-              </Tooltip>
+              <UndoRedoButton
+                tooltipText="Undo"
+                onClick={editHistory.undo}
+                disabled={!editHistory.canUndo()}
+              >
+                <UndoIcon />
+              </UndoRedoButton>
+              <UndoRedoButton
+                tooltipText="Redo"
+                onClick={editHistory.redo}
+                disabled={!editHistory.canRedo()}
+              >
+                <RedoIcon />
+              </UndoRedoButton>
             </div>
           </div>
           <Tooltip
@@ -322,82 +308,7 @@ class BuildDiagram extends React.Component<Props, State> {
             <div className="title"> Nodes </div>
           </div>
           <div className="content">
-            <TrayWidget>
-              <Tooltip
-                title={tooltips.assignment}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'assignment'
-                  }}
-                  name="Assignment Node"
-                  color="rgb(192,0,0)"
-                />
-              </Tooltip>
-              <Tooltip
-                title={tooltips.event}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'event'
-                  }}
-                  name="Event Node"
-                  color="rgb(0,192,0)"
-                />
-              </Tooltip>
-              <Tooltip
-                title={tooltips.entity}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'entity'
-                  }}
-                  name="New Entity Node"
-                  color="rgb(100,100,0)"
-                />
-              </Tooltip>
-              <Tooltip
-                title={tooltips.transfer}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'transfer'
-                  }}
-                  name="Transfer Node"
-                  color="rgb(255,100,0)"
-                />
-              </Tooltip>
-              {!isConstructor && (
-                <Tooltip
-                  title={tooltips.return}
-                  classes={{ tooltip: classes.tooltipFont }}
-                >
-                  <TrayItemWidget
-                    model={{
-                      type: 'return'
-                    }}
-                    name="Return Node"
-                    color="rgb(192,255,0)"
-                  />
-                </Tooltip>
-              )}
-              <Tooltip
-                title={tooltips.conditional}
-                classes={{ tooltip: classes.tooltipFont }}
-              >
-                <TrayItemWidget
-                  model={{
-                    type: 'conditional'
-                  }}
-                  name="Conditional Node"
-                  color="rgb(192,0,255)"
-                />
-              </Tooltip>
-            </TrayWidget>
+            <TrayWidget>{this.getTrayWidgetItems()}</TrayWidget>
             <div
               className="diagram-layer"
               onDrop={event => {

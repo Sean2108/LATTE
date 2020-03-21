@@ -55,7 +55,7 @@ describe('ParamList component', () => {
     textRows
       .at(0)
       .props()
-      .onChange({ currentTarget: { value: 'newstr' } });
+      .onChange({ target: { value: 'newstr' } });
     const newParams = [
       { type: 'string', name: 'str', displayName: 'str', value: 'newstr' },
       { type: 'uint', name: 'int', displayName: 'int', value: '42' },
@@ -69,7 +69,7 @@ describe('ParamList component', () => {
     textRows
       .at(1)
       .props()
-      .onChange({ currentTarget: { value: '1' } });
+      .onChange({ target: { value: '1' } });
     const newParams = [
       { type: 'string', name: 'str', displayName: 'str', value: 'teststr' },
       { type: 'uint', name: 'int', displayName: 'int', value: '1' },
@@ -80,7 +80,7 @@ describe('ParamList component', () => {
 
   it(' should result in correct function call when bool select value is changed', () => {
     const { selectRow, onchange } = setup();
-    selectRow.props().onChange({ currentTarget: { value: 'false' } });
+    selectRow.props().onChange({ target: { value: 'false' } });
     const newParams = [
       { type: 'string', name: 'str', displayName: 'str', value: 'teststr' },
       { type: 'uint', name: 'int', displayName: 'int', value: '42' },
