@@ -125,8 +125,9 @@ describe('BuildParser parse', () => {
   });
 
   it('should return empty code when only start node exists', () => {
+    const updateBuildError = jest.fn();
     const onVariableChange = jest.fn();
-    const buildParser = new BuildParser(onVariableChange);
+    const buildParser = new BuildParser(onVariableChange, updateBuildError);
     const startNode = new DefaultDataNodeModel('Start');
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     const code = buildParser.parse(startNode);
@@ -134,6 +135,7 @@ describe('BuildParser parse', () => {
     expect(mockNodeParserInstance.parseNode).not.toHaveBeenCalled();
     expect(onVariableChange).toHaveBeenCalledTimes(1);
     expect(code).toEqual({ code: '', variables: {} });
+    expect(updateBuildError).toHaveBeenCalledWith('');
   });
 
   it('should return correct code for diagram with 1 data node', () => {
@@ -446,8 +448,9 @@ ${INDENTATION}}
     );
   });
 
-  it('should use true while loop if true branch has a cycle', () => {
-    const buildParser = new BuildParser();
+  it('should use true while loop if true branch has a cycle and warn when there is an infinite loop', () => {
+    const updateBuildError = jest.fn();
+    const buildParser = new BuildParser(null, updateBuildError);
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     const compareNode = addNodeToDataNode(
       startNode,
@@ -463,7 +466,7 @@ ${INDENTATION}}
       { f1: 4 }
     );
     const t2Node = addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
-    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    addNodeToDataNode(targetFalseNode, 'f2', { f2: 6, type: 'assignment' });
     addLink(t2Node.addOutPort('t2'), compareNode.getPort('left'));
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
@@ -480,10 +483,13 @@ ${INDENTATION}}
         [{ t1: 3 }, INDENTATION.repeat(2)],
         [{ f1: 4 }, INDENTATION],
         [{ t2: 5 }, INDENTATION.repeat(2)],
-        [{ f2: 6 }, INDENTATION]
+        [{ f2: 6, type: 'assignment' }, INDENTATION]
       ],
       1,
       0
+    );
+    expect(updateBuildError).toHaveBeenCalledWith(
+      expect.stringContaining('Warning')
     );
     expect(code).toEqual(
       `${INDENTATION}while (c) {
@@ -496,8 +502,9 @@ ${INDENTATION}f2
     );
   });
 
-  it('should use false while loop if false branch has a cycle', () => {
-    const buildParser = new BuildParser();
+  it('should use false while loop if false branch has a cycle and not warn when there is no infinite loop', () => {
+    const updateBuildError = jest.fn();
+    const buildParser = new BuildParser(null, updateBuildError);
     const startNode = new DefaultDataNodeModel('Start', { start: 1 });
     const compareNode = addNodeToDataNode(
       startNode,
@@ -513,7 +520,10 @@ ${INDENTATION}f2
       { f1: 4 }
     );
     addNodeToDataNode(targetTrueNode, 't2', { t2: 5 });
-    const f2Node = addNodeToDataNode(targetFalseNode, 'f2', { f2: 6 });
+    const f2Node = addNodeToDataNode(targetFalseNode, 'f2', {
+      f2: 6,
+      type: 'assignment'
+    });
     addLink(f2Node.addOutPort('f2'), compareNode.getPort('left'));
     const mockNodeParserInstance = NodeParser.mock.instances[0];
     mockNodeParserInstance.parseNode
@@ -532,10 +542,13 @@ ${INDENTATION}f2
         [{ t1: 3 }, INDENTATION],
         [{ f1: 4 }, INDENTATION.repeat(2)],
         [{ t2: 5 }, INDENTATION],
-        [{ f2: 6 }, INDENTATION.repeat(2)]
+        [{ f2: 6, type: 'assignment' }, INDENTATION.repeat(2)]
       ],
       1,
       2
+    );
+    expect(updateBuildError).not.toHaveBeenCalledWith(
+      expect.stringContaining('Warning')
     );
     expect(code).toEqual(
       `${INDENTATION}while (!(c)) {

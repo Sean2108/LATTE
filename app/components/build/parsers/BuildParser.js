@@ -3,6 +3,7 @@ import NodeParser from './NodeParser';
 
 export default class BuildParser {
   constructor(onVariablesChange, updateBuildError = () => {}) {
+    this.updateBuildError = updateBuildError;
     this.nodeParser = new NodeParser(updateBuildError);
     this.reset({}, {});
     this.onVariablesChange = onVariablesChange;
@@ -27,8 +28,8 @@ export default class BuildParser {
       settings.bitsMode
     );
     this.indentation = settings.indentation;
-    if (this.nodeParser.updateBuildError) {
-      this.nodeParser.updateBuildError('');
+    if (this.updateBuildError) {
+      this.updateBuildError('');
     }
   }
 
@@ -48,7 +49,7 @@ export default class BuildParser {
       ...this.nodeParser.varList
     };
     this.onVariablesChange(variables);
-    return {code, variables};
+    return { code, variables };
   }
 
   findVariables(start) {
@@ -180,14 +181,23 @@ export default class BuildParser {
     };
     let node = this.getNextNode(outPort);
     let code = '';
+    let cycleHasAssignment = false;
     while (node) {
       if (node === start) {
+        if (this.updateBuildError && !cycleHasAssignment) {
+          this.updateBuildError(
+            'Warning - infinite loop detected! Loops should have at least 1 assignment node to update the terminating condition.'
+          );
+        }
         return code;
       }
       // unable to handle multiple diamond nodes in the same cycle
       if (node instanceof DiamondNodeModel) {
         this.nodeParser.memoryVarsDeclared = nodeParserMemoryVarsRollback;
         return null;
+      }
+      if (node.data.type === 'assignment') {
+        cycleHasAssignment = true;
       }
       code += `${this.nodeParser.parseNode(
         node.data,
@@ -201,10 +211,13 @@ export default class BuildParser {
 
   getNextNode(outPort) {
     const links = Object.values(outPort.getLinks());
-    if (!links.length) {
+    if (!links.length || !links[0].sourcePort || !links[0].targetPort) {
       return null;
     }
-    return links[0].targetPort.in ? links[0].targetPort.getNode() : links[0].sourcePort.getNode();
+
+    return links[0].targetPort.in
+      ? links[0].targetPort.getNode()
+      : links[0].sourcePort.getNode();
   }
 
   getNextNodeForDefaultNode(node) {
