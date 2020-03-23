@@ -31,7 +31,7 @@ export function extractStartNodes(
   engine: DiagramEngine,
   diagrams: Array<{}>
 ): Array<?DefaultDataNodeModel> {
-  return diagrams.map((diagram: {}): DefaultDataNodeModel => {
+  return diagrams.map((diagram: {}): ?DefaultDataNodeModel => {
     const diagramModel: DiagramModel = new DiagramModel();
     if (Object.entries(diagram).length > 0) {
       diagramModel.deSerializeDiagram(diagram, engine);
@@ -51,7 +51,7 @@ export function getNewStartNode() {
   return startNode;
 }
 
-export function findStart(model: DiagramModel): NodeModel {
+export function findStart(model: DiagramModel): ?NodeModel {
   for (const node: NodeModel of Object.values(model.getNodes())) {
     if (node.name === 'Start') {
       return node;

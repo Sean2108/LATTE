@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Popover from '@material-ui/core/Popover';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import { PopoverContainer } from '../../build_utils/ContainerUtils';
 
 const styles = theme => ({
   button: {
@@ -42,23 +42,9 @@ class BuildOptionsPopover extends React.Component {
       saveContract,
       DATA_OP
     } = this.props;
-    const open = Boolean(anchorEl);
 
     return (
-      <Popover
-        id="simple-popper"
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center'
-        }}
-      >
+      <PopoverContainer anchorEl={anchorEl} onClose={handleClose}>
         <div className={classes.optionspopover}>
           {dataOp === DATA_OP.SAVE_DATA || dataOp === DATA_OP.SAVE_CONTRACT ? (
             <TextField
@@ -112,7 +98,7 @@ class BuildOptionsPopover extends React.Component {
             Done
           </Button>
         </div>
-      </Popover>
+      </PopoverContainer>
     );
   }
 }

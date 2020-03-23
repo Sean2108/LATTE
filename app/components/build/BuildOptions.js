@@ -9,7 +9,7 @@ import { promisify } from 'util';
 import Tooltip from '@material-ui/core/Tooltip';
 import Web3Utils from './build_utils/Web3Utils';
 import CodeGenUtils from './build_utils/CodeGenUtils';
-import BuildOptionsPopover from './BuildOptionsPopover';
+import BuildOptionsPopover from './build_components/popovers/BuildOptionsPopover';
 import AsyncStatusButton from './build_components/AsyncStatusButton';
 import { objectEquals } from './build_utils/TypeCheckFormattingUtils';
 

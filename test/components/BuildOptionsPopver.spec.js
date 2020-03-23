@@ -4,7 +4,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import Select from '@material-ui/core/Select';
 import { createMount } from '@material-ui/core/test-utils';
 import { Popover, TextField, Button } from '@material-ui/core';
-import BuildOptionsPopover from '../../app/components/build/BuildOptionsPopover';
+import BuildOptionsPopover from '../../app/components/build/build_components/popovers/BuildOptionsPopover';
 
 Enzyme.configure({ adapter: new Adapter() });
 
