@@ -133,14 +133,30 @@ class Connect extends React.Component<Props, State> {
     });
   };
 
+  renderTextField(id, label, classes, submitted, errorText): React.Node {
+    const value: string = this.state[id];
+    return (
+      <TextField
+        id={id}
+        label={label}
+        className={classes.formControl}
+        onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+          this.setState({ [id]: event.currentTarget.value })
+        }
+        value={value}
+        margin="normal"
+        onKeyDown={this.handleKeyDown}
+        helperText={submitted && !value ? errorText : ''}
+      />
+    );
+  }
+
   render(): React.Node {
     const { classes } = this.props;
     const {
       connectionFailed,
       protocol,
-      address,
       submitted,
-      port,
       loading
     } = this.state;
 
@@ -181,41 +197,29 @@ class Connect extends React.Component<Props, State> {
             <Typography variant="title" noWrap>
               : //
             </Typography>
-            <TextField
-              id="address"
-              label="Blockchain Address"
-              className={classes.formControl}
-              onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
-                this.setState({ address: event.currentTarget.value })
-              }
-              value={address}
-              margin="normal"
-              onKeyDown={this.handleKeyDown}
-              helperText={
-                submitted && !address ? 'Address cannot be empty!' : ''
-              }
-            />
+            {this.renderTextField(
+              'address',
+              'Blockchain Address',
+              classes,
+              submitted,
+              'Address cannot be empty!'
+            )}
             <Typography variant="title" noWrap>
               :
             </Typography>
-            <TextField
-              id="port"
-              label="Blockchain Port"
-              className={classes.formControl}
-              onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
-                this.setState({ port: event.target.value })
-              }
-              value={port}
-              margin="normal"
-              onKeyDown={this.handleKeyDown}
-              helperText={submitted && !port ? 'Port cannot be empty!' : ''}
-            />
+            {this.renderTextField(
+              'port',
+              'Blockchain Port',
+              classes,
+              submitted,
+              'Port cannot be empty!'
+            )}
           </div>
           <br />
           <AsyncStatusButton
             success={!connectionFailed}
             loading={loading}
-            tooltipText='Connect to blockchain. The smart contract will be deployed to this address.'
+            tooltipText="Connect to blockchain. The smart contract will be deployed to this address."
             onClick={this.login}
           >
             Connect

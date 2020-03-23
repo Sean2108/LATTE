@@ -75,24 +75,28 @@ class ReturnNode extends React.Component<Props, State> {
     isMemory: this.props.bitsMode
   };
 
+  renderTextField(id: string, label: string, classes: Classes) {
+    return (<TextField
+      id={id}
+      label={label}
+      className={classes.textField}
+      multiline
+      rowsMax="3"
+      value={this.state[id]}
+      onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
+        this.setState({ [id]: event.currentTarget.value })
+      }
+      margin="dense"
+    />)
+  }
+
   render(): React.Node {
     const { classes, close, submit, bitsMode } = this.props;
 
     return (
       <FormControl className={classes.formControl}>
         <div>
-          <TextField
-            id="standard-name"
-            label="Variable Name"
-            className={classes.textField}
-            multiline
-            rowsMax="3"
-            value={this.state.variableSelected}
-            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
-              this.setState({ variableSelected: event.currentTarget.value })
-            }
-            margin="dense"
-          />
+          {this.renderTextField('variableSelected', 'Variable Name', classes)}
           <FormControl className={classes.innerFormControl}>
             <InputLabel htmlFor="assign">Assignment Type</InputLabel>
             <Select
@@ -112,18 +116,7 @@ class ReturnNode extends React.Component<Props, State> {
               <MenuItem value="/=">Divided by</MenuItem>
             </Select>
           </FormControl>
-          <TextField
-            id="standard-name"
-            label="Assigned Value"
-            multiline
-            rowsMax="3"
-            className={classes.textField}
-            onChange={(event: SyntheticInputEvent<HTMLInputElement>): void =>
-              this.setState({ assignedVal: event.currentTarget.value })
-            }
-            value={this.state.assignedVal}
-            margin="dense"
-          />
+          {this.renderTextField('assignedVal', 'Assigned Value', classes)}
         </div>
         <br />
         {bitsMode && (

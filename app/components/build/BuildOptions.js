@@ -22,6 +22,12 @@ const styles = theme => ({
   }
 });
 
+const DATA_OP = {
+  LOAD_DATA: 1,
+  SAVE_DATA: 2,
+  SAVE_CONTRACT: 3
+};
+
 class BuildOptions extends React.Component {
   state = {
     anchorEl: null,
@@ -117,6 +123,58 @@ class BuildOptions extends React.Component {
     return compileError;
   }
 
+  renderButtons(classes, onback) {
+    const buttonsInfo = [
+      {
+        tooltipText: 'Return to connect page',
+        color: 'primary',
+        text: 'Back',
+        variant: 'outlined',
+        onClick: onback
+      },
+      {
+        tooltipText: 'Load saved progress',
+        text: 'Load',
+        color: 'secondary',
+        variant: 'outlined',
+        onClick: event => this.handleClick(event, DATA_OP.LOAD_DATA)
+      },
+      {
+        tooltipText: 'Save saved progress',
+        text: 'Save',
+        color: 'secondary',
+        variant: 'outlined',
+        onClick: event => this.handleClick(event, DATA_OP.SAVE_DATA)
+      },
+      {
+        tooltipText: 'Generate and save smart contract code',
+        text: 'Generate Code',
+        color: 'primary',
+        variant: 'contained',
+        onClick: event => this.handleClick(event, DATA_OP.SAVE_CONTRACT)
+      }
+    ];
+
+    return buttonsInfo.map(
+      ({ tooltipText, variant, text, onClick, color }) => (
+        <Tooltip
+          title={tooltipText}
+          classes={{ tooltip: classes.tooltipFont }}
+          key={text}
+        >
+          <Button
+            variant={variant}
+            color={color}
+            className={classes.button}
+            onClick={onClick}
+          >
+            {text}
+          </Button>
+        </Tooltip>
+      )
+    );
+  }
+
   render() {
     const {
       classes,
@@ -127,12 +185,6 @@ class BuildOptions extends React.Component {
       loading
     } = this.props;
     const { anchorEl, dataOp, fileName, files, compileError } = this.state;
-
-    const DATA_OP = {
-      LOAD_DATA: 1,
-      SAVE_DATA: 2,
-      SAVE_CONTRACT: 3
-    };
 
     const showError =
       buildState.buildError || this.parseCompileError(compileError);
@@ -162,67 +214,7 @@ class BuildOptions extends React.Component {
           DATA_OP={DATA_OP}
         />
 
-        <Tooltip
-          title="Return to connect page"
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <Button
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={onback}
-          >
-            Back
-          </Button>
-        </Tooltip>
-
-        <Tooltip
-          title="Load saved progress"
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <Button
-            variant="outlined"
-            color="secondary"
-            className={classes.button}
-            onClick={event => {
-              this.handleClick(event, DATA_OP.LOAD_DATA);
-            }}
-          >
-            Load
-          </Button>
-        </Tooltip>
-
-        <Tooltip
-          title="Save current progress"
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <Button
-            variant="outlined"
-            color="secondary"
-            className={classes.button}
-            onClick={event => {
-              this.handleClick(event, DATA_OP.SAVE_DATA);
-            }}
-          >
-            Save
-          </Button>
-        </Tooltip>
-
-        <Tooltip
-          title="Generate and save smart contract code"
-          classes={{ tooltip: classes.tooltipFont }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={event => {
-              this.handleClick(event, DATA_OP.SAVE_CONTRACT);
-            }}
-          >
-            Generate Code
-          </Button>
-        </Tooltip>
+        {this.renderButtons(classes, onback)}
 
         <AsyncStatusButton
           loading={loading}
