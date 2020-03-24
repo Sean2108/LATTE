@@ -33,7 +33,8 @@ type Props = {
   onChangeRequire: (Array<RequireObj>) => void,
   requires: Array<RequireObj>,
   tooltipText: string,
-  entities: {}
+  entities: {},
+  updateBuildError: (string) => void
 };
 
 class RequiresList extends React.Component<Props> {
@@ -47,7 +48,8 @@ class RequiresList extends React.Component<Props> {
       onChangeRequire,
       requires,
       tooltipText,
-      entities
+      entities,
+      updateBuildError
     } = this.props;
 
     if (requires.length === 0) {
@@ -80,6 +82,7 @@ class RequiresList extends React.Component<Props> {
             }}
             variables={vars}
             structList={entities}
+            updateBuildError={updateBuildError}
           />
         ))}
         <Button

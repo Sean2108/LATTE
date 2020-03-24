@@ -1,4 +1,7 @@
-import { checkIntUintMismatch, bitsModeGetType } from '../build_utils/TypeCheckFormattingUtils';
+import {
+  checkIntUintMismatch,
+  bitsModeGetType
+} from '../build_utils/TypeCheckFormattingUtils';
 
 export default function parseVariable(
   rawVariable,
@@ -77,6 +80,11 @@ function parseStruct(variable, variables, structList, bitsMode) {
     const [struct, attr] = variable.split("'s ");
     const parsedStruct = parseVariable(struct, variables, structList, bitsMode);
     const parsedAttr = parseVariable(attr, variables, structList, bitsMode);
+    if (!(parsedStruct.type in structList)) {
+      throw new Error(
+        `${struct}'s type has not been defined, please do so in the Initial State tab under Entities.`
+      );
+    }
     for (const attribute of structList[parsedStruct.type]) {
       if (
         attribute.name === parsedAttr.name ||

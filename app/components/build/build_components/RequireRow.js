@@ -33,16 +33,37 @@ type Props = {
   updateRequire: RequireObj => void,
   variables?: VariablesLookupType,
   structList?: StructLookupType,
-  require: RequireObj
+  require: RequireObj,
+  updateBuildError?: string => void
 };
 
 class RequireRow extends React.Component<Props> {
   handleChange = (name: string) => (event: SyntheticInputEvent<>) => {
-    const { require, variables, structList, updateRequire } = this.props;
+    const {
+      require,
+      variables,
+      structList,
+      updateRequire,
+      updateBuildError
+    } = this.props;
     const state: RequireObj = { ...require, [name]: event.target.value };
     if (variables && structList) {
-      state.var1 = parseVariable(state.displayVar1, variables, structList).name;
-      state.var2 = parseVariable(state.displayVar2, variables, structList).name;
+      try {
+        state.var1 = parseVariable(
+          state.displayVar1,
+          variables,
+          structList
+        ).name;
+        state.var2 = parseVariable(
+          state.displayVar2,
+          variables,
+          structList
+        ).name;
+      } catch (err) {
+        updateBuildError && updateBuildError(err.message); // eslint-disable-line no-unused-expressions
+        state.var1 = state.displayVar1;
+        state.var2 = state.displayVar2;
+      }
     }
     updateRequire(state);
   };

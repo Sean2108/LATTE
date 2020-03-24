@@ -129,7 +129,7 @@ describe('VariableParser parseVariable function', () => {
     });
   });
 
-  it('parseStruct should return null type when type is not in structList', () => {
+  it('parseStruct should return null type when attribute is not in struct', () => {
     expect(
       parseVariable(
         "a's c",
@@ -141,6 +141,17 @@ describe('VariableParser parseVariable function', () => {
       name: 'a.c',
       type: null
     });
+  });
+
+  it('parseStruct should throw when type is not in structList', () => {
+    expect(() =>
+      parseVariable(
+        "a's c",
+        {},
+        { A: [{ name: 'b', type: 'int', bits: 8 }] },
+        true
+      )
+    ).toThrow();
   });
 
   it('parseMap should work without innerKey', () => {
